@@ -1,0 +1,176 @@
+/* Swift Theme — Desk (backend UI)
+   Tightens spacing, rounds corners, and adds a modern navbar/sidebar look. */
+
+html[data-swift-scheme] {
+  background: var(--swift-bg);
+}
+
+html[data-swift-scheme] body,
+html[data-swift-scheme] .desk-body {
+  background: var(--swift-bg);
+  color: var(--swift-text);
+}
+
+/* Navbar */
+html[data-swift-scheme] .navbar {
+  background: var(--swift-surface) !important;
+  border-bottom: 1px solid var(--swift-border);
+  box-shadow: var(--swift-shadow-sm);
+  height: 52px;
+  padding: 0 16px;
+}
+html[data-swift-scheme] .navbar .navbar-brand,
+html[data-swift-scheme] .navbar .nav-link {
+  color: var(--swift-text) !important;
+  font-weight: 500;
+}
+html[data-swift-scheme] .navbar .navbar-brand:hover,
+html[data-swift-scheme] .navbar .nav-link:hover {
+  color: var(--swift-primary) !important;
+}
+
+/* Sidebar */
+html[data-swift-scheme] .layout-side-section {
+  background: var(--swift-surface);
+  border-right: 1px solid var(--swift-border);
+}
+html[data-swift-scheme] .sidebar-item {
+  border-radius: var(--swift-radius-sm);
+  padding: 6px 10px;
+  margin: 2px 6px;
+  color: var(--swift-text-muted);
+  transition: background var(--swift-transition), color var(--swift-transition);
+}
+html[data-swift-scheme] .sidebar-item:hover {
+  background: var(--swift-surface-2);
+  color: var(--swift-text);
+}
+html[data-swift-scheme] .sidebar-item.selected {
+  background: color-mix(in oklab, var(--swift-primary) 12%, transparent);
+  color: var(--swift-primary);
+}
+
+/* Cards / forms */
+html[data-swift-scheme] .form-section,
+html[data-swift-scheme] .layout-main-section,
+html[data-swift-scheme] .frappe-card {
+  background: var(--swift-surface);
+  border: 1px solid var(--swift-border);
+  border-radius: var(--swift-radius);
+  box-shadow: var(--swift-shadow-sm);
+}
+html[data-swift-scheme] .form-control {
+  border-radius: var(--swift-radius-sm);
+  border-color: var(--swift-border);
+  background: var(--swift-surface);
+  color: var(--swift-text);
+}
+html[data-swift-scheme] .form-control:focus {
+  border-color: var(--swift-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--swift-primary) 22%, transparent);
+}
+
+/* Buttons */
+html[data-swift-scheme] .btn {
+  border-radius: var(--swift-radius-sm);
+  font-weight: 500;
+}
+html[data-swift-scheme] .btn-primary {
+  background: var(--swift-primary);
+  border-color: var(--swift-primary);
+  color: #fff;
+}
+html[data-swift-scheme] .btn-primary:hover {
+  background: var(--swift-primary-hover);
+  border-color: var(--swift-primary-hover);
+}
+
+/* Page head */
+html[data-swift-scheme] .page-head {
+  background: var(--swift-surface);
+  border-bottom: 1px solid var(--swift-border);
+}
+html[data-swift-scheme] .page-title h1 {
+  color: var(--swift-text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Lists / tables */
+html[data-swift-scheme] .list-row,
+html[data-swift-scheme] .list-row-container {
+  border-bottom: 1px solid var(--swift-border);
+  background: var(--swift-surface);
+}
+html[data-swift-scheme] .list-row:hover {
+  background: var(--swift-surface-2);
+}
+html[data-swift-scheme] table.table th,
+html[data-swift-scheme] table.table td {
+  border-color: var(--swift-border);
+}
+
+/* Modals */
+html[data-swift-scheme] .modal-content {
+  background: var(--swift-surface);
+  border: 1px solid var(--swift-border);
+  border-radius: var(--swift-radius-lg);
+  box-shadow: var(--swift-shadow-lg);
+}
+
+/* Sidebar collapsed compact mode */
+html[data-swift-sidebar="collapsed"] .layout-side-section {
+  max-width: 56px;
+  overflow: hidden;
+}
+html[data-swift-sidebar="collapsed"] .layout-side-section .sidebar-label,
+html[data-swift-sidebar="collapsed"] .layout-side-section .standard-sidebar-section-title {
+  display: none;
+}
+
+/* Theme switcher chip in navbar */
+.swift-theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--swift-border);
+  border-radius: 999px;
+  background: var(--swift-surface-2);
+  color: var(--swift-text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all var(--swift-transition);
+}
+.swift-theme-switcher:hover { border-color: var(--swift-primary); color: var(--swift-primary); }
+.swift-theme-switcher .swift-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--swift-primary);
+  box-shadow: 0 0 0 2px var(--swift-surface);
+}
+
+/* Palette popover */
+.swift-palette {
+  position: fixed;
+  z-index: 2000;
+  min-width: 240px;
+  background: var(--swift-surface);
+  border: 1px solid var(--swift-border);
+  border-radius: var(--swift-radius);
+  box-shadow: var(--swift-shadow-lg);
+  padding: 8px;
+}
+.swift-palette-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--swift-radius-sm);
+  cursor: pointer;
+  color: var(--swift-text);
+}
+.swift-palette-item:hover { background: var(--swift-surface-2); }
+.swift-palette-item .swatch {
+  width: 18px; height: 18px; border-radius: 6px;
+  border: 1px solid var(--swift-border);
+}
+.swift-palette-item.active { outline: 2px solid var(--swift-primary); outline-offset: -2px; }

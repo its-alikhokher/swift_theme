@@ -1,0 +1,169 @@
+/* Swift Theme — Core
+   Maps our theme tokens to Frappe/ERPNext v16 CSS variables so every widget
+   updates automatically when data-swift-scheme changes on <html>. */
+
+:root {
+  /* Public tokens (used by all schemes) */
+  --swift-radius: 10px;
+  --swift-radius-sm: 6px;
+  --swift-radius-lg: 14px;
+  --swift-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --swift-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --swift-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+  --swift-transition: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ---------- Scheme: Swift Light (default) ---------- */
+html[data-swift-scheme="swift-light"] {
+  --swift-bg:        #f7f8fb;
+  --swift-surface:   #ffffff;
+  --swift-surface-2: #f1f3f9;
+  --swift-border:    #e4e7ee;
+  --swift-text:      #1c2431;
+  --swift-text-muted:#5a6478;
+  --swift-primary:   #4f46e5;
+  --swift-primary-hover:#4338ca;
+  --swift-accent:    #14b8a6;
+  --swift-danger:    #ef4444;
+  --swift-success:   #16a34a;
+  --swift-warning:   #f59e0b;
+}
+
+/* ---------- Scheme: Swift Dark ---------- */
+html[data-swift-scheme="swift-dark"] {
+  color-scheme: dark;
+  --swift-bg:        #0f1115;
+  --swift-surface:   #171a21;
+  --swift-surface-2: #1f232c;
+  --swift-border:    #2a2f3a;
+  --swift-text:      #e6e9f0;
+  --swift-text-muted:#9099ac;
+  --swift-primary:   #7c7cff;
+  --swift-primary-hover:#6363f0;
+  --swift-accent:    #22d3ee;
+  --swift-danger:    #f87171;
+  --swift-success:   #4ade80;
+  --swift-warning:   #fbbf24;
+}
+
+/* ---------- Scheme: Ocean Blue ---------- */
+html[data-swift-scheme="ocean-blue"] {
+  --swift-bg:        #eef4fb;
+  --swift-surface:   #ffffff;
+  --swift-surface-2: #dbe7f4;
+  --swift-border:    #c3d3e6;
+  --swift-text:      #0b2540;
+  --swift-text-muted:#456079;
+  --swift-primary:   #0369a1;
+  --swift-primary-hover:#075985;
+  --swift-accent:    #0891b2;
+  --swift-danger:    #dc2626;
+  --swift-success:   #059669;
+  --swift-warning:   #d97706;
+}
+
+/* ---------- Scheme: Nord (dark) ---------- */
+html[data-swift-scheme="nord"] {
+  color-scheme: dark;
+  --swift-bg:        #2e3440;
+  --swift-surface:   #3b4252;
+  --swift-surface-2: #434c5e;
+  --swift-border:    #4c566a;
+  --swift-text:      #eceff4;
+  --swift-text-muted:#d8dee9;
+  --swift-primary:   #88c0d0;
+  --swift-primary-hover:#8fbcbb;
+  --swift-accent:    #a3be8c;
+  --swift-danger:    #bf616a;
+  --swift-success:   #a3be8c;
+  --swift-warning:   #ebcb8b;
+}
+
+/* ---------- Scheme: Dracula (dark) ---------- */
+html[data-swift-scheme="dracula"] {
+  color-scheme: dark;
+  --swift-bg:        #282a36;
+  --swift-surface:   #313442;
+  --swift-surface-2: #44475a;
+  --swift-border:    #4b4f66;
+  --swift-text:      #f8f8f2;
+  --swift-text-muted:#bfbfd3;
+  --swift-primary:   #bd93f9;
+  --swift-primary-hover:#a97ff0;
+  --swift-accent:    #8be9fd;
+  --swift-danger:    #ff5555;
+  --swift-success:   #50fa7b;
+  --swift-warning:   #f1fa8c;
+}
+
+/* ---------- Scheme: Solarized ---------- */
+html[data-swift-scheme="solarized"] {
+  --swift-bg:        #fdf6e3;
+  --swift-surface:   #fffbef;
+  --swift-surface-2: #eee8d5;
+  --swift-border:    #d9d2b8;
+  --swift-text:      #073642;
+  --swift-text-muted:#657b83;
+  --swift-primary:   #268bd2;
+  --swift-primary-hover:#1e6fa9;
+  --swift-accent:    #2aa198;
+  --swift-danger:    #dc322f;
+  --swift-success:   #859900;
+  --swift-warning:   #b58900;
+}
+
+/* ---------- Scheme: Forest ---------- */
+html[data-swift-scheme="forest"] {
+  --swift-bg:        #f2f6f1;
+  --swift-surface:   #ffffff;
+  --swift-surface-2: #e2ecdf;
+  --swift-border:    #c7d5c1;
+  --swift-text:      #14311f;
+  --swift-text-muted:#4b6650;
+  --swift-primary:   #2f7d3a;
+  --swift-primary-hover:#256630;
+  --swift-accent:    #b45309;
+  --swift-danger:    #b91c1c;
+  --swift-success:   #15803d;
+  --swift-warning:   #ca8a04;
+}
+
+/* ---------- Bridge to Frappe v16 variables ----------
+   Frappe uses --bg-color, --card-bg, --text-color, --border-color, --primary,
+   etc. We remap them so every existing widget adopts the scheme. */
+html[data-swift-scheme] {
+  --bg-color:           var(--swift-bg);
+  --fg-color:           var(--swift-surface);
+  --card-bg:            var(--swift-surface);
+  --subtle-fg:          var(--swift-surface-2);
+  --subtle-accent:      var(--swift-surface-2);
+  --control-bg:         var(--swift-surface);
+  --control-bg-on-gray: var(--swift-surface-2);
+  --border-color:       var(--swift-border);
+  --dark-border-color:  var(--swift-border);
+  --text-color:         var(--swift-text);
+  --text-muted:         var(--swift-text-muted);
+  --heading-color:      var(--swift-text);
+  --primary:            var(--swift-primary);
+  --primary-color:      var(--swift-primary);
+  --btn-primary:        var(--swift-primary);
+  --btn-primary-hover:  var(--swift-primary-hover);
+  --red-500:            var(--swift-danger);
+  --green-500:          var(--swift-success);
+  --yellow-500:         var(--swift-warning);
+  --sidebar-bg:         var(--swift-surface);
+  --navbar-bg:          var(--swift-surface);
+}
+
+/* Global smoothing of theme transitions */
+html[data-swift-scheme] body,
+html[data-swift-scheme] .navbar,
+html[data-swift-scheme] .layout-side-section,
+html[data-swift-scheme] .page-head,
+html[data-swift-scheme] .form-control,
+html[data-swift-scheme] .btn {
+  transition:
+    background-color var(--swift-transition),
+    color var(--swift-transition),
+    border-color var(--swift-transition);
+}

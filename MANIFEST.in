@@ -1,0 +1,20 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include swift_theme *.css
+recursive-include swift_theme *.csv
+recursive-include swift_theme *.html
+recursive-include swift_theme *.ico
+recursive-include swift_theme *.js
+recursive-include swift_theme *.json
+recursive-include swift_theme *.md
+recursive-include swift_theme *.png
+recursive-include swift_theme *.py
+recursive-include swift_theme *.svg
+recursive-include swift_theme *.txt
+recursive-include swift_theme *.woff
+recursive-include swift_theme *.woff2
+recursive-exclude swift_theme *.pyc

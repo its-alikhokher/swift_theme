@@ -1,0 +1,90 @@
+/* Swift Theme — Public website & customer portal */
+
+html[data-swift-scheme] body.website {
+  background: var(--swift-bg);
+  color: var(--swift-text);
+}
+
+/* Website navbar */
+html[data-swift-scheme] .website-navbar,
+html[data-swift-scheme] nav.navbar {
+  background: var(--swift-surface);
+  border-bottom: 1px solid var(--swift-border);
+  box-shadow: var(--swift-shadow-sm);
+}
+
+/* Hero / page content */
+html[data-swift-scheme] .page_content h1,
+html[data-swift-scheme] .page_content h2,
+html[data-swift-scheme] .page_content h3 {
+  color: var(--swift-text);
+  letter-spacing: -0.01em;
+}
+
+/* Buttons */
+html[data-swift-scheme] .btn.btn-primary-light,
+html[data-swift-scheme] .btn.btn-primary {
+  background: var(--swift-primary);
+  color: #fff;
+  border-radius: var(--swift-radius-sm);
+  font-weight: 500;
+}
+
+/* Cards on portal */
+html[data-swift-scheme] .card {
+  background: var(--swift-surface);
+  border: 1px solid var(--swift-border);
+  border-radius: var(--swift-radius);
+  box-shadow: var(--swift-shadow-sm);
+}
+
+/* Login page */
+html[data-swift-scheme] body#page-login,
+html[data-swift-scheme] body[data-path="login"] {
+  background:
+    radial-gradient(1000px 500px at 10% -10%, color-mix(in oklab, var(--swift-primary) 20%, transparent), transparent 60%),
+    radial-gradient(800px 400px at 100% 100%, color-mix(in oklab, var(--swift-accent) 18%, transparent), transparent 60%),
+    var(--swift-bg);
+  min-height: 100vh;
+}
+
+html[data-swift-scheme] .for-login,
+html[data-swift-scheme] .for-signup,
+html[data-swift-scheme] .for-forgot,
+html[data-swift-scheme] .login-content {
+  background: var(--swift-surface);
+  border: 1px solid var(--swift-border);
+  border-radius: var(--swift-radius-lg);
+  box-shadow: var(--swift-shadow-lg);
+  padding: 32px !important;
+  max-width: 420px;
+  margin: 6vh auto !important;
+}
+
+html[data-swift-scheme] .for-login .page-card-head h4,
+html[data-swift-scheme] .login-content h4 {
+  color: var(--swift-text);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Splash / loading */
+.swift-splash {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--swift-bg);
+  z-index: 9999;
+  transition: opacity 300ms ease;
+}
+.swift-splash.hide { opacity: 0; pointer-events: none; }
+.swift-splash .swift-splash-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.swift-splash .swift-spinner {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 3px solid var(--swift-border);
+  border-top-color: var(--swift-primary);
+  animation: swift-spin 700ms linear infinite;
+}
+@keyframes swift-spin { to { transform: rotate(360deg); } }

@@ -1,0 +1,115 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-01-01 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_general",
+  "default_scheme",
+  "font_family",
+  "column_break_1",
+  "enable_theme_switcher",
+  "enable_perf_mode",
+  "section_perf",
+  "sidebar_collapsed_default",
+  "reduce_animations",
+  "column_break_2",
+  "preload_fonts",
+  "lazy_load_images"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_general",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "fieldname": "default_scheme",
+   "fieldtype": "Select",
+   "label": "Default Color Scheme",
+   "options": "swift-light\nswift-dark\nocean-blue\nnord\ndracula\nsolarized\nforest",
+   "default": "swift-light",
+   "reqd": 1
+  },
+  {
+   "fieldname": "font_family",
+   "fieldtype": "Select",
+   "label": "Font Family",
+   "options": "Inter\nPoppins\nRoboto\nManrope\nSystem",
+   "default": "Inter"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enable_theme_switcher",
+   "fieldtype": "Check",
+   "label": "Show Theme Switcher in Navbar",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_perf_mode",
+   "fieldtype": "Check",
+   "label": "Enable Performance Mode",
+   "default": "1"
+  },
+  {
+   "fieldname": "section_perf",
+   "fieldtype": "Section Break",
+   "label": "Performance"
+  },
+  {
+   "fieldname": "sidebar_collapsed_default",
+   "fieldtype": "Check",
+   "label": "Sidebar Collapsed by Default",
+   "default": "0"
+  },
+  {
+   "fieldname": "reduce_animations",
+   "fieldtype": "Check",
+   "label": "Reduce Animations",
+   "default": "0"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "preload_fonts",
+   "fieldtype": "Check",
+   "label": "Preload Fonts",
+   "default": "1"
+  },
+  {
+   "fieldname": "lazy_load_images",
+   "fieldtype": "Check",
+   "label": "Lazy Load Images",
+   "default": "1"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-01-01 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Swift Theme",
+ "name": "Swift Theme Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
