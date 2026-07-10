@@ -1,0 +1,191 @@
+/* Swift Theme — Accents
+   Each accent defines: --swift-accent, --swift-accent-hover, --swift-accent-fg (on-color),
+   --swift-accent-soft (tinted bg). Uses Frappe's data-theme so the same accent
+   picks appropriate shades in Light vs Dark. */
+
+/* ---------------- Indigo ---------------- */
+html[data-swift-accent="indigo"] {
+  --swift-accent: #4f46e5;
+  --swift-accent-hover: #4338ca;
+  --swift-accent-fg: #ffffff;
+  --swift-accent-soft: rgba(79, 70, 229, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="indigo"] {
+  --swift-accent: #818cf8;
+  --swift-accent-hover: #6366f1;
+  --swift-accent-fg: #0b1020;
+  --swift-accent-soft: rgba(129, 140, 248, 0.18);
+}
+
+/* ---------------- Violet ---------------- */
+html[data-swift-accent="violet"] {
+  --swift-accent: #7c3aed;
+  --swift-accent-hover: #6d28d9;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(124, 58, 237, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="violet"] {
+  --swift-accent: #a78bfa;
+  --swift-accent-hover: #8b5cf6;
+  --swift-accent-fg: #1a0f2e;
+  --swift-accent-soft: rgba(167, 139, 250, 0.18);
+}
+
+/* ---------------- Blue ---------------- */
+html[data-swift-accent="blue"] {
+  --swift-accent: #2563eb;
+  --swift-accent-hover: #1d4ed8;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(37, 99, 235, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="blue"] {
+  --swift-accent: #60a5fa;
+  --swift-accent-hover: #3b82f6;
+  --swift-accent-fg: #0b1226;
+  --swift-accent-soft: rgba(96, 165, 250, 0.18);
+}
+
+/* ---------------- Sky ---------------- */
+html[data-swift-accent="sky"] {
+  --swift-accent: #0284c7;
+  --swift-accent-hover: #0369a1;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(2, 132, 199, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="sky"] {
+  --swift-accent: #38bdf8;
+  --swift-accent-hover: #0ea5e9;
+  --swift-accent-fg: #051726;
+  --swift-accent-soft: rgba(56, 189, 248, 0.18);
+}
+
+/* ---------------- Teal ---------------- */
+html[data-swift-accent="teal"] {
+  --swift-accent: #0d9488;
+  --swift-accent-hover: #0f766e;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(13, 148, 136, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="teal"] {
+  --swift-accent: #2dd4bf;
+  --swift-accent-hover: #14b8a6;
+  --swift-accent-fg: #05201d;
+  --swift-accent-soft: rgba(45, 212, 191, 0.18);
+}
+
+/* ---------------- Emerald ---------------- */
+html[data-swift-accent="emerald"] {
+  --swift-accent: #059669;
+  --swift-accent-hover: #047857;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(5, 150, 105, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="emerald"] {
+  --swift-accent: #34d399;
+  --swift-accent-hover: #10b981;
+  --swift-accent-fg: #052015;
+  --swift-accent-soft: rgba(52, 211, 153, 0.18);
+}
+
+/* ---------------- Amber ---------------- */
+html[data-swift-accent="amber"] {
+  --swift-accent: #d97706;
+  --swift-accent-hover: #b45309;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(217, 119, 6, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="amber"] {
+  --swift-accent: #fbbf24;
+  --swift-accent-hover: #f59e0b;
+  --swift-accent-fg: #201404;
+  --swift-accent-soft: rgba(251, 191, 36, 0.18);
+}
+
+/* ---------------- Rose ---------------- */
+html[data-swift-accent="rose"] {
+  --swift-accent: #e11d48;
+  --swift-accent-hover: #be123c;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(225, 29, 72, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="rose"] {
+  --swift-accent: #fb7185;
+  --swift-accent-hover: #f43f5e;
+  --swift-accent-fg: #260810;
+  --swift-accent-soft: rgba(251, 113, 133, 0.18);
+}
+
+/* ---------------- Pink ---------------- */
+html[data-swift-accent="pink"] {
+  --swift-accent: #db2777;
+  --swift-accent-hover: #be185d;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(219, 39, 119, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="pink"] {
+  --swift-accent: #f472b6;
+  --swift-accent-hover: #ec4899;
+  --swift-accent-fg: #260517;
+  --swift-accent-soft: rgba(244, 114, 182, 0.18);
+}
+
+/* ---------------- Slate (neutral) ---------------- */
+html[data-swift-accent="slate"] {
+  --swift-accent: #475569;
+  --swift-accent-hover: #334155;
+  --swift-accent-fg: #fff;
+  --swift-accent-soft: rgba(71, 85, 105, 0.12);
+}
+html[data-theme="dark"][data-swift-accent="slate"] {
+  --swift-accent: #94a3b8;
+  --swift-accent-hover: #64748b;
+  --swift-accent-fg: #0b1220;
+  --swift-accent-soft: rgba(148, 163, 184, 0.18);
+}
+
+/* ---------- Hex override (from Settings) ----------
+   When brand_hex_override is set, JS writes --swift-accent inline on <html>.
+   Same variable name -> automatically wins. */
+
+/* ---------- Bridge to Frappe v16 primary tokens ---------- */
+html[data-swift-accent] {
+  --primary:            var(--swift-accent);
+  --primary-color:      var(--swift-accent);
+  --btn-primary:        var(--swift-accent);
+  --btn-primary-hover:  var(--swift-accent-hover);
+  --focus-default:      var(--swift-accent);
+}
+
+/* Primary button */
+html[data-swift-accent] .btn-primary {
+  background: var(--swift-accent) !important;
+  border-color: var(--swift-accent) !important;
+  color: var(--swift-accent-fg) !important;
+}
+html[data-swift-accent] .btn-primary:hover {
+  background: var(--swift-accent-hover) !important;
+  border-color: var(--swift-accent-hover) !important;
+}
+
+/* Focus rings */
+html[data-swift-accent] .form-control:focus,
+html[data-swift-accent] input.input-with-feedback:focus,
+html[data-swift-accent] textarea.form-control:focus {
+  border-color: var(--swift-accent) !important;
+  box-shadow: 0 0 0 3px var(--swift-accent-soft) !important;
+}
+
+/* Links */
+html[data-swift-accent] a { color: var(--swift-accent); }
+html[data-swift-accent] a:hover { color: var(--swift-accent-hover); }
+
+/* Selected sidebar item */
+html[data-swift-accent] .sidebar-item.selected {
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
+}
+
+/* Checkbox / radio */
+html[data-swift-accent] .frappe-control[data-fieldtype="Check"] input[type="checkbox"]:checked {
+  accent-color: var(--swift-accent);
+}

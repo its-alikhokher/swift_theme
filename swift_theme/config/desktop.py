@@ -8,8 +8,8 @@ def get_data():
             "category": "Modules",
             "label": _("Swift Theme"),
             "color": "#7c7cff",
-            "icon": "octicon octicon-color-mode",
+            "icon": "octicon octicon-paintbrush",
             "type": "module",
-            "description": "Fast, multi-scheme Frappe theme (Desk, Portal, Login).",
+            "description": "Fast, deeply themable layer for Frappe v16.",
         }
     ]

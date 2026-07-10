@@ -1,0 +1,27 @@
+/* Swift Theme — Toasts & alerts (opt-in via data-swift-toast="on") */
+
+html[data-swift-toast="on"] .desk-alert,
+html[data-swift-toast="on"] .frappe-toast-message {
+  border-radius: var(--swift-radius) !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  box-shadow: var(--swift-shadow-md) !important;
+}
+
+html[data-swift-toast="on"] .desk-alert.green,
+html[data-swift-toast="on"] .desk-alert.success {
+  border-left: 3px solid #16a34a !important;
+}
+html[data-swift-toast="on"] .desk-alert.red,
+html[data-swift-toast="on"] .desk-alert.error {
+  border-left: 3px solid #ef4444 !important;
+}
+html[data-swift-toast="on"] .desk-alert.orange,
+html[data-swift-toast="on"] .desk-alert.warning {
+  border-left: 3px solid #f59e0b !important;
+}
+html[data-swift-toast="on"] .desk-alert.blue,
+html[data-swift-toast="on"] .desk-alert.info {
+  border-left: 3px solid var(--swift-accent) !important;
+}

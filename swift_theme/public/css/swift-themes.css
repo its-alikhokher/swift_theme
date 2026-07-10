@@ -1,0 +1,150 @@
+/* Swift Theme — Full Themes
+   These override the Frappe surface tokens (bg, card, text, border) with a
+   complete palette. Use them when you want a distinct look regardless of
+   Frappe's Light/Dark mode.
+
+   Each theme also sets its own accent — but if the user picks an accent
+   separately, the accent wins (accents.css is loaded before this file uses
+   !important only on background tokens, not on accent tokens). */
+
+/* ---------- Dracula ---------- */
+html[data-swift-theme="dracula"] {
+  color-scheme: dark;
+  --bg-color:      #282a36;
+  --fg-color:      #313442;
+  --card-bg:       #313442;
+  --subtle-fg:     #44475a;
+  --subtle-accent: #44475a;
+  --control-bg:    #313442;
+  --control-bg-on-gray: #44475a;
+  --border-color:  #4b4f66;
+  --text-color:    #f8f8f2;
+  --text-muted:    #bfbfd3;
+  --heading-color: #f8f8f2;
+  --sidebar-bg:    #21222c;
+  --navbar-bg:     #21222c;
+
+  --swift-accent:       #bd93f9;
+  --swift-accent-hover: #a97ff0;
+  --swift-accent-fg:    #1e1b2e;
+  --swift-accent-soft:  rgba(189, 147, 249, 0.18);
+}
+
+/* ---------- Nord ---------- */
+html[data-swift-theme="nord"] {
+  color-scheme: dark;
+  --bg-color:      #2e3440;
+  --fg-color:      #3b4252;
+  --card-bg:       #3b4252;
+  --subtle-fg:     #434c5e;
+  --subtle-accent: #434c5e;
+  --control-bg:    #3b4252;
+  --control-bg-on-gray: #434c5e;
+  --border-color:  #4c566a;
+  --text-color:    #eceff4;
+  --text-muted:    #d8dee9;
+  --heading-color: #eceff4;
+  --sidebar-bg:    #242933;
+  --navbar-bg:     #242933;
+
+  --swift-accent:       #88c0d0;
+  --swift-accent-hover: #8fbcbb;
+  --swift-accent-fg:    #1c2028;
+  --swift-accent-soft:  rgba(136, 192, 208, 0.18);
+}
+
+/* ---------- Solarized Light ---------- */
+html[data-swift-theme="solarized-light"] {
+  color-scheme: light;
+  --bg-color:      #fdf6e3;
+  --fg-color:      #fffbef;
+  --card-bg:       #fffbef;
+  --subtle-fg:     #eee8d5;
+  --subtle-accent: #eee8d5;
+  --control-bg:    #fffbef;
+  --control-bg-on-gray: #eee8d5;
+  --border-color:  #d9d2b8;
+  --text-color:    #073642;
+  --text-muted:    #657b83;
+  --heading-color: #073642;
+
+  --swift-accent:       #268bd2;
+  --swift-accent-hover: #1e6fa9;
+  --swift-accent-fg:    #fff;
+  --swift-accent-soft:  rgba(38, 139, 210, 0.15);
+}
+
+/* ---------- Solarized Dark ---------- */
+html[data-swift-theme="solarized-dark"] {
+  color-scheme: dark;
+  --bg-color:      #002b36;
+  --fg-color:      #073642;
+  --card-bg:       #073642;
+  --subtle-fg:     #0a4351;
+  --subtle-accent: #0a4351;
+  --control-bg:    #073642;
+  --control-bg-on-gray: #0a4351;
+  --border-color:  #135361;
+  --text-color:    #eee8d5;
+  --text-muted:    #93a1a1;
+  --heading-color: #eee8d5;
+  --sidebar-bg:    #002028;
+  --navbar-bg:     #002028;
+
+  --swift-accent:       #b58900;
+  --swift-accent-hover: #a07a00;
+  --swift-accent-fg:    #001318;
+  --swift-accent-soft:  rgba(181, 137, 0, 0.2);
+}
+
+/* ---------- Gruvbox Dark ---------- */
+html[data-swift-theme="gruvbox-dark"] {
+  color-scheme: dark;
+  --bg-color:      #282828;
+  --fg-color:      #32302f;
+  --card-bg:       #32302f;
+  --subtle-fg:     #3c3836;
+  --subtle-accent: #3c3836;
+  --control-bg:    #32302f;
+  --control-bg-on-gray: #3c3836;
+  --border-color:  #504945;
+  --text-color:    #ebdbb2;
+  --text-muted:    #a89984;
+  --heading-color: #fbf1c7;
+  --sidebar-bg:    #1d2021;
+  --navbar-bg:     #1d2021;
+
+  --swift-accent:       #fabd2f;
+  --swift-accent-hover: #d79921;
+  --swift-accent-fg:    #1d2021;
+  --swift-accent-soft:  rgba(250, 189, 47, 0.18);
+}
+
+/* ---------- Gruvbox Light ---------- */
+html[data-swift-theme="gruvbox-light"] {
+  color-scheme: light;
+  --bg-color:      #fbf1c7;
+  --fg-color:      #f9f5d7;
+  --card-bg:       #f9f5d7;
+  --subtle-fg:     #ebdbb2;
+  --subtle-accent: #ebdbb2;
+  --control-bg:    #f9f5d7;
+  --control-bg-on-gray: #ebdbb2;
+  --border-color:  #d5c4a1;
+  --text-color:    #3c3836;
+  --text-muted:    #7c6f64;
+  --heading-color: #282828;
+
+  --swift-accent:       #076678;
+  --swift-accent-hover: #045463;
+  --swift-accent-fg:    #fff;
+  --swift-accent-soft:  rgba(7, 102, 120, 0.15);
+}
+
+/* When a full theme is on, force our accent onto Frappe primary */
+html[data-swift-theme]:not([data-swift-theme=""]) {
+  --primary:            var(--swift-accent);
+  --primary-color:      var(--swift-accent);
+  --btn-primary:        var(--swift-accent);
+  --btn-primary-hover:  var(--swift-accent-hover);
+}

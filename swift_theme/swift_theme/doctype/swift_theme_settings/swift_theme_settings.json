@@ -1,94 +1,78 @@
 {
  "actions": [],
- "allow_rename": 0,
  "creation": "2026-01-01 00:00:00",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_general",
-  "default_scheme",
-  "font_family",
-  "column_break_1",
-  "enable_theme_switcher",
-  "enable_perf_mode",
-  "section_perf",
-  "sidebar_collapsed_default",
-  "reduce_animations",
-  "column_break_2",
-  "preload_fonts",
-  "lazy_load_images"
+  "sb_defaults", "default_accent", "default_theme", "cb_defaults", "default_font_family", "default_font_scale",
+  "sb_layout", "default_density", "default_radius", "cb_layout", "navbar_variant", "sidebar_variant",
+  "sb_features", "enable_switcher", "enable_command_palette", "enable_focus_mode", "cb_features", "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
+  "sb_brand", "brand_logo", "brand_logo_dark", "brand_name", "cb_brand", "brand_favicon", "brand_hex_override",
+  "sb_login", "login_layout", "login_bg_image", "cb_login", "login_tagline", "login_show_signup",
+  "sb_auto", "enable_auto_dark", "auto_dark_start", "cb_auto", "auto_dark_end",
+  "sb_print", "enable_print_theming", "print_font_family",
+  "sb_custom", "custom_css", "custom_js",
+  "sb_presets", "active_preset", "cb_presets", "import_preset_json", "export_preset_json"
  ],
  "fields": [
-  {
-   "fieldname": "section_general",
-   "fieldtype": "Section Break",
-   "label": "General"
-  },
-  {
-   "fieldname": "default_scheme",
-   "fieldtype": "Select",
-   "label": "Default Color Scheme",
-   "options": "swift-light\nswift-dark\nocean-blue\nnord\ndracula\nsolarized\nforest",
-   "default": "swift-light",
-   "reqd": 1
-  },
-  {
-   "fieldname": "font_family",
-   "fieldtype": "Select",
-   "label": "Font Family",
-   "options": "Inter\nPoppins\nRoboto\nManrope\nSystem",
-   "default": "Inter"
-  },
-  {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "enable_theme_switcher",
-   "fieldtype": "Check",
-   "label": "Show Theme Switcher in Navbar",
-   "default": "1"
-  },
-  {
-   "fieldname": "enable_perf_mode",
-   "fieldtype": "Check",
-   "label": "Enable Performance Mode",
-   "default": "1"
-  },
-  {
-   "fieldname": "section_perf",
-   "fieldtype": "Section Break",
-   "label": "Performance"
-  },
-  {
-   "fieldname": "sidebar_collapsed_default",
-   "fieldtype": "Check",
-   "label": "Sidebar Collapsed by Default",
-   "default": "0"
-  },
-  {
-   "fieldname": "reduce_animations",
-   "fieldtype": "Check",
-   "label": "Reduce Animations",
-   "default": "0"
-  },
-  {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "preload_fonts",
-   "fieldtype": "Check",
-   "label": "Preload Fonts",
-   "default": "1"
-  },
-  {
-   "fieldname": "lazy_load_images",
-   "fieldtype": "Check",
-   "label": "Lazy Load Images",
-   "default": "1"
-  }
+  {"fieldname": "sb_defaults", "fieldtype": "Section Break", "label": "Defaults"},
+  {"fieldname": "default_accent", "fieldtype": "Select", "label": "Default Accent", "options": "indigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate", "default": "indigo"},
+  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\ndracula\nnord\nsolarized-light\nsolarized-dark\ngruvbox-dark\ngruvbox-light"},
+  {"fieldname": "cb_defaults", "fieldtype": "Column Break"},
+  {"fieldname": "default_font_family", "fieldtype": "Select", "label": "Default Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem", "default": "Inter"},
+  {"fieldname": "default_font_scale", "fieldtype": "Select", "label": "Default Font Scale", "options": "S\nM\nL\nXL", "default": "M"},
+
+  {"fieldname": "sb_layout", "fieldtype": "Section Break", "label": "Layout"},
+  {"fieldname": "default_density", "fieldtype": "Select", "label": "Density", "options": "Compact\nComfortable\nCozy", "default": "Comfortable"},
+  {"fieldname": "default_radius", "fieldtype": "Select", "label": "Shape", "options": "Sharp\nRounded\nPill", "default": "Rounded"},
+  {"fieldname": "cb_layout", "fieldtype": "Column Break"},
+  {"fieldname": "navbar_variant", "fieldtype": "Select", "label": "Navbar", "options": "Solid\nGlass\nTransparent", "default": "Solid"},
+  {"fieldname": "sidebar_variant", "fieldtype": "Select", "label": "Sidebar", "options": "Attached\nFloating\nIcon-only", "default": "Attached"},
+
+  {"fieldname": "sb_features", "fieldtype": "Section Break", "label": "Features"},
+  {"fieldname": "enable_switcher", "fieldtype": "Check", "label": "Navbar Theme Switcher", "default": "1"},
+  {"fieldname": "enable_command_palette", "fieldtype": "Check", "label": "Command Palette (Ctrl+Shift+T)", "default": "1"},
+  {"fieldname": "enable_focus_mode", "fieldtype": "Check", "label": "Focus / Reading Mode Shortcuts", "default": "1"},
+  {"fieldname": "cb_features", "fieldtype": "Column Break"},
+  {"fieldname": "enable_perf_mode", "fieldtype": "Check", "label": "Performance Mode", "default": "1"},
+  {"fieldname": "enable_styled_scrollbar", "fieldtype": "Check", "label": "Styled Scrollbars", "default": "1"},
+  {"fieldname": "enable_toast_theming", "fieldtype": "Check", "label": "Theme Toasts & Progress Bar", "default": "1"},
+
+  {"fieldname": "sb_brand", "fieldtype": "Section Break", "label": "Brand"},
+  {"fieldname": "brand_logo", "fieldtype": "Attach Image", "label": "Logo (Light)"},
+  {"fieldname": "brand_logo_dark", "fieldtype": "Attach Image", "label": "Logo (Dark)"},
+  {"fieldname": "brand_name", "fieldtype": "Data", "label": "Brand Name"},
+  {"fieldname": "cb_brand", "fieldtype": "Column Break"},
+  {"fieldname": "brand_favicon", "fieldtype": "Attach Image", "label": "Favicon"},
+  {"fieldname": "brand_hex_override", "fieldtype": "Data", "label": "Custom Accent Hex (e.g. #7c7cff)", "description": "If set, overrides Default Accent for both light and dark modes."},
+
+  {"fieldname": "sb_login", "fieldtype": "Section Break", "label": "Login Page"},
+  {"fieldname": "login_layout", "fieldtype": "Select", "label": "Layout", "options": "Split\nCentered\nMinimal", "default": "Split"},
+  {"fieldname": "login_bg_image", "fieldtype": "Attach Image", "label": "Background Image (Split layout)"},
+  {"fieldname": "cb_login", "fieldtype": "Column Break"},
+  {"fieldname": "login_tagline", "fieldtype": "Small Text", "label": "Tagline"},
+  {"fieldname": "login_show_signup", "fieldtype": "Check", "label": "Show Signup Link", "default": "1"},
+
+  {"fieldname": "sb_auto", "fieldtype": "Section Break", "label": "Auto Dark"},
+  {"fieldname": "enable_auto_dark", "fieldtype": "Check", "label": "Auto switch to Dark by time"},
+  {"fieldname": "auto_dark_start", "fieldtype": "Time", "label": "Start (dark from)", "default": "19:00:00"},
+  {"fieldname": "cb_auto", "fieldtype": "Column Break"},
+  {"fieldname": "auto_dark_end", "fieldtype": "Time", "label": "End (back to light at)", "default": "07:00:00"},
+
+  {"fieldname": "sb_print", "fieldtype": "Section Break", "label": "Print Theming"},
+  {"fieldname": "enable_print_theming", "fieldtype": "Check", "label": "Apply accent + font to Print Formats", "default": "1"},
+  {"fieldname": "print_font_family", "fieldtype": "Select", "label": "Print Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem\nGeorgia\nTimes New Roman", "default": "Inter"},
+
+  {"fieldname": "sb_custom", "fieldtype": "Section Break", "label": "Custom Injection", "collapsible": 1},
+  {"fieldname": "custom_css", "fieldtype": "Code", "label": "Custom CSS (Desk + Website)", "options": "CSS"},
+  {"fieldname": "custom_js", "fieldtype": "Code", "label": "Custom JS (Desk only)", "options": "JavaScript"},
+
+  {"fieldname": "sb_presets", "fieldtype": "Section Break", "label": "Presets", "collapsible": 1},
+  {"fieldname": "active_preset", "fieldtype": "Select", "label": "Apply Preset", "options": "\nStartup\nEnterprise\nRetro\nNeon\nMinimal"},
+  {"fieldname": "cb_presets", "fieldtype": "Column Break"},
+  {"fieldname": "import_preset_json", "fieldtype": "Code", "label": "Import Preset JSON", "options": "JSON"},
+  {"fieldname": "export_preset_json", "fieldtype": "Code", "label": "Exported Config (read-only)", "options": "JSON", "read_only": 1}
  ],
  "issingle": 1,
  "links": [],
@@ -98,16 +82,7 @@
  "name": "Swift Theme Settings",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "print": 1,
-   "read": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
+  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "role": "System Manager", "share": 1, "write": 1}
  ],
  "sort_field": "modified",
  "sort_order": "DESC",

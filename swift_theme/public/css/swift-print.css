@@ -1,0 +1,23 @@
+/* Swift Theme — Print (applied to Print Formats)
+   Loaded manually via Custom HTML in Print Settings. See README. */
+
+@media print {
+  html, body { background: #fff !important; color: #111 !important; }
+  body { font-family: var(--swift-print-font, "Inter"), sans-serif !important; }
+  h1, h2, h3, h4 { color: #111 !important; letter-spacing: -0.01em; }
+  .print-format {
+    color: #111;
+    font-family: var(--swift-print-font, "Inter"), sans-serif;
+  }
+  .print-heading, .letter-head, .print-format h2 {
+    border-bottom: 2px solid var(--swift-print-accent, #4f46e5) !important;
+    padding-bottom: 8px;
+    color: var(--swift-print-accent, #4f46e5) !important;
+  }
+  table.table th {
+    background: var(--swift-print-accent, #4f46e5) !important;
+    color: #fff !important;
+    border-color: var(--swift-print-accent, #4f46e5) !important;
+  }
+  a { color: var(--swift-print-accent, #4f46e5) !important; text-decoration: none; }
+}

@@ -1,0 +1,113 @@
+/* Swift Theme — Login layouts
+   Three layouts, chosen via data-swift-login on <body>. All follow current
+   Frappe Light/Dark mode via existing CSS variables. */
+
+/* Shared */
+body[data-swift-login] {
+  min-height: 100vh;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+body[data-swift-login] .for-login,
+body[data-swift-login] .for-signup,
+body[data-swift-login] .for-forgot,
+body[data-swift-login] .login-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-lg);
+  box-shadow: var(--swift-shadow-lg);
+  padding: 36px !important;
+}
+
+body[data-swift-login] .page-card-head h4,
+body[data-swift-login] .login-content h4 {
+  color: var(--text-color);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Custom tagline */
+.swift-login-tagline {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* Custom brand row */
+.swift-login-brand {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.swift-login-brand img { height: 32px; }
+.swift-login-brand .name {
+  font-weight: 700;
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+/* ---------- Layout: Split (image left, form right) ---------- */
+body[data-swift-login="Split"] .container.for-login,
+body[data-swift-login="Split"] .container.for-signup,
+body[data-swift-login="Split"] .container.for-forgot,
+body[data-swift-login="Split"] .container.login-content {
+  max-width: 460px !important;
+  margin: 6vh 6vw 6vh auto !important;
+}
+body[data-swift-login="Split"]::before {
+  content: "";
+  position: fixed; inset: 0 55% 0 0;
+  background:
+    linear-gradient(135deg, var(--swift-accent-soft), transparent 60%),
+    var(--swift-login-bg, radial-gradient(1200px 800px at 20% 30%, var(--swift-accent) 0%, transparent 50%));
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  filter: saturate(1.05);
+}
+body[data-swift-login="Split"] .navbar { display: none !important; }
+body[data-swift-login="Split"] .page_content { position: relative; z-index: 1; }
+
+/* ---------- Layout: Centered (card in middle, subtle gradient) ---------- */
+body[data-swift-login="Centered"] {
+  background:
+    radial-gradient(900px 500px at 10% 0%, var(--swift-accent-soft), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, var(--swift-accent-soft), transparent 60%),
+    var(--bg-color);
+}
+body[data-swift-login="Centered"] .for-login,
+body[data-swift-login="Centered"] .for-signup,
+body[data-swift-login="Centered"] .for-forgot,
+body[data-swift-login="Centered"] .login-content {
+  max-width: 420px;
+  margin: 10vh auto !important;
+}
+
+/* ---------- Layout: Minimal (no card, flat) ---------- */
+body[data-swift-login="Minimal"] .for-login,
+body[data-swift-login="Minimal"] .for-signup,
+body[data-swift-login="Minimal"] .for-forgot,
+body[data-swift-login="Minimal"] .login-content {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  max-width: 380px;
+  margin: 14vh auto !important;
+}
+
+/* Splash */
+.swift-splash {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-color);
+  z-index: 9999;
+  transition: opacity 300ms ease;
+}
+.swift-splash.hide { opacity: 0; pointer-events: none; }
+.swift-splash .swift-spinner {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--swift-accent);
+  animation: swift-spin 700ms linear infinite;
+}
+@keyframes swift-spin { to { transform: rotate(360deg); } }

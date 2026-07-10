@@ -1,10 +1,4 @@
-/* Swift Theme — Performance
-   Applied only when <html data-swift-perf="on"> so users can opt in/out. */
-
-html[data-swift-perf="on"] * {
-  /* Cheaper compositing */
-  backface-visibility: hidden;
-}
+/* Swift Theme — Performance (opt-in) */
 
 html[data-swift-perf="on"] .list-row,
 html[data-swift-perf="on"] .frappe-card,
@@ -13,7 +7,6 @@ html[data-swift-perf="on"] .layout-main-section {
   contain-intrinsic-size: 400px;
 }
 
-/* Reduced animations mode */
 html[data-swift-anim="off"] *,
 html[data-swift-anim="off"] *::before,
 html[data-swift-anim="off"] *::after {
@@ -23,7 +16,6 @@ html[data-swift-anim="off"] *::after {
   scroll-behavior: auto !important;
 }
 
-/* Prefer OS setting when user has not made a choice */
 @media (prefers-reduced-motion: reduce) {
   html:not([data-swift-anim="on"]) *,
   html:not([data-swift-anim="on"]) *::before,
@@ -32,6 +24,3 @@ html[data-swift-anim="off"] *::after {
     transition-duration: 0.001ms !important;
   }
 }
-
-/* Lazy image hint */
-html[data-swift-lazy="on"] img:not([loading]) { loading: lazy; }

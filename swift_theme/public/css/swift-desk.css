@@ -1,176 +1,177 @@
-/* Swift Theme — Desk (backend UI)
-   Tightens spacing, rounds corners, and adds a modern navbar/sidebar look. */
+/* Swift Theme — Desk polish (works in ANY Frappe mode) */
 
-html[data-swift-scheme] {
-  background: var(--swift-bg);
-}
-
-html[data-swift-scheme] body,
-html[data-swift-scheme] .desk-body {
-  background: var(--swift-bg);
-  color: var(--swift-text);
-}
-
-/* Navbar */
-html[data-swift-scheme] .navbar {
-  background: var(--swift-surface) !important;
-  border-bottom: 1px solid var(--swift-border);
-  box-shadow: var(--swift-shadow-sm);
-  height: 52px;
-  padding: 0 16px;
-}
-html[data-swift-scheme] .navbar .navbar-brand,
-html[data-swift-scheme] .navbar .nav-link {
-  color: var(--swift-text) !important;
-  font-weight: 500;
-}
-html[data-swift-scheme] .navbar .navbar-brand:hover,
-html[data-swift-scheme] .navbar .nav-link:hover {
-  color: var(--swift-primary) !important;
-}
-
-/* Sidebar */
-html[data-swift-scheme] .layout-side-section {
-  background: var(--swift-surface);
-  border-right: 1px solid var(--swift-border);
-}
-html[data-swift-scheme] .sidebar-item {
-  border-radius: var(--swift-radius-sm);
-  padding: 6px 10px;
-  margin: 2px 6px;
-  color: var(--swift-text-muted);
-  transition: background var(--swift-transition), color var(--swift-transition);
-}
-html[data-swift-scheme] .sidebar-item:hover {
-  background: var(--swift-surface-2);
-  color: var(--swift-text);
-}
-html[data-swift-scheme] .sidebar-item.selected {
-  background: color-mix(in oklab, var(--swift-primary) 12%, transparent);
-  color: var(--swift-primary);
-}
-
-/* Cards / forms */
-html[data-swift-scheme] .form-section,
-html[data-swift-scheme] .layout-main-section,
-html[data-swift-scheme] .frappe-card {
-  background: var(--swift-surface);
-  border: 1px solid var(--swift-border);
+html[data-swift-accent] .form-section,
+html[data-swift-accent] .frappe-card,
+html[data-swift-accent] .layout-main-section {
   border-radius: var(--swift-radius);
-  box-shadow: var(--swift-shadow-sm);
-}
-html[data-swift-scheme] .form-control {
-  border-radius: var(--swift-radius-sm);
-  border-color: var(--swift-border);
-  background: var(--swift-surface);
-  color: var(--swift-text);
-}
-html[data-swift-scheme] .form-control:focus {
-  border-color: var(--swift-primary);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--swift-primary) 22%, transparent);
 }
 
-/* Buttons */
-html[data-swift-scheme] .btn {
-  border-radius: var(--swift-radius-sm);
-  font-weight: 500;
-}
-html[data-swift-scheme] .btn-primary {
-  background: var(--swift-primary);
-  border-color: var(--swift-primary);
-  color: #fff;
-}
-html[data-swift-scheme] .btn-primary:hover {
-  background: var(--swift-primary-hover);
-  border-color: var(--swift-primary-hover);
-}
-
-/* Page head */
-html[data-swift-scheme] .page-head {
-  background: var(--swift-surface);
-  border-bottom: 1px solid var(--swift-border);
-}
-html[data-swift-scheme] .page-title h1 {
-  color: var(--swift-text);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-/* Lists / tables */
-html[data-swift-scheme] .list-row,
-html[data-swift-scheme] .list-row-container {
-  border-bottom: 1px solid var(--swift-border);
-  background: var(--swift-surface);
-}
-html[data-swift-scheme] .list-row:hover {
-  background: var(--swift-surface-2);
-}
-html[data-swift-scheme] table.table th,
-html[data-swift-scheme] table.table td {
-  border-color: var(--swift-border);
-}
-
-/* Modals */
-html[data-swift-scheme] .modal-content {
-  background: var(--swift-surface);
-  border: 1px solid var(--swift-border);
+html[data-swift-accent] .modal-content {
   border-radius: var(--swift-radius-lg);
   box-shadow: var(--swift-shadow-lg);
 }
 
-/* Sidebar collapsed compact mode */
-html[data-swift-sidebar="collapsed"] .layout-side-section {
-  max-width: 56px;
-  overflow: hidden;
-}
-html[data-swift-sidebar="collapsed"] .layout-side-section .sidebar-label,
-html[data-swift-sidebar="collapsed"] .layout-side-section .standard-sidebar-section-title {
-  display: none;
+html[data-swift-accent] .btn,
+html[data-swift-accent] .form-control {
+  border-radius: var(--swift-radius-sm);
 }
 
-/* Theme switcher chip in navbar */
-.swift-theme-switcher {
+/* Switcher chip */
+.swift-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border: 1px solid var(--swift-border);
-  border-radius: 999px;
-  background: var(--swift-surface-2);
-  color: var(--swift-text);
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-pill);
+  background: var(--subtle-fg);
+  color: var(--text-color);
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
   transition: all var(--swift-transition);
 }
-.swift-theme-switcher:hover { border-color: var(--swift-primary); color: var(--swift-primary); }
-.swift-theme-switcher .swift-dot {
+.swift-chip:hover { border-color: var(--swift-accent); color: var(--swift-accent); }
+.swift-chip .swift-dot {
   width: 10px; height: 10px; border-radius: 50%;
-  background: var(--swift-primary);
-  box-shadow: 0 0 0 2px var(--swift-surface);
+  background: var(--swift-accent);
+  box-shadow: 0 0 0 2px var(--fg-color);
 }
 
-/* Palette popover */
+/* Palette (accent + theme + more) */
 .swift-palette {
   position: fixed;
   z-index: 2000;
-  min-width: 240px;
-  background: var(--swift-surface);
-  border: 1px solid var(--swift-border);
+  min-width: 300px;
+  max-width: 340px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: var(--swift-radius);
   box-shadow: var(--swift-shadow-lg);
-  padding: 8px;
+  padding: 10px;
+  color: var(--text-color);
 }
-.swift-palette-item {
-  display: flex; align-items: center; gap: 10px;
+.swift-palette h6 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 8px 4px 6px;
+}
+.swift-accent-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 0 4px;
+}
+.swift-accent-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--swift-radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform var(--swift-transition);
+}
+.swift-accent-swatch:hover { transform: scale(1.06); }
+.swift-accent-swatch.active { border-color: var(--text-color); }
+
+.swift-menu-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 8px 10px;
   border-radius: var(--swift-radius-sm);
   cursor: pointer;
-  color: var(--swift-text);
 }
-.swift-palette-item:hover { background: var(--swift-surface-2); }
-.swift-palette-item .swatch {
-  width: 18px; height: 18px; border-radius: 6px;
-  border: 1px solid var(--swift-border);
+.swift-menu-item:hover { background: var(--subtle-accent); }
+.swift-menu-item .swift-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
 }
-.swift-palette-item.active { outline: 2px solid var(--swift-primary); outline-offset: -2px; }
+
+.swift-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
+
+/* Focus mode */
+html[data-swift-focus="on"] .navbar,
+html[data-swift-focus="on"] .layout-side-section,
+html[data-swift-focus="on"] .page-head .flex.head-left,
+html[data-swift-focus="on"] .page-head .custom-actions {
+  display: none !important;
+}
+html[data-swift-focus="on"] .layout-main {
+  padding-top: 12px;
+}
+
+/* Reading mode: widen main content, hide side */
+html[data-swift-reading="on"] .layout-side-section {
+  display: none !important;
+}
+html[data-swift-reading="on"] .layout-main-section {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: calc(var(--swift-font-size) + 1px);
+  line-height: 1.65;
+}
+
+/* Command palette */
+.swift-cmdk-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 2500;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 12vh;
+}
+.swift-cmdk {
+  width: min(560px, 92vw);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-lg);
+  box-shadow: var(--swift-shadow-lg);
+  overflow: hidden;
+  color: var(--text-color);
+}
+.swift-cmdk input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 0;
+  outline: 0;
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-size: 15px;
+}
+.swift-cmdk-list {
+  max-height: 50vh;
+  overflow-y: auto;
+  border-top: 1px solid var(--border-color);
+}
+.swift-cmdk-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+.swift-cmdk-item.active, .swift-cmdk-item:hover {
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
+}
+.swift-cmdk-item .kbd {
+  margin-left: auto;
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+
+/* Top progress bar (Frappe uses .progress-bar sometimes; we add ours) */
+.swift-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--swift-accent);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 200ms ease;
+  z-index: 3000;
+}
+.swift-progress.active { transform: scaleX(0.7); }
+.swift-progress.done   { transform: scaleX(1); opacity: 0; }

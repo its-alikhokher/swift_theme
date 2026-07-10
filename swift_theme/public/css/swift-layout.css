@@ -1,0 +1,51 @@
+/* Swift Theme — Layout variants (Navbar + Sidebar) */
+
+/* -------- Navbar variants -------- */
+html[data-swift-navbar="Solid"] .navbar {
+  background: var(--fg-color) !important;
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--border-color);
+}
+html[data-swift-navbar="Glass"] .navbar {
+  background: color-mix(in oklab, var(--fg-color) 65%, transparent) !important;
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
+}
+html[data-swift-navbar="Transparent"] .navbar {
+  background: transparent !important;
+  backdrop-filter: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
+}
+
+/* -------- Sidebar variants -------- */
+html[data-swift-sidebar-variant="Attached"] .layout-side-section {
+  background: var(--fg-color);
+  border-right: 1px solid var(--border-color);
+  margin: 0;
+  border-radius: 0;
+}
+html[data-swift-sidebar-variant="Floating"] .layout-side-section {
+  background: var(--card-bg);
+  margin: 12px 0 12px 12px;
+  border-radius: var(--swift-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-md);
+}
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section {
+  max-width: 56px;
+  overflow: hidden;
+}
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .sidebar-label,
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .standard-sidebar-section-title,
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .desk-sidebar-item .sidebar-item-label {
+  display: none !important;
+}
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover {
+  max-width: 240px;
+}
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .sidebar-label,
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .desk-sidebar-item .sidebar-item-label,
+html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .standard-sidebar-section-title {
+  display: block !important;
+}

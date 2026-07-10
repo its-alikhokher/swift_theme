@@ -1,8 +1,57 @@
+import json
 import frappe
 from frappe.model.document import Document
 
+PRESETS = {
+    "Startup":    {"default_accent": "violet",  "default_theme": "",         "default_density": "Comfortable", "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Solid",       "sidebar_variant": "Attached"},
+    "Enterprise": {"default_accent": "blue",    "default_theme": "",         "default_density": "Compact",     "default_radius": "Sharp",   "default_font_family": "Roboto",  "default_font_scale": "S", "navbar_variant": "Solid",       "sidebar_variant": "Attached"},
+    "Retro":      {"default_accent": "amber",   "default_theme": "solarized-light", "default_density": "Cozy", "default_radius": "Rounded", "default_font_family": "Manrope","default_font_scale": "L",  "navbar_variant": "Solid",       "sidebar_variant": "Floating"},
+    "Neon":       {"default_accent": "pink",    "default_theme": "dracula",  "default_density": "Comfortable", "default_radius": "Pill",    "default_font_family": "Poppins", "default_font_scale": "M", "navbar_variant": "Glass",       "sidebar_variant": "Floating"},
+    "Minimal":    {"default_accent": "slate",   "default_theme": "",         "default_density": "Compact",     "default_radius": "Sharp",   "default_font_family": "System",  "default_font_scale": "M", "navbar_variant": "Transparent", "sidebar_variant": "Icon-only"},
+}
+
 
 class SwiftThemeSettings(Document):
+    def validate(self):
+        # Apply preset if user selected one (then clear the trigger field)
+        if self.active_preset and self.active_preset in PRESETS:
+            for k, v in PRESETS[self.active_preset].items():
+                self.set(k, v)
+            self.active_preset = ""
+
+        # Apply imported JSON
+        if self.import_preset_json:
+            try:
+                data = json.loads(self.import_preset_json)
+                allowed = self._exportable_fields()
+                for k, v in data.items():
+                    if k in allowed:
+                        self.set(k, v)
+                self.import_preset_json = ""
+            except Exception as e:
+                frappe.throw(f"Invalid preset JSON: {e}")
+
+        # Refresh exported JSON snapshot
+        self.export_preset_json = json.dumps(self._export_dict(), indent=2)
+
     def on_update(self):
-        # Bust user cache so new prefs load immediately
         frappe.clear_cache()
+
+    def _exportable_fields(self):
+        return {
+            "default_accent", "default_theme", "default_density", "default_radius",
+            "default_font_family", "default_font_scale",
+            "navbar_variant", "sidebar_variant",
+            "enable_switcher", "enable_command_palette", "enable_focus_mode",
+            "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
+            "enable_print_theming", "print_font_family",
+            "brand_name", "brand_hex_override",
+            "login_layout", "login_tagline", "login_show_signup",
+            "enable_auto_dark", "auto_dark_start", "auto_dark_end",
+        }
+
+    def _export_dict(self):
+        d = {}
+        for k in self._exportable_fields():
+            d[k] = self.get(k)
+        return d

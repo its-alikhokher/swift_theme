@@ -1,0 +1,10 @@
+{
+  "default_accent": "blue",
+  "default_theme": "",
+  "default_density": "Compact",
+  "default_radius": "Sharp",
+  "default_font_family": "Roboto",
+  "default_font_scale": "S",
+  "navbar_variant": "Solid",
+  "sidebar_variant": "Attached"
+}
