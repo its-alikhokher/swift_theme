@@ -15,13 +15,15 @@ ACCENTS = [
 ]
 
 FULL_THEMES = [
-    {"key": "",                 "label": "None (use accent + Frappe mode)"},
-    {"key": "dracula",          "label": "Dracula (dark)"},
-    {"key": "nord",             "label": "Nord (dark)"},
-    {"key": "solarized-light",  "label": "Solarized Light"},
-    {"key": "solarized-dark",   "label": "Solarized Dark"},
-    {"key": "gruvbox-dark",     "label": "Gruvbox Dark"},
-    {"key": "gruvbox-light",    "label": "Gruvbox Light"},
+    {"key": "",           "label": "None (use accent + Frappe mode)"},
+    {"key": "obsidian",   "label": "Obsidian",   "tag": "Dark · Developer luxury"},
+    {"key": "graphite",   "label": "Graphite",   "tag": "Dark · Editorial charcoal"},
+    {"key": "midnight",   "label": "Midnight",   "tag": "Dark · Yacht-club navy"},
+    {"key": "aurora",     "label": "Aurora",     "tag": "Dark · Glassy magic"},
+    {"key": "carbon",     "label": "Carbon",     "tag": "Dark · Terminal neon"},
+    {"key": "monochrome", "label": "Monochrome", "tag": "Light · Zero color noise"},
+    {"key": "porcelain",  "label": "Porcelain",  "tag": "Light · Warm editorial"},
+    {"key": "sandstone",  "label": "Sandstone",  "tag": "Light · Muji calm"},
 ]
 
 

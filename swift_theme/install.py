@@ -2,7 +2,7 @@ import frappe
 
 
 ACCENTS = ["indigo", "violet", "blue", "sky", "teal", "emerald", "amber", "rose", "pink", "slate"]
-THEMES = ["", "dracula", "nord", "solarized-light", "solarized-dark", "gruvbox-dark", "gruvbox-light"]
+THEMES = ["", "obsidian", "graphite", "midnight", "aurora", "carbon", "monochrome", "porcelain", "sandstone"]
 MODES = ["Follow Frappe", "Force Light", "Force Dark", "Auto (time-based)"]
 DENSITIES = ["Compact", "Comfortable", "Cozy"]
 RADII = ["Sharp", "Rounded", "Pill"]

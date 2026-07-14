@@ -1,150 +1,336 @@
-/* Swift Theme — Full Themes
-   These override the Frappe surface tokens (bg, card, text, border) with a
-   complete palette. Use them when you want a distinct look regardless of
-   Frappe's Light/Dark mode.
+/* Swift Theme — Premium Themes
+   Inspired by Linear, Vercel, Stripe, Raycast, Arc, Notion, GitHub, Superhuman.
+   Each theme sets: surface tokens (bg/card/border/text), accent, and a subtle
+   ambient gradient. Designed to feel expensive, not generic. */
 
-   Each theme also sets its own accent — but if the user picks an accent
-   separately, the accent wins (accents.css is loaded before this file uses
-   !important only on background tokens, not on accent tokens). */
-
-/* ---------- Dracula ---------- */
-html[data-swift-theme="dracula"] {
+/* ============================================================
+   1) OBSIDIAN  -  Deep near-black, cool platinum, electric violet
+   Vibe: Linear + Raycast. Premium, sharp, developer-tool luxury.
+   ============================================================ */
+html[data-swift-theme="obsidian"] {
   color-scheme: dark;
-  --bg-color:      #282a36;
-  --fg-color:      #313442;
-  --card-bg:       #313442;
-  --subtle-fg:     #44475a;
-  --subtle-accent: #44475a;
-  --control-bg:    #313442;
-  --control-bg-on-gray: #44475a;
-  --border-color:  #4b4f66;
-  --text-color:    #f8f8f2;
-  --text-muted:    #bfbfd3;
-  --heading-color: #f8f8f2;
-  --sidebar-bg:    #21222c;
-  --navbar-bg:     #21222c;
+  --bg-color:      #0a0b0f;
+  --fg-color:      #101218;
+  --card-bg:       #12141b;
+  --subtle-fg:     #171a23;
+  --subtle-accent: #1b1f2a;
+  --control-bg:    #12141b;
+  --control-bg-on-gray: #1b1f2a;
+  --border-color:  #23273356;
+  --text-color:    #e6e8ee;
+  --text-muted:    #8b93a7;
+  --heading-color: #f4f6fb;
+  --sidebar-bg:    #0c0e14;
+  --navbar-bg:     #0c0e14cc;
 
-  --swift-accent:       #bd93f9;
-  --swift-accent-hover: #a97ff0;
-  --swift-accent-fg:    #1e1b2e;
-  --swift-accent-soft:  rgba(189, 147, 249, 0.18);
+  --swift-accent:       #8b7cff;
+  --swift-accent-hover: #6f5dff;
+  --swift-accent-fg:    #0a0b0f;
+  --swift-accent-soft:  rgba(139, 124, 255, 0.14);
+
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(139,124,255,0.14), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(34,211,238,0.08), transparent 60%);
 }
 
-/* ---------- Nord ---------- */
-html[data-swift-theme="nord"] {
+/* ============================================================
+   2) GRAPHITE  -  Warm charcoal + copper. Editorial, magazine feel.
+   Vibe: Vercel dark + a hint of Stripe.
+   ============================================================ */
+html[data-swift-theme="graphite"] {
   color-scheme: dark;
-  --bg-color:      #2e3440;
-  --fg-color:      #3b4252;
-  --card-bg:       #3b4252;
-  --subtle-fg:     #434c5e;
-  --subtle-accent: #434c5e;
-  --control-bg:    #3b4252;
-  --control-bg-on-gray: #434c5e;
-  --border-color:  #4c566a;
-  --text-color:    #eceff4;
-  --text-muted:    #d8dee9;
-  --heading-color: #eceff4;
-  --sidebar-bg:    #242933;
-  --navbar-bg:     #242933;
+  --bg-color:      #0e0e10;
+  --fg-color:      #17171a;
+  --card-bg:       #1a1a1e;
+  --subtle-fg:     #202024;
+  --subtle-accent: #26262c;
+  --control-bg:    #1a1a1e;
+  --control-bg-on-gray: #26262c;
+  --border-color:  #2b2b30;
+  --text-color:    #ededed;
+  --text-muted:    #a1a1aa;
+  --heading-color: #fafafa;
+  --sidebar-bg:    #111114;
+  --navbar-bg:     #111114cc;
 
-  --swift-accent:       #88c0d0;
-  --swift-accent-hover: #8fbcbb;
-  --swift-accent-fg:    #1c2028;
-  --swift-accent-soft:  rgba(136, 192, 208, 0.18);
+  --swift-accent:       #f5a97f;
+  --swift-accent-hover: #ec8f5f;
+  --swift-accent-fg:    #1a0f08;
+  --swift-accent-soft:  rgba(245, 169, 127, 0.14);
+
+  --swift-ambient:
+    radial-gradient(900px 500px at 100% 0%, rgba(245,169,127,0.10), transparent 55%);
 }
 
-/* ---------- Solarized Light ---------- */
-html[data-swift-theme="solarized-light"] {
+/* ============================================================
+   3) MIDNIGHT  -  Deep blue-navy, arctic mint. Yacht-club premium.
+   Vibe: Superhuman + Arc.
+   ============================================================ */
+html[data-swift-theme="midnight"] {
+  color-scheme: dark;
+  --bg-color:      #0b1220;
+  --fg-color:      #101a2e;
+  --card-bg:       #142138;
+  --subtle-fg:     #1a2a45;
+  --subtle-accent: #203354;
+  --control-bg:    #142138;
+  --control-bg-on-gray: #1a2a45;
+  --border-color:  #24365a;
+  --text-color:    #e6ecf5;
+  --text-muted:    #94a3b8;
+  --heading-color: #f8fafc;
+  --sidebar-bg:    #0a0f1c;
+  --navbar-bg:     #0a0f1ccc;
+
+  --swift-accent:       #7dd3c0;
+  --swift-accent-hover: #5cc0aa;
+  --swift-accent-fg:    #06231e;
+  --swift-accent-soft:  rgba(125, 211, 192, 0.14);
+
+  --swift-ambient:
+    radial-gradient(1000px 500px at 0% 100%, rgba(125,211,192,0.10), transparent 55%),
+    radial-gradient(900px 400px at 100% 0%, rgba(96,165,250,0.10), transparent 55%);
+}
+
+/* ============================================================
+   4) MONOCHROME  -  Pure Vercel-white. Zero color noise, sharp edges.
+   Vibe: Vercel + Linear light. Minimal, editorial, expensive.
+   ============================================================ */
+html[data-swift-theme="monochrome"] {
   color-scheme: light;
-  --bg-color:      #fdf6e3;
-  --fg-color:      #fffbef;
-  --card-bg:       #fffbef;
-  --subtle-fg:     #eee8d5;
-  --subtle-accent: #eee8d5;
-  --control-bg:    #fffbef;
-  --control-bg-on-gray: #eee8d5;
-  --border-color:  #d9d2b8;
-  --text-color:    #073642;
-  --text-muted:    #657b83;
-  --heading-color: #073642;
+  --bg-color:      #fafafa;
+  --fg-color:      #ffffff;
+  --card-bg:       #ffffff;
+  --subtle-fg:     #f4f4f5;
+  --subtle-accent: #ececee;
+  --control-bg:    #ffffff;
+  --control-bg-on-gray: #f4f4f5;
+  --border-color:  #e5e5e7;
+  --text-color:    #0a0a0a;
+  --text-muted:    #71717a;
+  --heading-color: #000000;
+  --sidebar-bg:    #ffffff;
+  --navbar-bg:     #ffffffe6;
 
-  --swift-accent:       #268bd2;
-  --swift-accent-hover: #1e6fa9;
-  --swift-accent-fg:    #fff;
-  --swift-accent-soft:  rgba(38, 139, 210, 0.15);
+  --swift-accent:       #0a0a0a;
+  --swift-accent-hover: #262626;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(10, 10, 10, 0.06);
+
+  --swift-ambient: none;
 }
 
-/* ---------- Solarized Dark ---------- */
-html[data-swift-theme="solarized-dark"] {
-  color-scheme: dark;
-  --bg-color:      #002b36;
-  --fg-color:      #073642;
-  --card-bg:       #073642;
-  --subtle-fg:     #0a4351;
-  --subtle-accent: #0a4351;
-  --control-bg:    #073642;
-  --control-bg-on-gray: #0a4351;
-  --border-color:  #135361;
-  --text-color:    #eee8d5;
-  --text-muted:    #93a1a1;
-  --heading-color: #eee8d5;
-  --sidebar-bg:    #002028;
-  --navbar-bg:     #002028;
-
-  --swift-accent:       #b58900;
-  --swift-accent-hover: #a07a00;
-  --swift-accent-fg:    #001318;
-  --swift-accent-soft:  rgba(181, 137, 0, 0.2);
-}
-
-/* ---------- Gruvbox Dark ---------- */
-html[data-swift-theme="gruvbox-dark"] {
-  color-scheme: dark;
-  --bg-color:      #282828;
-  --fg-color:      #32302f;
-  --card-bg:       #32302f;
-  --subtle-fg:     #3c3836;
-  --subtle-accent: #3c3836;
-  --control-bg:    #32302f;
-  --control-bg-on-gray: #3c3836;
-  --border-color:  #504945;
-  --text-color:    #ebdbb2;
-  --text-muted:    #a89984;
-  --heading-color: #fbf1c7;
-  --sidebar-bg:    #1d2021;
-  --navbar-bg:     #1d2021;
-
-  --swift-accent:       #fabd2f;
-  --swift-accent-hover: #d79921;
-  --swift-accent-fg:    #1d2021;
-  --swift-accent-soft:  rgba(250, 189, 47, 0.18);
-}
-
-/* ---------- Gruvbox Light ---------- */
-html[data-swift-theme="gruvbox-light"] {
+/* ============================================================
+   5) PORCELAIN  -  Warm off-white, deep indigo. Notion + Stripe.
+   Vibe: Notion refined, editorial luxury.
+   ============================================================ */
+html[data-swift-theme="porcelain"] {
   color-scheme: light;
-  --bg-color:      #fbf1c7;
-  --fg-color:      #f9f5d7;
-  --card-bg:       #f9f5d7;
-  --subtle-fg:     #ebdbb2;
-  --subtle-accent: #ebdbb2;
-  --control-bg:    #f9f5d7;
-  --control-bg-on-gray: #ebdbb2;
-  --border-color:  #d5c4a1;
-  --text-color:    #3c3836;
-  --text-muted:    #7c6f64;
-  --heading-color: #282828;
+  --bg-color:      #faf9f7;
+  --fg-color:      #ffffff;
+  --card-bg:       #ffffff;
+  --subtle-fg:     #f4f2ee;
+  --subtle-accent: #ede9e2;
+  --control-bg:    #ffffff;
+  --control-bg-on-gray: #f4f2ee;
+  --border-color:  #e6e1d7;
+  --text-color:    #1c1b18;
+  --text-muted:    #6f6a5f;
+  --heading-color: #0f0e0c;
+  --sidebar-bg:    #f6f4f0;
+  --navbar-bg:     #ffffffe6;
 
-  --swift-accent:       #076678;
-  --swift-accent-hover: #045463;
-  --swift-accent-fg:    #fff;
-  --swift-accent-soft:  rgba(7, 102, 120, 0.15);
+  --swift-accent:       #4338ca;
+  --swift-accent-hover: #3730a3;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(67, 56, 202, 0.10);
+
+  --swift-ambient:
+    radial-gradient(800px 400px at 100% 0%, rgba(67,56,202,0.06), transparent 60%);
 }
 
-/* When a full theme is on, force our accent onto Frappe primary */
+/* ============================================================
+   6) AURORA  -  Dark violet-teal with subtle rainbow ambient.
+   Vibe: Raycast + Arc. Glassy, magical.
+   ============================================================ */
+html[data-swift-theme="aurora"] {
+  color-scheme: dark;
+  --bg-color:      #0d0a1a;
+  --fg-color:      #16112a;
+  --card-bg:       #1a1633;
+  --subtle-fg:     #221c40;
+  --subtle-accent: #2a2350;
+  --control-bg:    #1a1633;
+  --control-bg-on-gray: #2a2350;
+  --border-color:  #35306040;
+  --text-color:    #ece9f7;
+  --text-muted:    #a89fc7;
+  --heading-color: #ffffff;
+  --sidebar-bg:    #0a0716;
+  --navbar-bg:     #0a0716cc;
+
+  --swift-accent:       #a78bfa;
+  --swift-accent-hover: #8b6cf6;
+  --swift-accent-fg:    #17102e;
+  --swift-accent-soft:  rgba(167, 139, 250, 0.16);
+
+  --swift-ambient:
+    radial-gradient(1000px 500px at 0% 0%,  rgba(167,139,250,0.18), transparent 55%),
+    radial-gradient(1000px 500px at 100% 100%, rgba(52,211,153,0.10), transparent 55%),
+    radial-gradient(800px 400px at 50% 100%, rgba(244,114,182,0.08), transparent 55%);
+}
+
+/* ============================================================
+   7) SANDSTONE  -  Warm sand + terracotta + forest. Muji-luxury.
+   Vibe: Notion + Kinfolk. Calm, earthy, expensive.
+   ============================================================ */
+html[data-swift-theme="sandstone"] {
+  color-scheme: light;
+  --bg-color:      #f5f1ea;
+  --fg-color:      #fbf8f3;
+  --card-bg:       #ffffff;
+  --subtle-fg:     #efe9de;
+  --subtle-accent: #e6dfd0;
+  --control-bg:    #ffffff;
+  --control-bg-on-gray: #efe9de;
+  --border-color:  #d9d0bd;
+  --text-color:    #2b2519;
+  --text-muted:    #7a6f5c;
+  --heading-color: #1a150c;
+  --sidebar-bg:    #ede6d6;
+  --navbar-bg:     #fbf8f3e6;
+
+  --swift-accent:       #a0522d;
+  --swift-accent-hover: #8b4423;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(160, 82, 45, 0.10);
+
+  --swift-ambient:
+    radial-gradient(900px 500px at 100% 100%, rgba(160,82,45,0.08), transparent 60%);
+}
+
+/* ============================================================
+   8) CARBON  -  Absolute-black + neon-green. Terminal luxury.
+   Vibe: GitHub dark + hacker premium.
+   ============================================================ */
+html[data-swift-theme="carbon"] {
+  color-scheme: dark;
+  --bg-color:      #000000;
+  --fg-color:      #0a0a0a;
+  --card-bg:       #0f0f0f;
+  --subtle-fg:     #141414;
+  --subtle-accent: #1a1a1a;
+  --control-bg:    #0f0f0f;
+  --control-bg-on-gray: #1a1a1a;
+  --border-color:  #262626;
+  --text-color:    #ededed;
+  --text-muted:    #8a8a8a;
+  --heading-color: #ffffff;
+  --sidebar-bg:    #050505;
+  --navbar-bg:     #000000e6;
+
+  --swift-accent:       #22e07a;
+  --swift-accent-hover: #10c464;
+  --swift-accent-fg:    #001a09;
+  --swift-accent-soft:  rgba(34, 224, 122, 0.14);
+
+  --swift-ambient:
+    radial-gradient(900px 400px at 0% 0%, rgba(34,224,122,0.08), transparent 55%);
+}
+
+/* ============================================================
+   Shared: ambient background layer for all themes
+   ============================================================ */
+html[data-swift-theme]:not([data-swift-theme=""]) body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--swift-ambient, none);
+}
+
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar,
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-side-section,
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glassy navbar for premium themes */
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar {
+  background: var(--navbar-bg) !important;
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar tint */
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-side-section {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+}
+
+/* Cards / form sections — refined surfaces with hairline border */
+html[data-swift-theme]:not([data-swift-theme=""]) .frappe-card,
+html[data-swift-theme]:not([data-swift-theme=""]) .form-section,
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-main-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* Force our accent onto Frappe primary tokens */
 html[data-swift-theme]:not([data-swift-theme=""]) {
   --primary:            var(--swift-accent);
   --primary-color:      var(--swift-accent);
   --btn-primary:        var(--swift-accent);
   --btn-primary-hover:  var(--swift-accent-hover);
+  --focus-default:      var(--swift-accent);
+}
+
+/* Refined buttons - subtle shadow, sharper radius on premium themes */
+html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary {
+  background: var(--swift-accent) !important;
+  border-color: var(--swift-accent) !important;
+  color: var(--swift-accent-fg) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    0 1px 2px rgba(0,0,0,0.15);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary:hover {
+  background: var(--swift-accent-hover) !important;
+  border-color: var(--swift-accent-hover) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    0 4px 12px color-mix(in oklab, var(--swift-accent) 35%, transparent);
+}
+
+html[data-swift-theme]:not([data-swift-theme=""]) .btn {
+  transition: all 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Refined form controls */
+html[data-swift-theme]:not([data-swift-theme=""]) .form-control {
+  background: var(--control-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: all 160ms ease;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .form-control:focus {
+  border-color: var(--swift-accent);
+  box-shadow: 0 0 0 3px var(--swift-accent-soft);
+}
+
+/* Typography — tighter tracking on headings for premium feel */
+html[data-swift-theme]:not([data-swift-theme=""]) .page-title h1,
+html[data-swift-theme]:not([data-swift-theme=""]) .page-head .title-text,
+html[data-swift-theme]:not([data-swift-theme=""]) h1,
+html[data-swift-theme]:not([data-swift-theme=""]) h2,
+html[data-swift-theme]:not([data-swift-theme=""]) h3 {
+  letter-spacing: -0.02em;
+  color: var(--heading-color);
+  font-weight: 600;
 }

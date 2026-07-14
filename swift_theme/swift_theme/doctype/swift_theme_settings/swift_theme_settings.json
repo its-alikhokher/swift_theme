@@ -18,7 +18,7 @@
  "fields": [
   {"fieldname": "sb_defaults", "fieldtype": "Section Break", "label": "Defaults"},
   {"fieldname": "default_accent", "fieldtype": "Select", "label": "Default Accent", "options": "indigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate", "default": "indigo"},
-  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\ndracula\nnord\nsolarized-light\nsolarized-dark\ngruvbox-dark\ngruvbox-light"},
+  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\nobsidian\ngraphite\nmidnight\naurora\ncarbon\nmonochrome\nporcelain\nsandstone"},
   {"fieldname": "cb_defaults", "fieldtype": "Column Break"},
   {"fieldname": "default_font_family", "fieldtype": "Select", "label": "Default Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem", "default": "Inter"},
   {"fieldname": "default_font_scale", "fieldtype": "Select", "label": "Default Font Scale", "options": "S\nM\nL\nXL", "default": "M"},
@@ -69,7 +69,7 @@
   {"fieldname": "custom_js", "fieldtype": "Code", "label": "Custom JS (Desk only)", "options": "JavaScript"},
 
   {"fieldname": "sb_presets", "fieldtype": "Section Break", "label": "Presets", "collapsible": 1},
-  {"fieldname": "active_preset", "fieldtype": "Select", "label": "Apply Preset", "options": "\nStartup\nEnterprise\nRetro\nNeon\nMinimal"},
+  {"fieldname": "active_preset", "fieldtype": "Select", "label": "Apply Preset", "options": "\nLinear\nVercel\nStripe\nRaycast\nSuperhuman\nNotion\nTerminal\nEditorial"},
   {"fieldname": "cb_presets", "fieldtype": "Column Break"},
   {"fieldname": "import_preset_json", "fieldtype": "Code", "label": "Import Preset JSON", "options": "JSON"},
   {"fieldname": "export_preset_json", "fieldtype": "Code", "label": "Exported Config (read-only)", "options": "JSON", "read_only": 1}

@@ -109,7 +109,6 @@ html[data-swift-reading="on"] .layout-side-section {
   display: none !important;
 }
 html[data-swift-reading="on"] .layout-main-section {
-  max-width: 900px;
   margin: 0 auto;
   font-size: calc(var(--swift-font-size) + 1px);
   line-height: 1.65;
