@@ -350,39 +350,183 @@ html[data-swift-accent] .frappe-chart .line-graph-path,
 html[data-swift-accent] .frappe-chart .bar { transition: all var(--swift-transition); }
 
 /* ========================================================================
-   Frappe v16 — Sidebar (revised for new class names)
+   Frappe v16 — Body Sidebar (actual v16 class names from source)
+   Verified against frappe/public/scss/desk/sidebar.scss
    ======================================================================== */
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container {
+
+/* Override Frappe's own sidebar CSS variables when accent is active */
+html[data-swift-accent] {
+  --sidebar-hover-color:  var(--swift-accent-soft);
+  --sidebar-active-color: color-mix(in oklab, var(--swift-accent) 20%, var(--fg-color));
+  --sidebar-active-shadow: inset 3px 0 0 var(--swift-accent);
+}
+
+/* Body sidebar container polish */
+html[data-swift-accent] .body-sidebar-container {
+  transition: background var(--swift-transition), border-color var(--swift-transition);
+}
+html[data-swift-accent] .body-sidebar,
+html[data-swift-accent] .body-sidebar-top,
+html[data-swift-accent] .body-sidebar-bottom {
+  scrollbar-color: var(--swift-accent) transparent;
+}
+
+/* Standard sidebar items */
+html[data-swift-accent] .standard-sidebar-item,
+html[data-swift-accent] .sidebar-items .nav-item,
+html[data-swift-accent] .sidebar-items .section-item {
   border-radius: var(--swift-radius-sm);
-  transition: background var(--swift-transition), color var(--swift-transition);
+  transition:
+    background var(--swift-transition),
+    color var(--swift-transition),
+    transform var(--swift-transition),
+    box-shadow var(--swift-transition);
 }
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container:hover {
-  background: var(--swift-accent-soft);
-  color: var(--swift-accent);
+html[data-swift-accent] .standard-sidebar-item:hover,
+html[data-swift-accent] .sidebar-items .nav-item:hover,
+html[data-swift-accent] .sidebar-items .section-item:hover,
+html[data-swift-accent] .standard-sidebar-item.hover {
+  background: var(--swift-accent-soft) !important;
+  color: var(--swift-accent) !important;
+  transform: translateX(2px);
 }
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container.selected,
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container.selected > .standard-sidebar-item {
-  background: linear-gradient(90deg, var(--swift-accent-soft), transparent);
-  color: var(--swift-accent);
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--swift-accent);
+
+/* Active / selected sidebar item — Frappe uses .active-sidebar */
+html[data-swift-accent] .active-sidebar,
+html[data-swift-accent] .standard-sidebar-item.active-sidebar,
+html[data-swift-accent] .sidebar-items .nav-item.active-sidebar,
+html[data-swift-accent] .sidebar-items .item-anchor.active {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--swift-accent) 18%, transparent),
+    color-mix(in oklab, var(--swift-accent) 4%, transparent)
+  ) !important;
+  color: var(--swift-accent) !important;
+  font-weight: 600 !important;
+  box-shadow: inset 3px 0 0 var(--swift-accent), 0 1px 0 rgba(0,0,0,0.02) !important;
+  position: relative;
 }
-html[data-swift-accent] .standard-sidebar-section .sidebar-child-item:hover {
-  color: var(--swift-accent);
+html[data-swift-accent] .active-sidebar::after,
+html[data-swift-accent] .standard-sidebar-item.active-sidebar::after {
+  content: "";
+  position: absolute;
+  right: 8px; top: 50%;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--swift-accent);
+  box-shadow: 0 0 10px var(--swift-accent);
+  transform: translateY(-50%);
+  opacity: 0.9;
 }
-html[data-swift-accent] .desk-sidebar .sidebar-item-icon,
-html[data-swift-accent] .layout-side-section .sidebar-item-icon svg {
+
+/* Icons */
+html[data-swift-accent] .sidebar-item-icon,
+html[data-swift-accent] .sidebar-item-icon svg,
+html[data-swift-accent] .menu-icon {
   transition: color var(--swift-transition), transform var(--swift-transition);
 }
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container.selected .sidebar-item-icon,
-html[data-swift-accent] .standard-sidebar-section .sidebar-item-container.selected .sidebar-item-icon svg {
-  color: var(--swift-accent);
-  transform: scale(1.05);
+html[data-swift-accent] .active-sidebar .sidebar-item-icon,
+html[data-swift-accent] .active-sidebar .sidebar-item-icon svg,
+html[data-swift-accent] .standard-sidebar-item.active-sidebar .menu-icon {
+  color: var(--swift-accent) !important;
+  transform: scale(1.08);
 }
-/* sidebar variant: floating card */
+html[data-swift-accent] .standard-sidebar-item:hover .sidebar-item-icon svg {
+  color: var(--swift-accent);
+}
+
+/* Labels + suffixes (badges/counts) */
+html[data-swift-accent] .sidebar-item-label { transition: color var(--swift-transition); }
+html[data-swift-accent] .sidebar-item-suffix {
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
+  border-radius: var(--swift-radius-pill);
+  padding: 1px 8px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Section breaks + dividers */
+html[data-swift-accent] .section-break,
+html[data-swift-accent] .body-sidebar .divider {
+  border-color: var(--border-color);
+  opacity: 0.6;
+}
+
+/* Nested / expanded groups */
+html[data-swift-accent] .nested-container { padding-left: 6px; }
+html[data-swift-accent] .section-item.expanded > .item-anchor .drop-icon {
+  color: var(--swift-accent);
+  transform: rotate(90deg);
+  transition: transform var(--swift-transition), color var(--swift-transition);
+}
+
+/* Collapse + resize + toggle */
+html[data-swift-accent] .sidebar-toggle-btn,
+html[data-swift-accent] .collapse-sidebar-link {
+  color: var(--text-muted);
+  transition: color var(--swift-transition), background var(--swift-transition);
+  border-radius: var(--swift-radius-sm);
+}
+html[data-swift-accent] .sidebar-toggle-btn:hover,
+html[data-swift-accent] .collapse-sidebar-link:hover {
+  color: var(--swift-accent);
+  background: var(--swift-accent-soft);
+}
+html[data-swift-accent] .sidebar-resize-handle {
+  background: transparent;
+  transition: background var(--swift-transition);
+}
+html[data-swift-accent] .sidebar-resize-handle:hover {
+  background: var(--swift-accent);
+  opacity: 0.6;
+}
+
+/* Promotional banner (bottom of sidebar) */
+html[data-swift-accent] .promotional-banner {
+  border-radius: var(--swift-radius);
+  background: linear-gradient(135deg, var(--swift-accent-soft), transparent 70%);
+  border: 1px solid color-mix(in oklab, var(--swift-accent) 30%, var(--border-color));
+}
+
+/* User dropdown, notifications, background tasks */
+html[data-swift-accent] .dropdown-navbar-user,
+html[data-swift-accent] .dropdown-notifications,
+html[data-swift-accent] .dropdown-background-tasks {
+  border-radius: var(--swift-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-lg);
+  overflow: hidden;
+}
+html[data-swift-accent] .user-menu-active .dropdown-navbar-user,
+html[data-swift-accent] .dropdown-navbar-user.expanded {
+  border-color: var(--swift-accent);
+}
+html[data-swift-accent] .notifications-list .list-item:hover,
+html[data-swift-accent] .background-tasks-list .list-item:hover {
+  background: var(--swift-accent-soft);
+}
+html[data-swift-accent] .keyboard-shortcut {
+  background: var(--subtle-fg, var(--subtle-accent));
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-sm);
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 1px 6px;
+}
+
+/* Mobile overlay */
+html[data-swift-accent] .overlay {
+  background: color-mix(in oklab, #000 55%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Sidebar variant: Floating card */
+html[data-swift-sidebar-variant="Floating"] .body-sidebar-container,
 html[data-swift-sidebar-variant="Floating"] .layout-side-section {
   padding: 8px;
 }
+html[data-swift-sidebar-variant="Floating"] .body-sidebar,
 html[data-swift-sidebar-variant="Floating"] .layout-side-section > .desk-sidebar,
 html[data-swift-sidebar-variant="Floating"] .layout-side-section > .list-sidebar {
   background: var(--card-bg);
@@ -390,6 +534,95 @@ html[data-swift-sidebar-variant="Floating"] .layout-side-section > .list-sidebar
   border-radius: var(--swift-radius);
   box-shadow: var(--swift-shadow);
   padding: 10px;
+}
+/* Sidebar variant: Attached (default look, add accent border) */
+html[data-swift-sidebar-variant="Attached"] .body-sidebar {
+  border-right: 1px solid var(--border-color);
+}
+/* Sidebar variant: Rail (icon-only look) */
+html[data-swift-sidebar-variant="Rail"] .body-sidebar .sidebar-item-label,
+html[data-swift-sidebar-variant="Rail"] .body-sidebar .sidebar-item-suffix { display: none; }
+html[data-swift-sidebar-variant="Rail"] .body-sidebar { width: 56px; }
+html[data-swift-sidebar-variant="Rail"] .body-sidebar .standard-sidebar-item { justify-content: center; padding: 10px 0; }
+
+/* Onboarding sidebar */
+html[data-swift-accent] .onboarding-sidebar {
+  border-radius: var(--swift-radius);
+  border: 1px dashed var(--swift-accent);
+  background: var(--swift-accent-soft);
+}
+
+/* ========================================================================
+   Frappe v16 — Navbar (verified against frappe/public/scss/desk/navbar.scss)
+   ======================================================================== */
+html[data-swift-accent] {
+  --awesomebar-focus-bg: var(--card-bg);
+  --awesomebar-shadow: 0 8px 24px -10px color-mix(in oklab, var(--swift-accent) 40%, transparent);
+}
+html[data-swift-accent] .navbar-home:hover,
+html[data-swift-accent] .navbar-brand:hover {
+  filter: drop-shadow(0 0 6px var(--swift-accent));
+}
+html[data-swift-accent] .search-bar {
+  border-radius: var(--swift-radius-pill);
+  transition: box-shadow var(--swift-transition), border-color var(--swift-transition);
+}
+html[data-swift-accent] .search-bar:focus-within {
+  border-color: var(--swift-accent) !important;
+  box-shadow: 0 0 0 3px var(--swift-accent-soft);
+}
+html[data-swift-accent] .search-icon,
+html[data-swift-accent] .awesomebar-search-icon {
+  color: var(--text-muted);
+  transition: color var(--swift-transition);
+}
+html[data-swift-accent] .search-bar:focus-within .search-icon,
+html[data-swift-accent] .awesomebar-input-row:focus-within .awesomebar-search-icon {
+  color: var(--swift-accent);
+}
+html[data-swift-accent] .awesomplete > ul {
+  border-radius: var(--swift-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-lg);
+  overflow: hidden;
+}
+html[data-swift-accent] .awesomplete > ul > li[aria-selected="true"],
+html[data-swift-accent] .awesomplete > ul > li:hover {
+  background: var(--swift-accent-soft) !important;
+  color: var(--swift-accent) !important;
+}
+html[data-swift-accent] .navbar-modal-wrapper {
+  border-radius: var(--swift-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-lg);
+}
+html[data-swift-accent] .help-item:hover,
+html[data-swift-accent] .help-item-navigate:hover {
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
+  border-radius: var(--swift-radius-sm);
+}
+html[data-swift-accent] .help-item-escape {
+  background: var(--subtle-fg, var(--subtle-accent));
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-sm);
+  padding: 1px 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+html[data-swift-accent] .vertical-bar {
+  background: var(--border-color);
+  opacity: 0.6;
+}
+html[data-swift-accent] .dropdown-item:hover,
+html[data-swift-accent] .dropdown-item:focus {
+  background: var(--swift-accent-soft) !important;
+  color: var(--swift-accent) !important;
+}
+html[data-swift-accent] .modal-divider,
+html[data-swift-accent] .cool-awesomebar-modal-footer,
+html[data-swift-accent] .awesomebar-modal-footer {
+  border-color: var(--border-color);
 }
 
 /* ========================================================================

@@ -611,3 +611,81 @@ html[data-swift-theme]:not([data-swift-theme=""]) .kanban-card {
   background: var(--card-bg);
   border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%);
 }
+
+/* ========================================================================
+   Full-theme scoped: Body Sidebar premium (v16 verified classes)
+   ======================================================================== */
+html[data-swift-theme]:not([data-swift-theme=""]) .body-sidebar-container,
+html[data-swift-theme]:not([data-swift-theme=""]) .body-sidebar {
+  background: color-mix(in oklab, var(--fg-color) 82%, transparent) !important;
+  border-right: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.02),
+              4px 0 24px -14px color-mix(in oklab, var(--swift-accent) 60%, transparent);
+}
+
+/* Active item — theme-strength gradient pill */
+html[data-swift-theme]:not([data-swift-theme=""]) .active-sidebar,
+html[data-swift-theme]:not([data-swift-theme=""]) .standard-sidebar-item.active-sidebar,
+html[data-swift-theme]:not([data-swift-theme=""]) .item-anchor.active {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--swift-accent) 26%, transparent),
+    color-mix(in oklab, var(--swift-accent) 6%, transparent) 70%,
+    transparent
+  ) !important;
+  box-shadow:
+    inset 3px 0 0 var(--swift-accent),
+    0 0 24px -8px color-mix(in oklab, var(--swift-accent) 60%, transparent) !important;
+  color: var(--swift-accent) !important;
+}
+
+/* Section headings (like "Modules", "Domains") — subtle accent tint */
+html[data-swift-theme]:not([data-swift-theme=""]) .body-sidebar .section-item > .item-anchor {
+  color: color-mix(in oklab, var(--text-muted) 60%, var(--swift-accent) 40%);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Suffix badges */
+html[data-swift-theme]:not([data-swift-theme=""]) .sidebar-item-suffix {
+  background: color-mix(in oklab, var(--swift-accent) 22%, transparent);
+  color: var(--swift-accent);
+  border: 1px solid color-mix(in oklab, var(--swift-accent) 45%, transparent);
+}
+
+/* Promotional banner — glassy accent card */
+html[data-swift-theme]:not([data-swift-theme=""]) .promotional-banner {
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--swift-accent) 22%, transparent),
+    transparent 70%),
+    color-mix(in oklab, var(--card-bg) 80%, transparent);
+  border: 1px solid color-mix(in oklab, var(--swift-accent) 40%, var(--border-color));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 12px 30px -18px color-mix(in oklab, var(--swift-accent) 70%, transparent);
+}
+
+/* User dropdown / notifications — accent glow border */
+html[data-swift-theme]:not([data-swift-theme=""]) .dropdown-navbar-user.expanded,
+html[data-swift-theme]:not([data-swift-theme=""]) .user-menu-active .dropdown-navbar-user,
+html[data-swift-theme]:not([data-swift-theme=""]) .dropdown-notifications,
+html[data-swift-theme]:not([data-swift-theme=""]) .dropdown-background-tasks {
+  border-color: color-mix(in oklab, var(--swift-accent) 40%, var(--border-color)) !important;
+  box-shadow: 0 20px 40px -18px color-mix(in oklab, var(--swift-accent) 60%, transparent),
+              var(--swift-shadow-lg) !important;
+}
+
+/* Awesomebar (global search) — theme-strength focus */
+html[data-swift-theme]:not([data-swift-theme=""]) .search-bar,
+html[data-swift-theme]:not([data-swift-theme=""]) .awesomebar-input-row {
+  background: color-mix(in oklab, var(--card-bg) 85%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .search-bar:focus-within,
+html[data-swift-theme]:not([data-swift-theme=""]) .awesomebar-input-row:focus-within {
+  border-color: var(--swift-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--swift-accent) 25%, transparent) !important;
+}
