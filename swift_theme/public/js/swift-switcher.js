@@ -42,11 +42,19 @@
         var pop = document.createElement("div");
         pop.className = "swift-palette";
 
-        // Accents
-        pop.appendChild(section("Accent", accentsGrid(accents)));
+        // Full themes ALWAYS on top so users see the premium options first
+        pop.appendChild(section("Premium theme", themesList(themes)));
 
-        // Full themes
-        pop.appendChild(section("Full theme", themesList(themes)));
+        // Accents — only show when NO full theme is active
+        var currentTheme = document.documentElement.getAttribute("data-swift-theme") || "";
+        if (!currentTheme) {
+            pop.appendChild(section("Accent", accentsGrid(accents)));
+        } else {
+            var note = document.createElement("div");
+            note.className = "swift-palette-note";
+            note.textContent = "Accent picker is hidden — the active theme provides its own accent. Pick “None” above to choose your own.";
+            pop.appendChild(section("Accent", note));
+        }
 
         // Layout
         pop.appendChild(section("Density", segmented(["Compact","Comfortable","Cozy"], "density")));

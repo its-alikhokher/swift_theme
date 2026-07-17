@@ -239,22 +239,186 @@ html[data-swift-theme="carbon"] {
 }
 
 /* ============================================================
-   Shared: ambient background layer for all themes
+   9) EMERALD  -  Deep forest green, SaaS premium (Superhuman green).
+   Vibe: Notion + Cash App premium tier. Rich, calm, executive.
    ============================================================ */
+html[data-swift-theme="emerald"] {
+  color-scheme: dark;
+  --bg-color:      #071411;
+  --fg-color:      #0d1e1a;
+  --card-bg:       #112722;
+  --subtle-fg:     #163029;
+  --subtle-accent: #1c3c33;
+  --control-bg:    #112722;
+  --control-bg-on-gray: #1c3c33;
+  --border-color:  #22453b66;
+  --text-color:    #e6f2ed;
+  --text-muted:    #8fb0a4;
+  --heading-color: #f0faf5;
+  --sidebar-bg:    #06120f;
+  --navbar-bg:     #06120fcc;
+
+  --swift-accent:       #34d399;
+  --swift-accent-hover: #10b981;
+  --swift-accent-fg:    #052015;
+  --swift-accent-soft:  rgba(52, 211, 153, 0.16);
+
+  --swift-ambient:
+    radial-gradient(1000px 500px at 10% -10%, rgba(52,211,153,0.18), transparent 55%),
+    radial-gradient(900px 500px at 100% 110%, rgba(20,184,166,0.10), transparent 60%);
+}
+
+/* ============================================================
+   10) SAPPHIRE  -  Royal deep blue + platinum. Enterprise banking premium.
+   Vibe: Bloomberg Terminal x Apple.
+   ============================================================ */
+html[data-swift-theme="sapphire"] {
+  color-scheme: dark;
+  --bg-color:      #060b1a;
+  --fg-color:      #0c1428;
+  --card-bg:       #101a35;
+  --subtle-fg:     #17244a;
+  --subtle-accent: #1c2c58;
+  --control-bg:    #101a35;
+  --control-bg-on-gray: #1c2c58;
+  --border-color:  #223368aa;
+  --text-color:    #e6ecfb;
+  --text-muted:    #9aa8cf;
+  --heading-color: #f4f7ff;
+  --sidebar-bg:    #050916;
+  --navbar-bg:     #050916cc;
+
+  --swift-accent:       #6ea8ff;
+  --swift-accent-hover: #4d8dff;
+  --swift-accent-fg:    #061024;
+  --swift-accent-soft:  rgba(110, 168, 255, 0.16);
+
+  --swift-ambient:
+    radial-gradient(1100px 600px at 0% 0%, rgba(110,168,255,0.16), transparent 55%),
+    radial-gradient(900px 500px at 100% 100%, rgba(155,120,255,0.10), transparent 60%);
+}
+
+/* ============================================================
+   11) ROSE GOLD  -  Warm pearl white + rose gold. Fashion premium.
+   Vibe: Apple + luxury brand landing pages.
+   ============================================================ */
+html[data-swift-theme="rose-gold"] {
+  color-scheme: light;
+  --bg-color:      #fbf6f3;
+  --fg-color:      #ffffff;
+  --card-bg:       #ffffff;
+  --subtle-fg:     #f6ece7;
+  --subtle-accent: #f0dfd6;
+  --control-bg:    #ffffff;
+  --control-bg-on-gray: #f6ece7;
+  --border-color:  #ebd8ce;
+  --text-color:    #2a1a14;
+  --text-muted:    #806760;
+  --heading-color: #1a0d09;
+  --sidebar-bg:    #f7ece6;
+  --navbar-bg:     #ffffffe6;
+
+  --swift-accent:       #c17767;
+  --swift-accent-hover: #a55e4f;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(193, 119, 103, 0.12);
+
+  --swift-ambient:
+    radial-gradient(900px 500px at 100% 0%, rgba(193,119,103,0.10), transparent 60%),
+    radial-gradient(700px 400px at 0% 100%, rgba(217,171,157,0.08), transparent 60%);
+}
+
+/* ============================================================
+   12) IVORY  -  Cream white + deep emerald ink. Museum-quality light.
+   Vibe: Aesop store, Rimowa. Understated luxury.
+   ============================================================ */
+html[data-swift-theme="ivory"] {
+  color-scheme: light;
+  --bg-color:      #f6f4ef;
+  --fg-color:      #fffdf8;
+  --card-bg:       #fffdf8;
+  --subtle-fg:     #eeeadf;
+  --subtle-accent: #e5e0d1;
+  --control-bg:    #fffdf8;
+  --control-bg-on-gray: #eeeadf;
+  --border-color:  #d8d2c0;
+  --text-color:    #1a1f1a;
+  --text-muted:    #6e7268;
+  --heading-color: #0c1310;
+  --sidebar-bg:    #efece2;
+  --navbar-bg:     #fffdf8e6;
+
+  --swift-accent:       #1f5f4a;
+  --swift-accent-hover: #164837;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(31, 95, 74, 0.10);
+
+  --swift-ambient:
+    radial-gradient(800px 400px at 100% 100%, rgba(31,95,74,0.06), transparent 60%);
+}
+
+/* ============================================================
+   Shared: FORCE-PAINT ambient gradients so they render in real Frappe.
+   Frappe paints .desk-body background — we override on <html> AND add a
+   fixed body::before layer that survives Frappe's own CSS. */
+html[data-swift-theme]:not([data-swift-theme=""]) {
+  background: var(--bg-color) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) body,
+html[data-swift-theme]:not([data-swift-theme=""]) .desk-body,
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-main,
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-main-section-wrapper {
+  background: transparent !important;
+}
 html[data-swift-theme]:not([data-swift-theme=""]) body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: var(--swift-ambient, none);
+  background: var(--swift-ambient, none), var(--bg-color);
+  background-attachment: fixed;
+  animation: swift-ambient-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes swift-ambient-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-2%, -1%, 0) scale(1.04); }
 }
 
 html[data-swift-theme]:not([data-swift-theme=""]) .navbar,
 html[data-swift-theme]:not([data-swift-theme=""]) .layout-side-section,
-html[data-swift-theme]:not([data-swift-theme=""]) .layout-main {
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-main,
+html[data-swift-theme]:not([data-swift-theme=""]) .desk-body > * {
   position: relative;
   z-index: 1;
+}
+
+/* Sidebar hairline glow line at accent color — high-end SaaS touch */
+html[data-swift-theme]:not([data-swift-theme=""]) .layout-side-section {
+  box-shadow: inset -1px 0 0 0 var(--border-color),
+              1px 0 24px -8px color-mix(in oklab, var(--swift-accent) 25%, transparent);
+}
+
+/* Page title gets a subtle accent gradient — premium magazine feel */
+html[data-swift-theme]:not([data-swift-theme=""]) .page-title h1,
+html[data-swift-theme]:not([data-swift-theme=""]) .page-head .title-text {
+  background: linear-gradient(135deg,
+    var(--heading-color) 40%,
+    color-mix(in oklab, var(--swift-accent) 65%, var(--heading-color)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+
+/* Active sidebar item — soft gradient pill */
+html[data-swift-theme]:not([data-swift-theme=""]) .sidebar-item.selected,
+html[data-swift-theme]:not([data-swift-theme=""]) .desk-sidebar-item.selected {
+  background: linear-gradient(135deg,
+    var(--swift-accent-soft),
+    color-mix(in oklab, var(--swift-accent) 6%, transparent)) !important;
+  color: var(--swift-accent) !important;
+  box-shadow: inset 2px 0 0 0 var(--swift-accent);
 }
 
 /* Glassy navbar for premium themes */
@@ -288,24 +452,55 @@ html[data-swift-theme]:not([data-swift-theme=""]) {
   --focus-default:      var(--swift-accent);
 }
 
-/* Refined buttons - subtle shadow, sharper radius on premium themes */
+/* Premium buttons — real gradient fill + shine sweep on hover */
 html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary {
-  background: var(--swift-accent) !important;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--swift-accent) 90%, white),
+    var(--swift-accent) 60%,
+    var(--swift-accent-hover)) !important;
   border-color: var(--swift-accent) !important;
   color: var(--swift-accent-fg) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 1px 2px rgba(0,0,0,0.15);
-  font-weight: 500;
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.20),
+    0 4px 14px -4px color-mix(in oklab, var(--swift-accent) 45%, transparent);
+  font-weight: 600;
   letter-spacing: -0.005em;
 }
+html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    transparent 30%,
+    rgba(255,255,255,0.22) 45%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.22) 55%,
+    transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
 html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary:hover {
-  background: var(--swift-accent-hover) !important;
-  border-color: var(--swift-accent-hover) !important;
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    0 4px 12px color-mix(in oklab, var(--swift-accent) 35%, transparent);
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 8px 22px -6px color-mix(in oklab, var(--swift-accent) 55%, transparent);
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .btn-primary:hover::after {
+  transform: translateX(120%);
+}
+
+/* Theme cross-fade — smooth transition when user switches theme */
+html[data-swift-theme] * {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 html[data-swift-theme]:not([data-swift-theme=""]) .btn {
@@ -333,4 +528,86 @@ html[data-swift-theme]:not([data-swift-theme=""]) h3 {
   letter-spacing: -0.02em;
   color: var(--heading-color);
   font-weight: 600;
+}
+
+/* ========================================================================
+   Full-theme scoped: Navbar force-paint (fixes cases where Frappe's own
+   navbar rules paint over the theme). Glassy + accent underline on hover.
+   ======================================================================== */
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar {
+  background: color-mix(in oklab, var(--fg-color) 78%, transparent) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px -12px rgba(0,0,0,0.35);
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .navbar-brand,
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .app-logo,
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .nav-link {
+  color: var(--text-color) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .nav-link:hover,
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .navbar-nav > .nav-item.active > a {
+  color: var(--swift-accent) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .navbar .navbar-brand::after {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px; margin-left: 8px;
+  border-radius: 50%;
+  background: var(--swift-accent);
+  box-shadow: 0 0 12px var(--swift-accent);
+  animation: swift-brand-pulse 2.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+@keyframes swift-brand-pulse {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%     { opacity: 1;   transform: scale(1.25); }
+}
+
+/* ========================================================================
+   Full-theme scoped: Dashboard widgets — premium multi-color cards
+   (Override the neutral accent-mode gradient with theme-specific saturation)
+   ======================================================================== */
+html[data-swift-theme]:not([data-swift-theme=""]) .widget,
+html[data-swift-theme]:not([data-swift-theme=""]) .number-card,
+html[data-swift-theme]:not([data-swift-theme=""]) .dashboard-graph {
+  background: color-mix(in oklab, var(--card-bg) 92%, var(--swift-accent) 8%);
+  border: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
+  box-shadow: 0 8px 24px -18px color-mix(in oklab, var(--swift-accent) 60%, transparent);
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .widget:hover,
+html[data-swift-theme]:not([data-swift-theme=""]) .number-card:hover {
+  box-shadow: 0 20px 40px -20px color-mix(in oklab, var(--swift-accent) 70%, transparent);
+  border-color: var(--swift-accent);
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .number-card .widget-body .number {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Multi-color number card cycle (theme mode) — richer, glowing */
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+1) .widget-body .number { background: linear-gradient(135deg,#a78bfa,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+2) .widget-body .number { background: linear-gradient(135deg,#34d399,#059669); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+3) .widget-body .number { background: linear-gradient(135deg,#fbbf24,#d97706); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+4) .widget-body .number { background: linear-gradient(135deg,#f472b6,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+5) .widget-body .number { background: linear-gradient(135deg,#38bdf8,#0284c7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-theme]:not([data-swift-theme=""]) .widget-group .widget.number-card:nth-child(6n+6) .widget-body .number { background: linear-gradient(135deg,#f87171,#dc2626); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+/* ========================================================================
+   Full-theme scoped: List / Report / Kanban premium look
+   ======================================================================== */
+html[data-swift-theme]:not([data-swift-theme=""]) .list-row-container:hover {
+  background: color-mix(in oklab, var(--swift-accent) 12%, transparent) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .dt-header {
+  background: color-mix(in oklab, var(--card-bg) 80%, var(--swift-accent) 20%) !important;
+  border-bottom: 2px solid var(--swift-accent) !important;
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .kanban-column {
+  background: color-mix(in oklab, var(--card-bg) 96%, var(--swift-accent) 4%);
+}
+html[data-swift-theme]:not([data-swift-theme=""]) .kanban-card {
+  background: var(--card-bg);
+  border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%);
 }

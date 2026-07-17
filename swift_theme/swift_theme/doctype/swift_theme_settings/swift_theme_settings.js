@@ -11,14 +11,32 @@ frappe.ui.form.on("Swift Theme Settings", {
             navigator.clipboard.writeText(frm.doc.export_preset_json || "");
             frappe.show_alert({message: __("Copied"), indicator: "green"});
         });
+
+        toggleAccentVisibility(frm);
     },
     default_accent(frm) { livePreview(frm); },
-    default_theme(frm) { livePreview(frm); },
+    default_theme(frm) {
+        toggleAccentVisibility(frm);
+        livePreview(frm);
+    },
     default_density(frm) { livePreview(frm); },
     default_radius(frm) { livePreview(frm); },
     default_font_scale(frm) { livePreview(frm); },
     default_font_family(frm) { livePreview(frm); },
 });
+
+function toggleAccentVisibility(frm) {
+    // When a Full Theme is active, the theme owns its accent — hide the picker.
+    const hasFullTheme = !!frm.doc.default_theme;
+    frm.toggle_display("default_accent", !hasFullTheme);
+    frm.toggle_display("brand_hex_override", !hasFullTheme);
+    if (hasFullTheme) {
+        frm.set_df_property("default_theme", "description",
+            __("Full theme provides its own accent color. Clear this field to pick an accent manually."));
+    } else {
+        frm.set_df_property("default_theme", "description", "");
+    }
+}
 
 function livePreview(frm) {
     if (!window.SwiftTheme) return;

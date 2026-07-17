@@ -81,7 +81,18 @@
             if (p.enable_toast_theming === 1) { applyAttr("toast", "on"); set("toast", "on"); }
         },
         setAccent: function (v)         { applyAttr("accent", v); set("accent", v); persist("swift_accent", v); },
-        setFullTheme: function (v)      { applyAttr("theme", v);  set("theme", v);  persist("swift_theme", v); },
+        setFullTheme: function (v)      {
+            applyAttr("theme", v);  set("theme", v);  persist("swift_theme", v);
+            // Auto-switch Frappe's own Light/Dark mode based on theme family
+            try {
+                var DARK  = ["emerald","sapphire","obsidian","midnight","aurora","graphite","carbon"];
+                var LIGHT = ["ivory","porcelain","rose-gold","monochrome","sandstone"];
+                var mode  = DARK.indexOf(v) > -1 ? "dark" : (LIGHT.indexOf(v) > -1 ? "light" : null);
+                if (mode && window.frappe && frappe.ui && frappe.ui.set_theme) {
+                    frappe.ui.set_theme(mode);
+                }
+            } catch (e) {}
+        },
         setDensity: function (v)        { applyAttr("density", v); set("density", v); persist("swift_density", v); },
         setRadius: function (v)         { applyAttr("radius", v);  set("radius", v);  persist("swift_radius", v); },
         setFontScale: function (v)      { applyAttr("font-scale", v); set("font_scale", v); persist("swift_font_scale", v); },

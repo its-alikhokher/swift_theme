@@ -18,7 +18,7 @@
  "fields": [
   {"fieldname": "sb_defaults", "fieldtype": "Section Break", "label": "Defaults"},
   {"fieldname": "default_accent", "fieldtype": "Select", "label": "Default Accent", "options": "indigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate", "default": "indigo"},
-  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\nobsidian\ngraphite\nmidnight\naurora\ncarbon\nmonochrome\nporcelain\nsandstone"},
+  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\nemerald\nsapphire\nobsidian\nmidnight\naurora\ngraphite\ncarbon\nivory\nporcelain\nrose-gold\nmonochrome\nsandstone"},
   {"fieldname": "cb_defaults", "fieldtype": "Column Break"},
   {"fieldname": "default_font_family", "fieldtype": "Select", "label": "Default Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem", "default": "Inter"},
   {"fieldname": "default_font_scale", "fieldtype": "Select", "label": "Default Font Scale", "options": "S\nM\nL\nXL", "default": "M"},

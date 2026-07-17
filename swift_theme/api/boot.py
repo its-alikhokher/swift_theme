@@ -16,13 +16,17 @@ ACCENTS = [
 
 FULL_THEMES = [
     {"key": "",           "label": "None (use accent + Frappe mode)"},
+    {"key": "emerald",    "label": "Emerald",    "tag": "Dark · SaaS premium green"},
+    {"key": "sapphire",   "label": "Sapphire",   "tag": "Dark · Enterprise banking blue"},
     {"key": "obsidian",   "label": "Obsidian",   "tag": "Dark · Developer luxury"},
-    {"key": "graphite",   "label": "Graphite",   "tag": "Dark · Editorial charcoal"},
     {"key": "midnight",   "label": "Midnight",   "tag": "Dark · Yacht-club navy"},
     {"key": "aurora",     "label": "Aurora",     "tag": "Dark · Glassy magic"},
+    {"key": "graphite",   "label": "Graphite",   "tag": "Dark · Editorial charcoal"},
     {"key": "carbon",     "label": "Carbon",     "tag": "Dark · Terminal neon"},
-    {"key": "monochrome", "label": "Monochrome", "tag": "Light · Zero color noise"},
+    {"key": "ivory",      "label": "Ivory",      "tag": "Light · Museum-quality luxury"},
     {"key": "porcelain",  "label": "Porcelain",  "tag": "Light · Warm editorial"},
+    {"key": "rose-gold",  "label": "Rose Gold",  "tag": "Light · Fashion pearl"},
+    {"key": "monochrome", "label": "Monochrome", "tag": "Light · Zero color noise"},
     {"key": "sandstone",  "label": "Sandstone",  "tag": "Light · Muji calm"},
 ]
 
