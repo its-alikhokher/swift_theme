@@ -1,0 +1,17 @@
+{
+  "default_accent": "pink",
+  "default_theme": "dracula",
+  "default_density": "Comfortable",
+  "default_radius": "Pill",
+  "default_font_family": "Poppins",
+  "default_font_scale": "M",
+  "navbar_variant": "Glass",
+  "sidebar_variant": "Floating",
+  "enable_switcher": 1,
+  "enable_command_palette": 1,
+  "enable_focus_mode": 1,
+  "enable_perf_mode": 1,
+  "enable_styled_scrollbar": 1,
+  "enable_toast_theming": 1,
+  "enable_print_theming": 1
+}

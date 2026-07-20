@@ -1,0 +1,24 @@
+/* Swift Theme — Scrollbars (opt-in via data-swift-scrollbar="on") */
+
+html[data-swift-scrollbar="on"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--swift-accent) transparent;
+}
+
+html[data-swift-scrollbar="on"] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html[data-swift-scrollbar="on"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+html[data-swift-scrollbar="on"] ::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--swift-accent) 55%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html[data-swift-scrollbar="on"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--swift-accent);
+  background-clip: padding-box;
+}

@@ -1,0 +1,26 @@
+/* Swift Theme — Performance (opt-in) */
+
+html[data-swift-perf="on"] .list-row,
+html[data-swift-perf="on"] .frappe-card,
+html[data-swift-perf="on"] .layout-main-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 400px;
+}
+
+html[data-swift-anim="off"] *,
+html[data-swift-anim="off"] *::before,
+html[data-swift-anim="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-swift-anim="on"]) *,
+  html:not([data-swift-anim="on"]) *::before,
+  html:not([data-swift-anim="on"]) *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

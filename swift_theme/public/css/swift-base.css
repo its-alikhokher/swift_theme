@@ -1,0 +1,57 @@
+/* Swift Theme — Base tokens
+   IMPORTANT: We DO NOT override Frappe's --bg-color, --card-bg, --text-color
+   unless a Full Theme is active. This keeps Frappe's Light/Dark/Auto working. */
+
+:root {
+  --swift-radius-sharp: 2px;
+  --swift-radius-rounded: 10px;
+  --swift-radius-pill: 999px;
+
+  --swift-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --swift-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --swift-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.14);
+
+  --swift-transition: 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Default radius/density scales — overridden by data attrs below */
+  --swift-radius:    var(--swift-radius-rounded);
+  --swift-radius-sm: 6px;
+  --swift-radius-lg: 14px;
+
+  --swift-space-1: 4px;
+  --swift-space-2: 8px;
+  --swift-space-3: 12px;
+  --swift-space-4: 16px;
+  --swift-row-h: 36px;
+  --swift-font-size: 14px;
+}
+
+/* ---------- Radius scale (Sharp / Rounded / Pill) ---------- */
+html[data-swift-radius="Sharp"]   { --swift-radius: 2px;  --swift-radius-sm: 2px;  --swift-radius-lg: 4px; }
+html[data-swift-radius="Rounded"] { --swift-radius: 10px; --swift-radius-sm: 6px;  --swift-radius-lg: 14px; }
+html[data-swift-radius="Pill"]    { --swift-radius: 999px; --swift-radius-sm: 999px; --swift-radius-lg: 999px; }
+
+/* ---------- Font scale (S / M / L / XL) ---------- */
+html[data-swift-font-scale="S"]  { --swift-font-size: 12.5px; }
+html[data-swift-font-scale="M"]  { --swift-font-size: 14px; }
+html[data-swift-font-scale="L"]  { --swift-font-size: 15.5px; }
+html[data-swift-font-scale="XL"] { --swift-font-size: 17px; }
+
+html[data-swift-font-scale] body { font-size: var(--swift-font-size); }
+
+/* ---------- Density (Compact / Comfortable / Cozy) ---------- */
+html[data-swift-density="Compact"]     { --swift-row-h: 30px; --swift-space-3: 8px;  --swift-space-4: 12px; }
+html[data-swift-density="Comfortable"] { --swift-row-h: 36px; --swift-space-3: 12px; --swift-space-4: 16px; }
+html[data-swift-density="Cozy"]        { --swift-row-h: 44px; --swift-space-3: 16px; --swift-space-4: 22px; }
+
+html[data-swift-density] .list-row,
+html[data-swift-density] .list-row-container > .list-row {
+  min-height: var(--swift-row-h);
+}
+html[data-swift-density] .form-section,
+html[data-swift-density] .layout-main-section {
+  padding: var(--swift-space-4);
+}
+html[data-swift-density] .form-control {
+  padding: calc(var(--swift-space-2) - 2px) var(--swift-space-3);
+}

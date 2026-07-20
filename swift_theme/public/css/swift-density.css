@@ -1,0 +1,22 @@
+/* Swift Theme — Density fine-tuning
+   swift-base already sets --swift-row-h and spacing tokens.
+   Here we translate those into concrete component tweaks. */
+
+html[data-swift-density] .list-row-col,
+html[data-swift-density] .list-row .list-subject {
+  padding-top: calc((var(--swift-row-h) - 20px) / 2);
+  padding-bottom: calc((var(--swift-row-h) - 20px) / 2);
+}
+
+html[data-swift-density] .btn {
+  padding: calc(var(--swift-space-2) - 2px) var(--swift-space-3);
+  border-radius: var(--swift-radius-sm);
+}
+html[data-swift-density] .btn-sm { padding: 4px 8px; }
+
+html[data-swift-density] .page-head .title-area h1.title { padding: var(--swift-space-2) 0; }
+
+/* Table rows */
+html[data-swift-density="Compact"]     table.table td { padding: 4px 8px; }
+html[data-swift-density="Comfortable"] table.table td { padding: 8px 12px; }
+html[data-swift-density="Cozy"]        table.table td { padding: 12px 16px; }

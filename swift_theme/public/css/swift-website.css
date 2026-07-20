@@ -1,0 +1,29 @@
+/* Swift Theme — Public website + portal */
+
+html[data-swift-accent] .website-navbar,
+html[data-swift-accent] nav.navbar {
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-sm);
+}
+
+html[data-swift-accent] .btn.btn-primary,
+html[data-swift-accent] .btn.btn-primary-light {
+  background: var(--swift-accent);
+  color: var(--swift-accent-fg);
+  border-radius: var(--swift-radius-sm);
+  border-color: var(--swift-accent);
+  font-weight: 500;
+}
+html[data-swift-accent] .btn.btn-primary:hover {
+  background: var(--swift-accent-hover);
+  border-color: var(--swift-accent-hover);
+}
+
+html[data-swift-accent] .card {
+  border-radius: var(--swift-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--swift-shadow-sm);
+}
+
+html[data-swift-accent] a { color: var(--swift-accent); }
+html[data-swift-accent] a:hover { color: var(--swift-accent-hover); }
