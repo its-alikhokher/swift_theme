@@ -86,4 +86,4 @@ bench --site your-site.local migrate
 
 ## License
 
-MIT — © MuleRun
+MIT — © its-alikhokher
