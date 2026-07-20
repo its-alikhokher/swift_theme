@@ -161,9 +161,23 @@
 
     function togglesList() {
         var wrap = document.createElement("div");
+        var sidebarOff = window.SwiftSidebar && window.SwiftSidebar.isOff && window.SwiftSidebar.isOff();
+        var pins = (window.SwiftSidebar && window.SwiftSidebar.getPins && window.SwiftSidebar.getPins()) || [];
         var items = [
             { label: "Focus mode (F)",   onClick: function () { window.SwiftTheme.toggleFocus(); } },
             { label: "Reading mode (R)", onClick: function () { window.SwiftTheme.toggleReading(); } },
+            { label: (sidebarOff ? "Show sidebar (Alt+B)" : "Hide sidebar totally (Alt+B)"),
+              onClick: function () {
+                  if (window.SwiftSidebar) window.SwiftSidebar.toggleOff();
+                  closePalette();
+              }
+            },
+            { label: "Clear pinned items (" + pins.length + ")",
+              onClick: function () {
+                  if (window.SwiftSidebar) window.SwiftSidebar.clearPins();
+                  closePalette();
+              }
+            },
             { label: "Command palette (Ctrl+Shift+T)", onClick: function () { document.dispatchEvent(new CustomEvent("swift:cmdk:open")); closePalette(); } },
         ];
         items.forEach(function (i) {
@@ -173,6 +187,20 @@
             row.addEventListener("click", i.onClick);
             wrap.appendChild(row);
         });
+        // Show list of currently pinned items
+        if (pins.length) {
+            var hint = document.createElement("div");
+            hint.className = "swift-palette-note";
+            hint.style.marginTop = "6px";
+            hint.textContent = "Pinned: " + pins.slice(0, 5).join(", ") + (pins.length > 5 ? "…" : "");
+            wrap.appendChild(hint);
+        } else {
+            var hint2 = document.createElement("div");
+            hint2.className = "swift-palette-note";
+            hint2.style.marginTop = "6px";
+            hint2.textContent = "Tip: hover any sidebar item and click ★ to pin it to the top.";
+            wrap.appendChild(hint2);
+        }
         return wrap;
     }
 
