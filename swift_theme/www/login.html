@@ -1,0 +1,181 @@
+{% extends "templates/web.html" %}
+
+{%- block head_include %}
+{{ super() }}
+{{ frappe.render_template('templates/includes/login/login_icons.html') }}
+<style>
+/* Critical login styles to ensure proper override */
+.for-login, .for-signup, .for-forgot {
+max-width: 360px;
+margin: 10vh auto;
+}
+.page-card {
+border: none !important;
+box-shadow: none !important;
+background: transparent !important;
+}
+</style>
+{%- endblock -%}
+
+{% block title %}{{ _("Login") }}{% endblock %}
+
+{% block page_content %}
+<!-- Custom Swift Theme Login Page -->
+<div class="login-content {{ 'signup-form' if signup_form else '' }}">
+<!-- Brand Section -->
+<div class="swift-login-brand">
+<img src="/assets/swift_theme/icons/favicon.svg" alt="Logo" />
+<span class="name">{{ frappe.get_site_config().sitename or "Swift Theme" }}</span>
+</div>
+
+<!-- Login Form -->
+<div class="page-card">
+<div class="page-card-head">
+<h4>{{ _("Login") }}</h4>
+<p class="swift-login-tagline">{{ _("Welcome back! Please sign in to continue.") }}</p>
+</div>
+
+<form id="login" class="for-login" action="/api/method/login" method="post">
+<div class="form-group">
+<label class="sr-only" for="login_email">{{ _("Email or Username") }}</label>
+<input type="text" id="login_email" name="usr" 
+class="form-control" placeholder="{{ _('Email or Username') }}" required autofocus>
+</div>
+
+<div class="form-group">
+<label class="sr-only" for="login_password">{{ _("Password") }}</label>
+<input type="password" id="login_password" name="pwd" 
+class="form-control" placeholder="{{ _('Password') }}" required>
+</div>
+
+<div class="forgot-password-message">
+<a href="#forgot">{{ _("Forgot Password?") }}</a>
+</div>
+
+<button type="submit" class="btn btn-primary btn-block login-btn">
+{{ _("Login") }}
+</button>
+
+{% if disable_signup == 0 and enable_google_login or enable_facebook_login or enable_github_login or enable_azure_login or enable_salesforce_login %}
+<div class="social-logins text-center">
+<div class="or-separator">{{ _("or") }}</div>
+{% if enable_google_login %}
+<a href="/api/method/frappe.integrations.oauth2_logins.login_via_google" class="btn btn-default btn-sm btn-block">
+{{ _("Login with Google") }}
+</a>
+{% endif %}
+{% if enable_facebook_login %}
+<a href="/api/method/frappe.integrations.oauth2_logins.login_via_facebook" class="btn btn-default btn-sm btn-block">
+{{ _("Login with Facebook") }}
+</a>
+{% endif %}
+{% if enable_github_login %}
+<a href="/api/method/frappe.integrations.oauth2_logins.login_via_github" class="btn btn-default btn-sm btn-block">
+{{ _("Login with GitHub") }}
+</a>
+{% endif %}
+{% if enable_azure_login %}
+<a href="/api/method/frappe.integrations.oauth2_logins.login_via_azure" class="btn btn-default btn-sm btn-block">
+{{ _("Login with Azure") }}
+</a>
+{% endif %}
+</div>
+{% endif %}
+</form>
+
+{% if ldap_settings and ldap_settings.enabled %}
+<div class="text-center">
+<button class="btn btn-block btn-default btn-login-ldap">
+{{ _("Login with LDAP") }}
+</button>
+</div>
+{% endif %}
+</div>
+
+<!-- Signup Link -->
+{% if not disable_signup and not ldap_settings.enabled %}
+<div class="text-center signup-section">
+{{ _("Don't have an account?") }} <a href="#signup">{{ _("Sign up") }}</a>
+</div>
+{% endif %}
+</div>
+
+<!-- Forgot Password Section -->
+<div class="card-box forgot-form" style="display:none;">
+<div class="page-card-head">
+<h4>{{ _("Forgot Password") }}</h4>
+</div>
+<form class="for-forgot" action="/api/method/frappe.core.doctype.user.user.reset_password" method="post">
+<div class="form-group">
+<input type="text" name="email" id="forgot_email" class="form-control" 
+placeholder="{{ _('Email Address') }}" required>
+</div>
+<button type="submit" class="btn btn-primary btn-block">
+{{ _("Reset Password") }}
+</button>
+<div class="back-to-login">
+<a href="#login">{{ _("Back to Login") }}</a>
+</div>
+</form>
+</div>
+
+<!-- Signup Section -->
+{% if not disable_signup %}
+<div class="card-box signup-form" style="display:none;">
+<div class="page-card-head">
+<h4>{{ _("Sign Up") }}</h4>
+</div>
+<form class="for-signup" action="/api/method/frappe.core.doctype.user.user.signup" method="post">
+<div class="form-group">
+<input type="text" name="full_name" class="form-control" 
+placeholder="{{ _('Full Name') }}" required>
+</div>
+<div class="form-group">
+<input type="email" name="email" class="form-control" 
+placeholder="{{ _('Email Address') }}" required>
+</div>
+<div class="form-group">
+<input type="password" name="password" class="form-control" 
+placeholder="{{ _('Password') }}" required>
+</div>
+<button type="submit" class="btn btn-primary btn-block">
+{{ _("Sign Up") }}
+</button>
+<div class="back-to-login">
+<a href="#login">{{ _("Back to Login") }}</a>
+</div>
+</form>
+</div>
+{% endif %}
+
+<script>
+// Simple form switching logic
+frappe.ready(function() {
+function showForm(formName) {
+$('.for-login, .for-signup, .for-forgot, .card-box').hide();
+if(formName === 'signup') {
+$('.for-signup, .signup-form').show();
+} else if(formName === 'forgot') {
+$('.for-forgot, .forgot-form').show();
+} else {
+$('.for-login').show();
+}
+}
+
+$('a[href="#signup"]').click(function(e) {
+e.preventDefault();
+showForm('signup');
+});
+
+$('a[href="#forgot"]').click(function(e) {
+e.preventDefault();
+showForm('forgot');
+});
+
+$('a[href="#login"]').click(function(e) {
+e.preventDefault();
+showForm('login');
+});
+});
+</script>
+{% endblock %}
