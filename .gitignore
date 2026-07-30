@@ -2,6 +2,12 @@
 # Compiled and build artifacts
 *.pyc
 __pycache__/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.py~
 
 # Dependencies
 .venv/
