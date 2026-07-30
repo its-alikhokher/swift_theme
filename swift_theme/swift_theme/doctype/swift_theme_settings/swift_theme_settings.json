@@ -1,90 +1,192 @@
 {
- "actions": [],
- "creation": "2026-01-01 00:00:00",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "sb_defaults", "default_accent", "default_theme", "cb_defaults", "default_font_family", "default_font_scale",
-  "sb_layout", "default_density", "default_radius", "cb_layout", "navbar_variant", "sidebar_variant",
-  "sb_features", "enable_switcher", "enable_command_palette", "enable_focus_mode", "cb_features", "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
-  "sb_brand", "brand_logo", "brand_logo_dark", "brand_name", "cb_brand", "brand_favicon", "brand_hex_override",
-  "sb_login", "login_layout", "login_bg_image", "cb_login", "login_tagline", "login_show_signup",
-  "sb_auto", "enable_auto_dark", "auto_dark_start", "cb_auto", "auto_dark_end",
-  "sb_print", "enable_print_theming", "print_font_family",
-  "sb_custom", "custom_css", "custom_js",
-  "sb_presets", "active_preset", "cb_presets", "import_preset_json", "export_preset_json"
+  "section_break_1",
+  "default_accent",
+  "brand_hex_override",
+  "enable_custom_logo",
+  "app_logo",
+  "section_break_colors",
+  "color_mode",
+  "gradient_start",
+  "gradient_end",
+  "primary_color",
+  "secondary_color",
+  "section_break_ui",
+  "density",
+  "radius",
+  "font_scale",
+  "performance_mode",
+  "sidebar_behavior_section",
+  "sidebar_variant",
+  "pin_behavior",
+  "sounds_section",
+  "enable_sounds",
+  "volume_level"
  ],
  "fields": [
-  {"fieldname": "sb_defaults", "fieldtype": "Section Break", "label": "Defaults"},
-  {"fieldname": "default_accent", "fieldtype": "Select", "label": "Default Accent", "options": "indigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate", "default": "indigo"},
-  {"fieldname": "default_theme", "fieldtype": "Select", "label": "Default Full Theme (overrides accent)", "options": "\nemerald\nsapphire\nobsidian\nmidnight\naurora\ngraphite\ncarbon\nivory\nporcelain\nrose-gold\nmonochrome\nsandstone"},
-  {"fieldname": "cb_defaults", "fieldtype": "Column Break"},
-  {"fieldname": "default_font_family", "fieldtype": "Select", "label": "Default Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem", "default": "Inter"},
-  {"fieldname": "default_font_scale", "fieldtype": "Select", "label": "Default Font Scale", "options": "S\nM\nL\nXL", "default": "M"},
-
-  {"fieldname": "sb_layout", "fieldtype": "Section Break", "label": "Layout"},
-  {"fieldname": "default_density", "fieldtype": "Select", "label": "Density", "options": "Compact\nComfortable\nCozy", "default": "Comfortable"},
-  {"fieldname": "default_radius", "fieldtype": "Select", "label": "Shape", "options": "Sharp\nRounded\nPill", "default": "Rounded"},
-  {"fieldname": "cb_layout", "fieldtype": "Column Break"},
-  {"fieldname": "navbar_variant", "fieldtype": "Select", "label": "Navbar", "options": "Solid\nGlass\nTransparent", "default": "Solid"},
-  {"fieldname": "sidebar_variant", "fieldtype": "Select", "label": "Sidebar", "options": "Attached\nFloating\nIcon-only", "default": "Attached"},
-
-  {"fieldname": "sb_features", "fieldtype": "Section Break", "label": "Features"},
-  {"fieldname": "enable_switcher", "fieldtype": "Check", "label": "Navbar Theme Switcher", "default": "1"},
-  {"fieldname": "enable_command_palette", "fieldtype": "Check", "label": "Command Palette (Ctrl+Shift+T)", "default": "1"},
-  {"fieldname": "enable_focus_mode", "fieldtype": "Check", "label": "Focus / Reading Mode Shortcuts", "default": "1"},
-  {"fieldname": "cb_features", "fieldtype": "Column Break"},
-  {"fieldname": "enable_perf_mode", "fieldtype": "Check", "label": "Performance Mode", "default": "1"},
-  {"fieldname": "enable_styled_scrollbar", "fieldtype": "Check", "label": "Styled Scrollbars", "default": "1"},
-  {"fieldname": "enable_toast_theming", "fieldtype": "Check", "label": "Theme Toasts & Progress Bar", "default": "1"},
-
-  {"fieldname": "sb_brand", "fieldtype": "Section Break", "label": "Brand"},
-  {"fieldname": "brand_logo", "fieldtype": "Attach Image", "label": "Logo (Light)"},
-  {"fieldname": "brand_logo_dark", "fieldtype": "Attach Image", "label": "Logo (Dark)"},
-  {"fieldname": "brand_name", "fieldtype": "Data", "label": "Brand Name"},
-  {"fieldname": "cb_brand", "fieldtype": "Column Break"},
-  {"fieldname": "brand_favicon", "fieldtype": "Attach Image", "label": "Favicon"},
-  {"fieldname": "brand_hex_override", "fieldtype": "Data", "label": "Custom Accent Hex (e.g. #7c7cff)", "description": "If set, overrides Default Accent for both light and dark modes."},
-
-  {"fieldname": "sb_login", "fieldtype": "Section Break", "label": "Login Page"},
-  {"fieldname": "login_layout", "fieldtype": "Select", "label": "Layout", "options": "Split\nCentered\nMinimal", "default": "Split"},
-  {"fieldname": "login_bg_image", "fieldtype": "Attach Image", "label": "Background Image (Split layout)"},
-  {"fieldname": "cb_login", "fieldtype": "Column Break"},
-  {"fieldname": "login_tagline", "fieldtype": "Small Text", "label": "Tagline"},
-  {"fieldname": "login_show_signup", "fieldtype": "Check", "label": "Show Signup Link", "default": "1"},
-
-  {"fieldname": "sb_auto", "fieldtype": "Section Break", "label": "Auto Dark"},
-  {"fieldname": "enable_auto_dark", "fieldtype": "Check", "label": "Auto switch to Dark by time"},
-  {"fieldname": "auto_dark_start", "fieldtype": "Time", "label": "Start (dark from)", "default": "19:00:00"},
-  {"fieldname": "cb_auto", "fieldtype": "Column Break"},
-  {"fieldname": "auto_dark_end", "fieldtype": "Time", "label": "End (back to light at)", "default": "07:00:00"},
-
-  {"fieldname": "sb_print", "fieldtype": "Section Break", "label": "Print Theming"},
-  {"fieldname": "enable_print_theming", "fieldtype": "Check", "label": "Apply accent + font to Print Formats", "default": "1"},
-  {"fieldname": "print_font_family", "fieldtype": "Select", "label": "Print Font", "options": "Inter\nPoppins\nManrope\nRoboto\nSystem\nGeorgia\nTimes New Roman", "default": "Inter"},
-
-  {"fieldname": "sb_custom", "fieldtype": "Section Break", "label": "Custom Injection", "collapsible": 1},
-  {"fieldname": "custom_css", "fieldtype": "Code", "label": "Custom CSS (Desk + Website)", "options": "CSS"},
-  {"fieldname": "custom_js", "fieldtype": "Code", "label": "Custom JS (Desk only)", "options": "JavaScript"},
-
-  {"fieldname": "sb_presets", "fieldtype": "Section Break", "label": "Presets", "collapsible": 1},
-  {"fieldname": "active_preset", "fieldtype": "Select", "label": "Apply Preset", "options": "\nLinear\nVercel\nStripe\nRaycast\nSuperhuman\nNotion\nTerminal\nEditorial"},
-  {"fieldname": "cb_presets", "fieldtype": "Column Break"},
-  {"fieldname": "import_preset_json", "fieldtype": "Code", "label": "Import Preset JSON", "options": "JSON"},
-  {"fieldname": "export_preset_json", "fieldtype": "Code", "label": "Exported Config (read-only)", "options": "JSON", "read_only": 1}
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break",
+   "label": "Branding & Accent"
+  },
+  {
+   "default": "Swift Blue",
+   "fieldname": "default_accent",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Preset Theme",
+   "options": "None\nSwift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red"
+  },
+  {
+   "depends_on": "eval:doc.default_accent=='None'",
+   "fieldname": "brand_hex_override",
+   "fieldtype": "Color",
+   "label": "Custom Brand Color"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_custom_logo",
+   "fieldtype": "Check",
+   "label": "Use Custom Logo"
+  },
+  {
+   "depends_on": "eval:doc.enable_custom_logo==1",
+   "fieldname": "app_logo",
+   "fieldtype": "Attach Image",
+   "label": "App Logo"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_colors",
+   "fieldtype": "Section Break",
+   "label": "Gradient / Manual Colors"
+  },
+  {
+   "default": "Preset",
+   "fieldname": "color_mode",
+   "fieldtype": "Select",
+   "label": "Color Mode",
+   "options": "Preset\nGradient\nManual"
+  },
+  {
+   "depends_on": "eval:doc.color_mode=='Gradient'",
+   "fieldname": "gradient_start",
+   "fieldtype": "Color",
+   "label": "Gradient Start"
+  },
+  {
+   "depends_on": "eval:doc.color_mode=='Gradient'",
+   "fieldname": "gradient_end",
+   "fieldtype": "Color",
+   "label": "Gradient End"
+  },
+  {
+   "depends_on": "eval:doc.color_mode=='Manual'",
+   "fieldname": "primary_color",
+   "fieldtype": "Color",
+   "label": "Primary Color"
+  },
+  {
+   "depends_on": "eval:doc.color_mode=='Manual'",
+   "fieldname": "secondary_color",
+   "fieldtype": "Color",
+   "label": "Secondary Color"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_ui",
+   "fieldtype": "Section Break",
+   "label": "UI Preferences"
+  },
+  {
+   "default": "Comfortable",
+   "fieldname": "density",
+   "fieldtype": "Select",
+   "label": "Density",
+   "options": "Compact\nComfortable\nSpacious"
+  },
+  {
+   "default": "Medium",
+   "fieldname": "radius",
+   "fieldtype": "Select",
+   "label": "Corner Radius",
+   "options": "None\nSmall\nMedium\nLarge\nFull"
+  },
+  {
+   "default": "100%",
+   "fieldname": "font_scale",
+   "fieldtype": "Select",
+   "label": "Font Scale",
+   "options": "80%\n90%\n100%\n110%\n120%"
+  },
+  {
+   "default": "0",
+   "fieldname": "performance_mode",
+   "fieldtype": "Check",
+   "label": "Performance Mode (Disable Animations)"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sidebar_behavior_section",
+   "fieldtype": "Section Break",
+   "label": "Sidebar Behavior"
+  },
+  {
+   "default": "Floating",
+   "fieldname": "sidebar_variant",
+   "fieldtype": "Select",
+   "label": "Sidebar Style",
+   "options": "Floating\nAttached\nMinimal"
+  },
+  {
+   "default": "Click to Pin",
+   "fieldname": "pin_behavior",
+   "fieldtype": "Select",
+   "label": "Pin Behavior",
+   "options": "Click to Pin\nHover to Expand\nAlways Expanded"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sounds_section",
+   "fieldtype": "Section Break",
+   "label": "Sound Settings"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_sounds",
+   "fieldtype": "Check",
+   "label": "Enable Sounds"
+  },
+  {
+   "default": "50",
+   "fieldname": "volume_level",
+   "fieldtype": "Int",
+   "label": "Volume Level (%)"
+  }
  ],
+ "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-01-01 00:00:00",
+ "modified": "2024-07-30 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",
  "owner": "Administrator",
  "permissions": [
-  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "role": "System Manager", "share": 1, "write": 1}
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
  ],
- "sort_field": "modified",
+ "sort_field": "creation",
  "sort_order": "DESC",
- "track_changes": 1
+ "states": []
 }
