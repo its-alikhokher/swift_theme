@@ -1,0 +1,290 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:theme_key",
+ "creation": "2025-07-30 14:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "identity_section",
+  "theme_name",
+  "theme_key",
+  "column_break_identity",
+  "is_default",
+  "is_dark",
+  "owner_user",
+  "is_public",
+  "colors_section",
+  "bg_primary",
+  "bg_surface",
+  "bg_input",
+  "column_break_colors_1",
+  "text_primary",
+  "text_muted",
+  "border",
+  "column_break_colors_2",
+  "accent",
+  "accent_hover",
+  "buttons_section",
+  "button_bg",
+  "button_text",
+  "column_break_buttons",
+  "button_hover_bg",
+  "typography_section",
+  "font_family",
+  "font_size_base",
+  "column_break_typography",
+  "font_weight_base",
+  "motion_section",
+  "transition_duration",
+  "border_radius",
+  "column_break_motion",
+  "enable_hover_lift",
+  "advanced_section",
+  "custom_css",
+  "custom_js"
+ ],
+ "fields": [
+  {
+   "fieldname": "identity_section",
+   "fieldtype": "Section Break",
+   "label": "Identity"
+  },
+  {
+   "fieldname": "theme_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Theme Name",
+   "reqd": 1
+  },
+  {
+   "description": "URL-safe slug. Lowercase letters, digits and hyphens.",
+   "fieldname": "theme_key",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Theme Key",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_identity",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Shipped with the app. Cannot be deleted.",
+   "fieldname": "is_default",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Default"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_dark",
+   "fieldtype": "Check",
+   "label": "Is Dark Theme"
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "label": "Owner",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "description": "Make this custom theme available to other users.",
+   "fieldname": "is_public",
+   "fieldtype": "Check",
+   "label": "Public"
+  },
+  {
+   "fieldname": "colors_section",
+   "fieldtype": "Section Break",
+   "label": "Colors"
+  },
+  {
+   "fieldname": "bg_primary",
+   "fieldtype": "Color",
+   "label": "Background Primary"
+  },
+  {
+   "fieldname": "bg_surface",
+   "fieldtype": "Color",
+   "label": "Surface Background"
+  },
+  {
+   "fieldname": "bg_input",
+   "fieldtype": "Color",
+   "label": "Input Background"
+  },
+  {
+   "fieldname": "column_break_colors_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "text_primary",
+   "fieldtype": "Color",
+   "label": "Text Primary"
+  },
+  {
+   "fieldname": "text_muted",
+   "fieldtype": "Color",
+   "label": "Text Muted"
+  },
+  {
+   "fieldname": "border",
+   "fieldtype": "Color",
+   "label": "Border Color"
+  },
+  {
+   "fieldname": "column_break_colors_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accent",
+   "fieldtype": "Color",
+   "label": "Accent Color"
+  },
+  {
+   "fieldname": "accent_hover",
+   "fieldtype": "Color",
+   "label": "Accent Hover"
+  },
+  {
+   "fieldname": "buttons_section",
+   "fieldtype": "Section Break",
+   "label": "Buttons"
+  },
+  {
+   "fieldname": "button_bg",
+   "fieldtype": "Color",
+   "label": "Button Background"
+  },
+  {
+   "fieldname": "button_text",
+   "fieldtype": "Color",
+   "label": "Button Text"
+  },
+  {
+   "fieldname": "column_break_buttons",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "button_hover_bg",
+   "fieldtype": "Color",
+   "label": "Button Hover BG"
+  },
+  {
+   "fieldname": "typography_section",
+   "fieldtype": "Section Break",
+   "label": "Typography"
+  },
+  {
+   "default": "\"Inter\", system-ui, sans-serif",
+   "fieldname": "font_family",
+   "fieldtype": "Data",
+   "label": "Font Family"
+  },
+  {
+   "default": "14px",
+   "fieldname": "font_size_base",
+   "fieldtype": "Data",
+   "label": "Base Font Size"
+  },
+  {
+   "fieldname": "column_break_typography",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "400",
+   "fieldname": "font_weight_base",
+   "fieldtype": "Int",
+   "label": "Base Font Weight"
+  },
+  {
+   "fieldname": "motion_section",
+   "fieldtype": "Section Break",
+   "label": "Motion & Shape"
+  },
+  {
+   "default": "150ms",
+   "fieldname": "transition_duration",
+   "fieldtype": "Data",
+   "label": "Transition Duration"
+  },
+  {
+   "default": "8px",
+   "fieldname": "border_radius",
+   "fieldtype": "Data",
+   "label": "Border Radius"
+  },
+  {
+   "fieldname": "column_break_motion",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_hover_lift",
+   "fieldtype": "Check",
+   "label": "Enable Hover Lift"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "advanced_section",
+   "fieldtype": "Section Break",
+   "label": "Advanced Customization"
+  },
+  {
+   "description": "Custom CSS to apply with this theme",
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS"
+  },
+  {
+   "description": "Custom JavaScript to execute on theme load",
+   "fieldname": "custom_js",
+   "fieldtype": "Code",
+   "label": "Custom JS",
+   "options": "JS"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2025-07-30 14:00:00",
+ "modified_by": "Administrator",
+ "module": "Swift Theme",
+ "name": "Theme Definition",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "All"
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "if_owner": 1,
+   "read": 1,
+   "role": "All",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

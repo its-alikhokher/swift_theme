@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:user",
+ "creation": "2025-07-30 14:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "enabled",
+  "volume_control_section",
+  "master_volume",
+  "sounds_section",
+  "sounds"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "description": "Master on/off switch for sounds",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable Sounds"
+  },
+  {
+   "collapsible": 0,
+   "fieldname": "volume_control_section",
+   "fieldtype": "Section Break",
+   "label": "Volume Control"
+  },
+  {
+   "default": "100",
+   "description": "Master volume level (0-100)",
+   "fieldname": "master_volume",
+   "fieldtype": "Int",
+   "label": "Master Volume (%)",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "sounds_section",
+   "fieldtype": "Section Break",
+   "label": "Per-Event Sounds"
+  },
+  {
+   "fieldname": "sounds",
+   "fieldtype": "Table",
+   "label": "Sound Mappings",
+   "options": "User Sound Mapping"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2025-07-30 14:00:00",
+ "modified_by": "Administrator",
+ "module": "Swift Theme",
+ "name": "User Sound Preference",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "if_owner": 1,
+   "read": 1,
+   "role": "All",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
