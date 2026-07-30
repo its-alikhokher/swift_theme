@@ -8,6 +8,7 @@ body[data-swift-login] {
   background: var(--bg-color);
   color: var(--text-color);
 }
+
 body[data-swift-login] .for-login,
 body[data-swift-login] .for-signup,
 body[data-swift-login] .for-forgot,
@@ -31,18 +32,94 @@ body[data-swift-login] .login-content h4 {
   color: var(--text-muted);
   font-size: 14px;
   margin-top: 6px;
+  margin-bottom: 20px;
 }
 
 /* Custom brand row */
 .swift-login-brand {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 16px;
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
-.swift-login-brand img { height: 32px; }
+
+.swift-login-brand img { 
+  height: 36px; 
+  width: auto;
+}
+
 .swift-login-brand .name {
   font-weight: 700;
   color: var(--text-color);
-  font-size: 18px;
+  font-size: 20px;
+}
+
+/* Form elements */
+body[data-swift-login] .form-control {
+  border-radius: var(--swift-radius-md);
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+body[data-swift-login] .form-control:focus {
+  border-color: var(--swift-accent);
+  box-shadow: 0 0 0 2px var(--swift-accent-soft);
+}
+
+body[data-swift-login] .btn-primary {
+  background: var(--swift-accent);
+  border-color: var(--swift-accent);
+  font-weight: 600;
+  padding: 11px;
+  border-radius: var(--swift-radius-md);
+}
+
+body[data-swift-login] .btn-primary:hover {
+  opacity: 0.9;
+}
+
+body[data-swift-login] .forgot-password-message,
+body[data-swift-login] .back-to-login {
+  margin-top: 12px;
+  text-align: center;
+}
+
+body[data-swift-login] .forgot-password-message a,
+body[data-swift-login] .back-to-login a {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+body[data-swift-login] .forgot-password-message a:hover,
+body[data-swift-login] .back-to-login a:hover {
+  color: var(--swift-accent);
+}
+
+body[data-swift-login] .or-separator {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+body[data-swift-login] .social-logins .btn {
+  margin-top: 8px;
+}
+
+body[data-swift-login] .signup-section {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+body[data-swift-login] .signup-section a {
+  color: var(--swift-accent);
+  font-weight: 600;
+  text-decoration: none;
 }
 
 /* ---------- Layout: Split (image left, form right) ---------- */
@@ -53,6 +130,7 @@ body[data-swift-login="Split"] .container.login-content {
   max-width: 460px !important;
   margin: 6vh 6vw 6vh auto !important;
 }
+
 body[data-swift-login="Split"]::before {
   content: "";
   position: fixed; inset: 0 55% 0 0;
@@ -64,6 +142,7 @@ body[data-swift-login="Split"]::before {
   z-index: 0;
   filter: saturate(1.05);
 }
+
 body[data-swift-login="Split"] .navbar { display: none !important; }
 body[data-swift-login="Split"] .page_content { position: relative; z-index: 1; }
 
@@ -74,6 +153,7 @@ body[data-swift-login="Centered"] {
     radial-gradient(900px 600px at 100% 100%, var(--swift-accent-soft), transparent 60%),
     var(--bg-color);
 }
+
 body[data-swift-login="Centered"] .for-login,
 body[data-swift-login="Centered"] .for-signup,
 body[data-swift-login="Centered"] .for-forgot,
@@ -102,7 +182,9 @@ body[data-swift-login="Minimal"] .login-content {
   z-index: 9999;
   transition: opacity 300ms ease;
 }
+
 .swift-splash.hide { opacity: 0; pointer-events: none; }
+
 .swift-splash .swift-spinner {
   width: 42px; height: 42px;
   border-radius: 50%;
@@ -110,4 +192,5 @@ body[data-swift-login="Minimal"] .login-content {
   border-top-color: var(--swift-accent);
   animation: swift-spin 700ms linear infinite;
 }
+
 @keyframes swift-spin { to { transform: rotate(360deg); } }
