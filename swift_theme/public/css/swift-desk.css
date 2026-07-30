@@ -1,662 +1,309 @@
-/* Swift Theme — Desk polish (works in ANY Frappe mode) */
+/* Swift Theme - Premium Desk Styles for Frappe v16 */
+/* Fixes: Sidebar dance, Gradient Fallback, Premium Views */
 
-html[data-swift-accent] .form-section,
-html[data-swift-accent] .frappe-card,
-html[data-swift-accent] .layout-main-section {
-  border-radius: var(--swift-radius);
-}
-
-html[data-swift-accent] .modal-content {
-  border-radius: var(--swift-radius-lg);
-  box-shadow: var(--swift-shadow-lg);
-}
-
-html[data-swift-accent] .btn,
-html[data-swift-accent] .form-control {
-  border-radius: var(--swift-radius-sm);
+/* ============================================
+   ROOT VARIABLES & GRADIENT FALLBACK
+   ============================================ */
+:root {
+    --swift-default-gradient-start: #0f172a;
+    --swift-default-gradient-end: #1e293b;
+    --swift-sidebar-transition: 0.2s ease;
 }
 
-/* Switcher chip */
-.swift-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  height: 30px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius-pill);
-  background: var(--subtle-fg);
-  color: var(--text-color);
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all var(--swift-transition);
-}
-.swift-chip:hover { border-color: var(--swift-accent); color: var(--swift-accent); }
-.swift-chip .swift-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--swift-accent);
-  box-shadow: 0 0 0 2px var(--fg-color);
+/* Apply gradient when no theme selected */
+html:not([data-swift-theme]) {
+    background: linear-gradient(135deg, var(--swift-default-gradient-start) 0%, var(--swift-default-gradient-end) 100%);
 }
 
-/* Palette (accent + theme + more) */
-.swift-palette {
-  position: fixed;
-  z-index: 2000;
-  min-width: 300px;
-  max-width: 340px;
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius);
-  box-shadow: var(--swift-shadow-lg);
-  padding: 10px;
-  color: var(--text-color);
-}
-.swift-palette h6 {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  margin: 8px 4px 6px;
-}
-.swift-accent-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  padding: 0 4px;
-}
-.swift-accent-swatch {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: var(--swift-radius-sm);
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: transform var(--swift-transition);
-}
-.swift-accent-swatch:hover { transform: scale(1.06); }
-.swift-accent-swatch.active { border-color: var(--text-color); }
-
-.swift-menu-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 8px 10px;
-  border-radius: var(--swift-radius-sm);
-  cursor: pointer;
-}
-.swift-menu-item:hover { background: var(--subtle-accent); }
-.swift-menu-item .swift-tag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--swift-accent-soft);
-  color: var(--swift-accent);
+html:not([data-swift-theme]) body {
+    background: transparent !important;
 }
 
-.swift-divider { height: 1px; background: var(--border-color); margin: 8px 0; }
-
-.swift-palette-note {
-  padding: 8px 10px;
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: var(--text-muted);
-  background: var(--subtle-fg, var(--subtle-accent));
-  border-radius: var(--swift-radius-sm);
-  border: 1px dashed var(--border-color);
+/* Auto-detect dark/light based on gradient colors */
+@media (prefers-color-scheme: light) {
+    html:not([data-swift-theme]) {
+        --swift-default-gradient-start: #f8fafc;
+        --swift-default-gradient-end: #e2e8f0;
+    }
 }
 
-/* Focus mode */
-html[data-swift-focus="on"] .navbar,
-html[data-swift-focus="on"] .layout-side-section,
-html[data-swift-focus="on"] .page-head .flex.head-left,
-html[data-swift-focus="on"] .page-head .custom-actions {
-  display: none !important;
-}
-html[data-swift-focus="on"] .layout-main {
-  padding-top: 12px;
+/* ============================================
+   SIDEBAR FIXES - No Dancing, Smooth Transitions
+   ============================================ */
+.layout-side-section {
+    transition: width var(--swift-sidebar-transition), transform var(--swift-sidebar-transition) !important;
 }
 
-/* Reading mode: widen main content, hide side */
-html[data-swift-reading="on"] .layout-side-section {
-  display: none !important;
-}
-html[data-swift-reading="on"] .layout-main-section {
-  margin: 0 auto;
-  font-size: calc(var(--swift-font-size) + 1px);
-  line-height: 1.65;
+.sidebar-inner, .standard-sidebar-section {
+    transition: opacity var(--swift-sidebar-transition) !important;
 }
 
-/* Command palette */
-.swift-cmdk-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.35);
-  z-index: 2500;
-  display: flex; align-items: flex-start; justify-content: center;
-  padding-top: 12vh;
-}
-.swift-cmdk {
-  width: min(560px, 92vw);
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius-lg);
-  box-shadow: var(--swift-shadow-lg);
-  overflow: hidden;
-  color: var(--text-color);
-}
-.swift-cmdk input {
-  width: 100%;
-  padding: 14px 18px;
-  border: 0;
-  outline: 0;
-  background: var(--card-bg);
-  color: var(--text-color);
-  font-size: 15px;
-}
-.swift-cmdk-list {
-  max-height: 50vh;
-  overflow-y: auto;
-  border-top: 1px solid var(--border-color);
-}
-.swift-cmdk-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 16px;
-  cursor: pointer;
-}
-.swift-cmdk-item.active, .swift-cmdk-item:hover {
-  background: var(--swift-accent-soft);
-  color: var(--swift-accent);
-}
-.swift-cmdk-item .kbd {
-  margin-left: auto;
-  font-size: 11px;
-  padding: 2px 6px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  color: var(--text-muted);
+/* Fix hover dance - stable width */
+.layout-side-section:hover {
+    width: auto !important;
+    min-width: 240px;
 }
 
-/* ========================================================================
-   Frappe v16 — List View polish
-   ======================================================================== */
-html[data-swift-accent] .list-row-container {
-  border-radius: var(--swift-radius-sm);
-  transition: background-color var(--swift-transition), transform var(--swift-transition);
-}
-html[data-swift-accent] .list-row-container:hover {
-  background: var(--swift-accent-soft);
-}
-html[data-swift-accent] .list-row-container .list-row-checkbox:checked {
-  accent-color: var(--swift-accent);
-}
-html[data-swift-accent] .list-row-container.level.selected,
-html[data-swift-accent] .list-row-container[data-selected="true"] {
-  background: linear-gradient(90deg, var(--swift-accent-soft), transparent);
-  border-left: 3px solid var(--swift-accent);
-}
-html[data-swift-accent] .list-sidebar .list-link.active,
-html[data-swift-accent] .list-sidebar .list-tags .tag-pill.active {
-  color: var(--swift-accent);
-  font-weight: 600;
-}
-html[data-swift-accent] .filter-section .filter-pill,
-html[data-swift-accent] .filter-selector .btn-primary-light {
-  border-radius: var(--swift-radius-pill);
-  border-color: var(--swift-accent);
-  color: var(--swift-accent);
-}
-html[data-swift-accent] .list-count { color: var(--swift-accent); font-weight: 600; }
-html[data-swift-accent] .indicator-pill { border-radius: var(--swift-radius-pill); }
-
-/* ========================================================================
-   Frappe v16 — Report View / Query Report polish
-   ======================================================================== */
-html[data-swift-accent] .dt-scrollable { border-radius: var(--swift-radius-sm); }
-html[data-swift-accent] .dt-header,
-html[data-swift-accent] .datatable .dt-header {
-  background: var(--subtle-fg, var(--subtle-accent)) !important;
-  border-bottom: 2px solid var(--swift-accent) !important;
-}
-html[data-swift-accent] .dt-cell--header,
-html[data-swift-accent] .dt-cell__content--header {
-  color: var(--text-color);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-html[data-swift-accent] .dt-row:hover .dt-cell {
-  background: var(--swift-accent-soft) !important;
-}
-html[data-swift-accent] .dt-row--highlight .dt-cell {
-  background: var(--swift-accent-soft) !important;
-}
-html[data-swift-accent] .dt-cell--focus {
-  box-shadow: inset 0 0 0 2px var(--swift-accent) !important;
-}
-html[data-swift-accent] .report-summary {
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  background: linear-gradient(135deg, var(--swift-accent-soft), transparent);
-}
-html[data-swift-accent] .report-summary .summary-value { color: var(--swift-accent); }
-
-/* ========================================================================
-   Frappe v16 — Kanban board polish
-   ======================================================================== */
-html[data-swift-accent] .kanban-board { gap: 14px; }
-html[data-swift-accent] .kanban-column {
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  background: var(--fg-color);
-  overflow: hidden;
-}
-html[data-swift-accent] .kanban-column .kanban-column-title,
-html[data-swift-accent] .kanban-column .column-title {
-  padding: 10px 12px;
-  border-bottom: 2px solid var(--swift-accent);
-  background: linear-gradient(180deg, var(--swift-accent-soft), transparent);
-  font-weight: 600;
-}
-html[data-swift-accent] .kanban-card,
-html[data-swift-accent] .kanban-column .kanban-card-doc {
-  border-radius: var(--swift-radius-sm);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--swift-shadow);
-  transition: transform var(--swift-transition), box-shadow var(--swift-transition);
-}
-html[data-swift-accent] .kanban-card:hover,
-html[data-swift-accent] .kanban-column .kanban-card-doc:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--swift-shadow-lg);
-  border-color: var(--swift-accent);
-}
-html[data-swift-accent] .kanban-card.is-dragging {
-  transform: rotate(1.5deg) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+/* Sidebar variants */
+html[data-swift-sidebar="floating"] .layout-side-section {
+    margin: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    background: var(--bg-color, #fff);
 }
 
-/* ========================================================================
-   Frappe v16 — Dashboard: multi-color widgets + charts
-   ======================================================================== */
-html[data-swift-accent] .widget,
-html[data-swift-accent] .dashboard-graph,
-html[data-swift-accent] .number-card {
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  transition: transform var(--swift-transition), box-shadow var(--swift-transition);
-}
-html[data-swift-accent] .widget:hover,
-html[data-swift-accent] .number-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--swift-shadow-lg);
-}
-html[data-swift-accent] .widget-title,
-html[data-swift-accent] .number-card .widget-title {
-  font-weight: 600;
-  letter-spacing: 0.01em;
+html[data-swift-sidebar="attached"] .layout-side-section {
+    border-right: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: none;
 }
 
-/* Multi-color number cards — cycle 6 accent hues by :nth-child */
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+1) {
-  background: linear-gradient(135deg, rgba(99,102,241,0.14), transparent 70%);
-  border-color: rgba(99,102,241,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+1) .widget-body .number {
-  background: linear-gradient(135deg,#818cf8,#4f46e5);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+2) {
-  background: linear-gradient(135deg, rgba(52,211,153,0.14), transparent 70%);
-  border-color: rgba(52,211,153,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+2) .widget-body .number {
-  background: linear-gradient(135deg,#6ee7b7,#059669);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+3) {
-  background: linear-gradient(135deg, rgba(251,146,60,0.14), transparent 70%);
-  border-color: rgba(251,146,60,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+3) .widget-body .number {
-  background: linear-gradient(135deg,#fdba74,#d97706);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+4) {
-  background: linear-gradient(135deg, rgba(244,114,182,0.14), transparent 70%);
-  border-color: rgba(244,114,182,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+4) .widget-body .number {
-  background: linear-gradient(135deg,#f9a8d4,#db2777);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+5) {
-  background: linear-gradient(135deg, rgba(56,189,248,0.14), transparent 70%);
-  border-color: rgba(56,189,248,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+5) .widget-body .number {
-  background: linear-gradient(135deg,#7dd3fc,#0284c7);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+6) {
-  background: linear-gradient(135deg, rgba(167,139,250,0.14), transparent 70%);
-  border-color: rgba(167,139,250,0.35);
-}
-html[data-swift-accent] .widget-group .widget.number-card:nth-child(6n+6) .widget-body .number {
-  background: linear-gradient(135deg,#c4b5fd,#7c3aed);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+html[data-swift-sidebar="minimal"] .layout-side-section {
+    width: 60px;
+    overflow: hidden;
 }
 
-html[data-swift-accent] .chart-container .chart,
-html[data-swift-accent] .dashboard-graph .chart-container {
-  border-radius: var(--swift-radius-sm);
-}
-html[data-swift-accent] .frappe-chart .line-graph-path,
-html[data-swift-accent] .frappe-chart .bar { transition: all var(--swift-transition); }
-
-/* ========================================================================
-   Frappe v16 — Body Sidebar (actual v16 class names from source)
-   Verified against frappe/public/scss/desk/sidebar.scss
-   ======================================================================== */
-
-/* Override Frappe's own sidebar CSS variables when accent is active */
-html[data-swift-accent] {
-  --sidebar-hover-color:  var(--swift-accent-soft);
-  --sidebar-active-color: color-mix(in oklab, var(--swift-accent) 20%, var(--fg-color));
-  --sidebar-active-shadow: inset 3px 0 0 var(--swift-accent);
+html[data-swift-sidebar="minimal"] .layout-side-section:hover {
+    width: 240px;
 }
 
-/* Body sidebar container polish */
-html[data-swift-accent] .body-sidebar-container {
-  transition: background var(--swift-transition), border-color var(--swift-transition);
-}
-html[data-swift-accent] .body-sidebar,
-html[data-swift-accent] .body-sidebar-top,
-html[data-swift-accent] .body-sidebar-bottom {
-  scrollbar-color: var(--swift-accent) transparent;
+/* Pin behavior fixes */
+html[data-swift-pin="click"] .sidebar-inner {
+    pointer-events: all;
 }
 
-/* Standard sidebar items */
-html[data-swift-accent] .standard-sidebar-item,
-html[data-swift-accent] .sidebar-items .nav-item,
-html[data-swift-accent] .sidebar-items .section-item {
-  border-radius: var(--swift-radius-sm);
-  transition:
-    background var(--swift-transition),
-    color var(--swift-transition),
-    transform var(--swift-transition),
-    box-shadow var(--swift-transition);
-}
-html[data-swift-accent] .standard-sidebar-item:hover,
-html[data-swift-accent] .sidebar-items .nav-item:hover,
-html[data-swift-accent] .sidebar-items .section-item:hover,
-html[data-swift-accent] .standard-sidebar-item.hover {
-  background: var(--swift-accent-soft) !important;
-  color: var(--swift-accent) !important;
-  transform: translateX(2px);
+html[data-swift-pin="hover"] .layout-side-section:not(:hover) .sidebar-inner {
+    opacity: 0.3;
 }
 
-/* Active / selected sidebar item — Frappe uses .active-sidebar */
-html[data-swift-accent] .active-sidebar,
-html[data-swift-accent] .standard-sidebar-item.active-sidebar,
-html[data-swift-accent] .sidebar-items .nav-item.active-sidebar,
-html[data-swift-accent] .sidebar-items .item-anchor.active {
-  background: linear-gradient(90deg,
-    color-mix(in oklab, var(--swift-accent) 18%, transparent),
-    color-mix(in oklab, var(--swift-accent) 4%, transparent)
-  ) !important;
-  color: var(--swift-accent) !important;
-  font-weight: 600 !important;
-  box-shadow: inset 3px 0 0 var(--swift-accent), 0 1px 0 rgba(0,0,0,0.02) !important;
-  position: relative;
-}
-html[data-swift-accent] .active-sidebar::after,
-html[data-swift-accent] .standard-sidebar-item.active-sidebar::after {
-  content: "";
-  position: absolute;
-  right: 8px; top: 50%;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--swift-accent);
-  box-shadow: 0 0 10px var(--swift-accent);
-  transform: translateY(-50%);
-  opacity: 0.9;
+/* Sidebar items - smooth hover, no jump */
+.standard-sidebar-item, .desk-sidebar-item {
+    transition: all 0.15s ease !important;
+    border-radius: 8px;
+    margin: 2px 8px;
 }
 
-/* Icons */
-html[data-swift-accent] .sidebar-item-icon,
-html[data-swift-accent] .sidebar-item-icon svg,
-html[data-swift-accent] .menu-icon {
-  transition: color var(--swift-transition), transform var(--swift-transition);
-}
-html[data-swift-accent] .active-sidebar .sidebar-item-icon,
-html[data-swift-accent] .active-sidebar .sidebar-item-icon svg,
-html[data-swift-accent] .standard-sidebar-item.active-sidebar .menu-icon {
-  color: var(--swift-accent) !important;
-  transform: scale(1.08);
-}
-html[data-swift-accent] .standard-sidebar-item:hover .sidebar-item-icon svg {
-  color: var(--swift-accent);
+.standard-sidebar-item:hover, .desk-sidebar-item:hover {
+    background: var(--accent-color, #0b84f3) !important;
+    color: #fff !important;
+    transform: translateX(4px);
 }
 
-/* Labels + suffixes (badges/counts) */
-html[data-swift-accent] .sidebar-item-label { transition: color var(--swift-transition); }
-html[data-swift-accent] .sidebar-item-suffix {
-  background: var(--swift-accent-soft);
-  color: var(--swift-accent);
-  border-radius: var(--swift-radius-pill);
-  padding: 1px 8px;
-  font-weight: 600;
-  font-size: 11px;
+.standard-sidebar-item.selected, .desk-sidebar-item.selected {
+    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
+    color: #fff;
+    font-weight: 600;
 }
 
-/* Section breaks + dividers */
-html[data-swift-accent] .section-break,
-html[data-swift-accent] .body-sidebar .divider {
-  border-color: var(--border-color);
-  opacity: 0.6;
+/* ============================================
+   LIST VIEW - Premium Styling
+   ============================================ */
+.list-row-container {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Nested / expanded groups */
-html[data-swift-accent] .nested-container { padding-left: 6px; }
-html[data-swift-accent] .section-item.expanded > .item-anchor .drop-icon {
-  color: var(--swift-accent);
-  transform: rotate(90deg);
-  transition: transform var(--swift-transition), color var(--swift-transition);
+.list-row {
+    transition: background 0.15s ease;
+    border-bottom: 1px solid var(--border-color, #f1f5f9);
 }
 
-/* Collapse + resize + toggle */
-html[data-swift-accent] .sidebar-toggle-btn,
-html[data-swift-accent] .collapse-sidebar-link {
-  color: var(--text-muted);
-  transition: color var(--swift-transition), background var(--swift-transition);
-  border-radius: var(--swift-radius-sm);
-}
-html[data-swift-accent] .sidebar-toggle-btn:hover,
-html[data-swift-accent] .collapse-sidebar-link:hover {
-  color: var(--swift-accent);
-  background: var(--swift-accent-soft);
-}
-html[data-swift-accent] .sidebar-resize-handle {
-  background: transparent;
-  transition: background var(--swift-transition);
-}
-html[data-swift-accent] .sidebar-resize-handle:hover {
-  background: var(--swift-accent);
-  opacity: 0.6;
+.list-row:hover {
+    background: var(--accent-light, rgba(11, 132, 243, 0.05)) !important;
 }
 
-/* Promotional banner (bottom of sidebar) */
-html[data-swift-accent] .promotional-banner {
-  border-radius: var(--swift-radius);
-  background: linear-gradient(135deg, var(--swift-accent-soft), transparent 70%);
-  border: 1px solid color-mix(in oklab, var(--swift-accent) 30%, var(--border-color));
+.list-row-checkbox {
+    accent-color: var(--accent-color, #0b84f3);
 }
 
-/* User dropdown, notifications, background tasks */
-html[data-swift-accent] .dropdown-navbar-user,
-html[data-swift-accent] .dropdown-notifications,
-html[data-swift-accent] .dropdown-background-tasks {
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--swift-shadow-lg);
-  overflow: hidden;
-}
-html[data-swift-accent] .user-menu-active .dropdown-navbar-user,
-html[data-swift-accent] .dropdown-navbar-user.expanded {
-  border-color: var(--swift-accent);
-}
-html[data-swift-accent] .notifications-list .list-item:hover,
-html[data-swift-accent] .background-tasks-list .list-item:hover {
-  background: var(--swift-accent-soft);
-}
-html[data-swift-accent] .keyboard-shortcut {
-  background: var(--subtle-fg, var(--subtle-accent));
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius-sm);
-  color: var(--text-muted);
-  font-size: 11px;
-  padding: 1px 6px;
+.filter-section {
+    background: var(--card-bg, #fff);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* Mobile overlay */
-html[data-swift-accent] .overlay {
-  background: color-mix(in oklab, #000 55%, transparent);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+.list-count-badge {
+    background: var(--accent-color, #0b84f3);
+    color: #fff;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-weight: 600;
 }
 
-/* Sidebar variant: Floating card */
-html[data-swift-sidebar-variant="Floating"] .body-sidebar-container,
-html[data-swift-sidebar-variant="Floating"] .layout-side-section {
-  padding: 8px;
-}
-html[data-swift-sidebar-variant="Floating"] .body-sidebar,
-html[data-swift-sidebar-variant="Floating"] .layout-side-section > .desk-sidebar,
-html[data-swift-sidebar-variant="Floating"] .layout-side-section > .list-sidebar {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius);
-  box-shadow: var(--swift-shadow);
-  padding: 10px;
-}
-/* Sidebar variant: Attached (default look, add accent border) */
-html[data-swift-sidebar-variant="Attached"] .body-sidebar {
-  border-right: 1px solid var(--border-color);
-}
-/* Sidebar variant: Rail (icon-only look) */
-html[data-swift-sidebar-variant="Rail"] .body-sidebar .sidebar-item-label,
-html[data-swift-sidebar-variant="Rail"] .body-sidebar .sidebar-item-suffix { display: none; }
-html[data-swift-sidebar-variant="Rail"] .body-sidebar { width: 56px; }
-html[data-swift-sidebar-variant="Rail"] .body-sidebar .standard-sidebar-item { justify-content: center; padding: 10px 0; }
-
-/* Onboarding sidebar */
-html[data-swift-accent] .onboarding-sidebar {
-  border-radius: var(--swift-radius);
-  border: 1px dashed var(--swift-accent);
-  background: var(--swift-accent-soft);
+/* Status pills */
+.indicator-pill, .indicator-pill-right {
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-/* ========================================================================
-   Frappe v16 — Navbar (verified against frappe/public/scss/desk/navbar.scss)
-   ======================================================================== */
-html[data-swift-accent] {
-  --awesomebar-focus-bg: var(--card-bg);
-  --awesomebar-shadow: 0 8px 24px -10px color-mix(in oklab, var(--swift-accent) 40%, transparent);
-}
-html[data-swift-accent] .navbar-home:hover,
-html[data-swift-accent] .navbar-brand:hover {
-  filter: drop-shadow(0 0 6px var(--swift-accent));
-}
-html[data-swift-accent] .search-bar {
-  border-radius: var(--swift-radius-pill);
-  transition: box-shadow var(--swift-transition), border-color var(--swift-transition);
-}
-html[data-swift-accent] .search-bar:focus-within {
-  border-color: var(--swift-accent) !important;
-  box-shadow: 0 0 0 3px var(--swift-accent-soft);
-}
-html[data-swift-accent] .search-icon,
-html[data-swift-accent] .awesomebar-search-icon {
-  color: var(--text-muted);
-  transition: color var(--swift-transition);
-}
-html[data-swift-accent] .search-bar:focus-within .search-icon,
-html[data-swift-accent] .awesomebar-input-row:focus-within .awesomebar-search-icon {
-  color: var(--swift-accent);
-}
-html[data-swift-accent] .awesomplete > ul {
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--swift-shadow-lg);
-  overflow: hidden;
-}
-html[data-swift-accent] .awesomplete > ul > li[aria-selected="true"],
-html[data-swift-accent] .awesomplete > ul > li:hover {
-  background: var(--swift-accent-soft) !important;
-  color: var(--swift-accent) !important;
-}
-html[data-swift-accent] .navbar-modal-wrapper {
-  border-radius: var(--swift-radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--swift-shadow-lg);
-}
-html[data-swift-accent] .help-item:hover,
-html[data-swift-accent] .help-item-navigate:hover {
-  background: var(--swift-accent-soft);
-  color: var(--swift-accent);
-  border-radius: var(--swift-radius-sm);
-}
-html[data-swift-accent] .help-item-escape {
-  background: var(--subtle-fg, var(--subtle-accent));
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius-sm);
-  padding: 1px 6px;
-  color: var(--text-muted);
-  font-size: 11px;
-}
-html[data-swift-accent] .vertical-bar {
-  background: var(--border-color);
-  opacity: 0.6;
-}
-html[data-swift-accent] .dropdown-item:hover,
-html[data-swift-accent] .dropdown-item:focus {
-  background: var(--swift-accent-soft) !important;
-  color: var(--swift-accent) !important;
-}
-html[data-swift-accent] .modal-divider,
-html[data-swift-accent] .cool-awesomebar-modal-footer,
-html[data-swift-accent] .awesomebar-modal-footer {
-  border-color: var(--border-color);
+/* ============================================
+   REPORT VIEW - Premium Styling
+   ============================================ */
+.dt-scrollable {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
 }
 
-/* ========================================================================
-   Frappe v16 — Navbar consistency across themes
-   ======================================================================== */
-html[data-swift-accent] .navbar {
-  border-bottom: 1px solid var(--border-color);
-  backdrop-filter: saturate(160%) blur(8px);
-  -webkit-backdrop-filter: saturate(160%) blur(8px);
+.dt-header {
+    background: linear-gradient(90deg, var(--accent-color, #0b84f3), var(--accent-dark, #096fc9));
+    color: #fff !important;
 }
-html[data-swift-navbar="Glass"] .navbar {
-  background: color-mix(in oklab, var(--navbar-bg, var(--fg-color)) 70%, transparent) !important;
-}
-html[data-swift-navbar="Solid"] .navbar {
-  background: var(--navbar-bg, var(--fg-color)) !important;
-}
-html[data-swift-accent] .navbar .navbar-nav > .nav-item > a:hover,
-html[data-swift-accent] .navbar .navbar-nav > .nav-item.active > a {
-  color: var(--swift-accent) !important;
-}
-html[data-swift-accent] .navbar .navbar-brand,
-html[data-swift-accent] .navbar .app-logo {
-  transition: transform var(--swift-transition);
-}
-html[data-swift-accent] .navbar .navbar-brand:hover { transform: scale(1.02); }
 
-/* Top progress bar (Frappe uses .progress-bar sometimes; we add ours) */
-.swift-progress {
-  position: fixed; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--swift-accent);
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-  transition: transform 200ms ease;
-  z-index: 3000;
+.dt-cell {
+    border: 1px solid var(--border-color, #e2e8f0);
+    transition: background 0.15s ease;
 }
-.swift-progress.active { transform: scaleX(0.7); }
-.swift-progress.done   { transform: scaleX(1); opacity: 0; }
+
+.dt-cell--header {
+    font-weight: 700;
+    background: var(--bg-light, #f8fafc);
+}
+
+.dt-row:nth-child(even) {
+    background: var(--bg-light, #f9fafb);
+}
+
+.dt-row:hover {
+    background: var(--accent-light, rgba(11, 132, 243, 0.05));
+}
+
+.report-summary {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* ============================================
+   KANBAN VIEW - Premium Styling
+   ============================================ */
+.kanban-board {
+    background: var(--bg-body, #f8fafc);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.kanban-column {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    margin: 8px;
+    overflow: hidden;
+}
+
+.kanban-column-title {
+    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
+    color: #fff;
+    padding: 12px 16px;
+    font-weight: 700;
+    border-radius: 12px 12px 0 0;
+}
+
+.kanban-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.kanban-card-doc {
+    font-weight: 600;
+    color: var(--text-color, #1e293b);
+}
+
+/* Drag preview */
+.kanban-card.dragging {
+    opacity: 0.5;
+    transform: rotate(3deg);
+}
+
+/* ============================================
+   DASHBOARD VIEW - Premium Styling
+   ============================================ */
+.widget {
+    background: var(--card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border: 1px solid var(--border-color, #e2e8f0);
+    overflow: hidden;
+}
+
+.widget-title {
+    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
+    color: #fff;
+    padding: 12px 16px;
+    font-weight: 700;
+    border-radius: 12px 12px 0 0;
+}
+
+.number-card {
+    background: linear-gradient(135deg, var(--accent-color, #0b84f3), var(--accent-dark, #096fc9));
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(11, 132, 243, 0.3);
+}
+
+.number-card .number {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.chart-container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.dashboard-graph svg {
+    stroke: var(--accent-color, #0b84f3) !important;
+    stroke-width: 2;
+}
+
+/* ============================================
+   PERFORMANCE MODE - Disable Animations
+   ============================================ */
+html[data-swift-performance="1"] * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .layout-side-section {
+        position: fixed;
+        z-index: 1000;
+        transform: translateX(-100%);
+    }
+    
+    .layout-side-section.show {
+        transform: translateX(0);
+    }
+    
+    .kanban-board {
+        padding: 8px;
+    }
+    
+    .kanban-column {
+        min-width: 280px;
+    }
+}
