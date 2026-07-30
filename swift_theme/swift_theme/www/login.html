@@ -1,0 +1,304 @@
+{% extends "templates/web.html" %}
+{% block title %}{{ _("Login") }}{% endblock %}
+
+{% block page_content %}
+<div class="login-page-wrapper">
+    <div class="login-box">
+        <!-- Logo Section -->
+        <div class="login-logo">
+            {% if logo %}
+                <img src="{{ logo }}" alt="Logo" />
+            {% else %}
+                <svg class="app-logo" width="60" height="60" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" rx="12" fill="var(--primary-color)"/>
+                    <path d="M12 20L18 26L28 14" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            {% endif %}
+            <h2 class="login-title">{{ app_name or "Swift Theme" }}</h2>
+            <p class="login-subtitle">Welcome back! Please login to your account.</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-form" action="/api/method/login" method="post">
+            <input type="hidden" name="cmd" value="login">
+            <input type="hidden" name="redirect_to" value="{{ redirect_to or '/' }}">
+            
+            <div class="form-group">
+                <label for="login_email">Email Address</label>
+                <input type="email" id="login_email" name="usr" class="form-control" placeholder="name@example.com" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="login_password">Password</label>
+                <div class="password-field">
+                    <input type="password" id="login_password" name="pwd" class="form-control" placeholder="••••••••" required>
+                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember_me"> Remember me
+                </label>
+                <a href="/forgot" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary btn-block">Sign In</button>
+        </form>
+
+        {% if disable_signup == 0 %}
+        <div class="signup-link">
+            Don't have an account? <a href="/signup">Sign up here</a>
+        </div>
+        {% endif %}
+        
+        <div class="login-footer">
+            <p>&copy; {{ frappe.utils.now_year }} {{ app_name or "Frappe Technologies" }}. All rights reserved.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0b84f3; /* Default Swift Blue */
+        --bg-gradient-1: #0f172a;
+        --bg-gradient-2: #1e293b;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --input-bg: #f8fafc;
+        --input-border: #e2e8f0;
+    }
+
+    /* Dynamic Background if no image is set */
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Animated Blobs for Premium Look */
+    body::before, body::after {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.4;
+        z-index: 0;
+        animation: float 10s infinite ease-in-out;
+    }
+
+    body::before {
+        background: #3b82f6;
+        top: -100px;
+        left: -100px;
+    }
+
+    body::after {
+        background: #8b5cf6;
+        bottom: -100px;
+        right: -100px;
+        animation-delay: -5s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(30px, 50px); }
+    }
+
+    .login-page-wrapper {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 420px;
+        padding: 20px;
+    }
+
+    .login-box {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .login-box:hover {
+        transform: translateY(-5px);
+    }
+
+    .login-logo img, .app-logo {
+        margin-bottom: 20px;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .login-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0 0 8px 0;
+    }
+
+    .login-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0 0 30px 0;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--input-border);
+        background: var(--input-bg);
+        font-size: 14px;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(11, 132, 243, 0.1);
+        background: #fff;
+    }
+
+    .password-field {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 18px;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    .toggle-password:hover {
+        opacity: 1;
+    }
+
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(11, 132, 243, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: #096fc9;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(11, 132, 243, 0.4);
+    }
+
+    .signup-link {
+        margin-top: 24px;
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .signup-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .login-box {
+            padding: 30px 20px;
+        }
+        body::before, body::after {
+            width: 300px;
+            height: 300px;
+        }
+    }
+</style>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById('login_password');
+        const icon = document.querySelector('.toggle-password');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            icon.textContent = '👁️';
+        }
+    }
+
+    // Auto-detect theme preference for login page background
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.style.setProperty('--card-bg', 'rgba(30, 41, 59, 0.95)');
+        document.documentElement.style.setProperty('--text-main', '#f1f5f9');
+        document.documentElement.style.setProperty('--text-muted', '#94a3b8');
+        document.documentElement.style.setProperty('--input-bg', '#1e293b');
+        document.documentElement.style.setProperty('--input-border', '#334155');
+    }
+</script>
+{% endblock %}
