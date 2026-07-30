@@ -1,2 +1,2 @@
-# Copyright (c) 2025, Swift Theme
+# Copyright (c) 2025, its-alikhokher
 # License: MIT
