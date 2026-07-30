@@ -1,60 +1,196 @@
 ```
-# Compiled and build artifacts
-*.pyc
+# Python
 __pycache__/
-*.o
-*.obj
-*.class
-*.exe
-*.dll
+*.py[cod]
+*$py.class
 *.so
-*.a
-*.out
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-dist/
+.Python
 build/
-target/
-.gradle/
-.mypy_cache/
-.pytest_cache/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # Environment
+.ENV
 .env
+.env.*
 .env.local
-*.env.*
+.env.production
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+.ENV.bak/
 
-# Editors
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# System files
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Coverage
+# Logs
+*.log
+
+# Testing
+.coverage
 coverage/
 htmlcov/
-.coverage
+.nyc_output/
+istanbul.out
+coverage-final.json
 
-# Compressed files
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# Frappe/ERPNext specific
+site1.local/logs/
+*.pdf
+*.csv
+*.xlsx
+*.doc
+*.docx
+*.ppt
+*.pptx
 *.zip
-*.gz
 *.tar
-*.tgz
+*.gz
+*.rar
+*.7z
 *.bz2
 *.xz
-*.7z
-*.rar
 *.zst
 *.lz4
 *.lzh
