@@ -3,6 +3,11 @@
 *.pyc
 __pycache__/
 
+# Dependencies
+.venv/
+venv/
+node_modules/
+
 # Logs and temp files
 *.log
 *.tmp
@@ -16,4 +21,29 @@ __pycache__/
 # Editors
 .vscode/
 .idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Web artifacts
+www/*.js
+www/*.css
+www/*.map
 ```
