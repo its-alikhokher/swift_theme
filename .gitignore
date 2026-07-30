@@ -21,7 +21,6 @@ target/
 .gradle/
 .mypy_cache/
 .pytest_cache/
-.julia/
 
 # Logs and temp files
 *.log
@@ -37,8 +36,6 @@ target/
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # System files
 .DS_Store
