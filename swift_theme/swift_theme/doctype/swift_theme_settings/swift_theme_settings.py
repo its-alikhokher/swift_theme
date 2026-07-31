@@ -2,20 +2,9 @@ import json
 import frappe
 from frappe.model.document import Document
 
-PRESETS = {
-    "Linear":     {"default_accent": "violet",  "default_theme": "obsidian",   "default_density": "Compact",     "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Glass",       "sidebar_variant": "Attached"},
-    "Vercel":     {"default_accent": "slate",   "default_theme": "monochrome", "default_density": "Comfortable", "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Solid",       "sidebar_variant": "Attached"},
-    "Stripe":     {"default_accent": "indigo",  "default_theme": "porcelain",  "default_density": "Comfortable", "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Glass",       "sidebar_variant": "Attached"},
-    "Raycast":    {"default_accent": "violet",  "default_theme": "aurora",     "default_density": "Comfortable", "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Glass",       "sidebar_variant": "Floating"},
-    "Superhuman": {"default_accent": "teal",    "default_theme": "midnight",   "default_density": "Compact",     "default_radius": "Rounded", "default_font_family": "Inter",   "default_font_scale": "M", "navbar_variant": "Glass",       "sidebar_variant": "Icon-only"},
-    "Notion":     {"default_accent": "slate",   "default_theme": "sandstone",  "default_density": "Cozy",        "default_radius": "Rounded", "default_font_family": "Manrope", "default_font_scale": "M", "navbar_variant": "Solid",       "sidebar_variant": "Attached"},
-    "Terminal":   {"default_accent": "emerald", "default_theme": "carbon",     "default_density": "Compact",     "default_radius": "Sharp",   "default_font_family": "System",  "default_font_scale": "S", "navbar_variant": "Solid",       "sidebar_variant": "Attached"},
-    "Editorial":  {"default_accent": "amber",   "default_theme": "graphite",   "default_density": "Cozy",        "default_radius": "Rounded", "default_font_family": "Manrope", "default_font_scale": "L", "navbar_variant": "Solid",       "sidebar_variant": "Floating"},
-}
 
-PREMIUM_THEMES = [
-    {
-        "name": "Swift Blue",
+PREMIUM_THEMES = {
+    "Swift Blue": {
         "value": "swift-blue",
         "mode": "light",
         "colors": {
@@ -28,8 +17,7 @@ PREMIUM_THEMES = [
             "text_muted": "#64748b"
         }
     },
-    {
-        "name": "Midnight Pro",
+    "Midnight Pro": {
         "value": "midnight-pro",
         "mode": "dark",
         "colors": {
@@ -42,8 +30,7 @@ PREMIUM_THEMES = [
             "text_muted": "#94a3b8"
         }
     },
-    {
-        "name": "Emerald Luxury",
+    "Emerald Luxury": {
         "value": "emerald-luxury",
         "mode": "dark",
         "colors": {
@@ -56,8 +43,7 @@ PREMIUM_THEMES = [
             "text_muted": "#6ee7b7"
         }
     },
-    {
-        "name": "Rose Gold",
+    "Rose Gold": {
         "value": "rose-gold",
         "mode": "light",
         "colors": {
@@ -70,8 +56,7 @@ PREMIUM_THEMES = [
             "text_muted": "#be123c"
         }
     },
-    {
-        "name": "Sapphire Elite",
+    "Sapphire Elite": {
         "value": "sapphire-elite",
         "mode": "dark",
         "colors": {
@@ -84,8 +69,7 @@ PREMIUM_THEMES = [
             "text_muted": "#93c5fd"
         }
     },
-    {
-        "name": "Golden Hour",
+    "Golden Hour": {
         "value": "golden-hour",
         "mode": "light",
         "colors": {
@@ -98,8 +82,7 @@ PREMIUM_THEMES = [
             "text_muted": "#b45309"
         }
     },
-    {
-        "name": "Carbon Fiber",
+    "Carbon Fiber": {
         "value": "carbon-fiber",
         "mode": "dark",
         "colors": {
@@ -112,8 +95,7 @@ PREMIUM_THEMES = [
             "text_muted": "#9ca3af"
         }
     },
-    {
-        "name": "Pearl White",
+    "Pearl White": {
         "value": "pearl-white",
         "mode": "light",
         "colors": {
@@ -126,8 +108,7 @@ PREMIUM_THEMES = [
             "text_muted": "#64748b"
         }
     },
-    {
-        "name": "Royal Purple",
+    "Royal Purple": {
         "value": "royal-purple",
         "mode": "dark",
         "colors": {
@@ -140,8 +121,7 @@ PREMIUM_THEMES = [
             "text_muted": "#d8b4fe"
         }
     },
-    {
-        "name": "Ocean Depth",
+    "Ocean Depth": {
         "value": "ocean-depth",
         "mode": "dark",
         "colors": {
@@ -154,8 +134,7 @@ PREMIUM_THEMES = [
             "text_muted": "#67e8f9"
         }
     },
-    {
-        "name": "Forest Mist",
+    "Forest Mist": {
         "value": "forest-mist",
         "mode": "light",
         "colors": {
@@ -168,8 +147,7 @@ PREMIUM_THEMES = [
             "text_muted": "#84cc16"
         }
     },
-    {
-        "name": "Crimson Red",
+    "Crimson Red": {
         "value": "crimson-red",
         "mode": "dark",
         "colors": {
@@ -182,13 +160,17 @@ PREMIUM_THEMES = [
             "text_muted": "#fca5a5"
         }
     }
-]
+}
 
 
 class SwiftThemeSettings(Document):
     def validate(self):
-        # Validation logic removed - no active_preset field exists in JSON
-        pass
+        # Validate Custom Gradient mode requires both colors
+        if self.color_mode == "Custom Gradient":
+            if not self.gradient_start or not self.gradient_end:
+                frappe.throw(
+                    "Both Gradient Start and Gradient End colors are required when using Custom Gradient mode."
+                )
 
     def on_update(self):
         frappe.clear_cache()
@@ -196,21 +178,103 @@ class SwiftThemeSettings(Document):
 
 
 @frappe.whitelist()
-def get_premium_themes():
-    """Returns the catalog of luxury premium themes available in Swift Theme"""
-    return {"themes": PREMIUM_THEMES}
+def get_active_theme_config():
+    """Returns JSON with colors/mode based on current settings selection"""
+    settings = frappe.get_single("Swift Theme Settings")
+    
+    config = {
+        "color_mode": settings.color_mode,
+        "sidebar_variant": settings.sidebar_variant,
+        "pin_behavior": settings.pin_behavior,
+        "enable_sounds": settings.enable_sounds,
+        "volume_level": settings.volume_level or 50,
+    }
+    
+    if settings.color_mode == "Preset Themes":
+        preset_name = settings.active_preset or "Swift Blue"
+        theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES["Swift Blue"])
+        config["theme"] = theme_data
+        config["mode"] = theme_data["mode"]
+        config["colors"] = theme_data["colors"]
+        config["gradient_start"] = None
+        config["gradient_end"] = None
+    elif settings.color_mode == "Custom Gradient":
+        config["gradient_start"] = settings.gradient_start
+        config["gradient_end"] = settings.gradient_end
+        config["mode"] = "custom"
+        config["colors"] = {
+            "primary": settings.gradient_start or "#0b84f3",
+            "secondary": settings.gradient_end or "#0056b3",
+            "bg1": settings.gradient_start or "#0f172a",
+            "bg2": settings.gradient_end or "#1e293b",
+        }
+    
+    return config
 
 
 @frappe.whitelist()
-def apply_theme(theme_value):
-    """Applies a specific premium theme for the current user session"""
-    selected_theme = next((t for t in PREMIUM_THEMES if t["value"] == theme_value), None)
+def play_sound(event_name):
+    """Checks settings and returns sound file/volume for the given event"""
+    settings = frappe.get_single("Swift Theme Settings")
     
-    if not selected_theme:
+    if not settings.enable_sounds:
+        return {"enabled": False, "sound": None, "volume": 0}
+    
+    volume = (settings.volume_level or 50) / 100.0
+    
+    # Look for custom sound in sound_events table
+    sound_file = None
+    if settings.sound_events:
+        for event in settings.sound_events:
+            if event.event_key == event_name:
+                sound_file = event.sound_file
+                break
+    
+    # Default sounds mapping if no custom sound found
+    default_sounds = {
+        "save": "/assets/swift_theme/sounds/save.mp3",
+        "submit": "/assets/swift_theme/sounds/submit.mp3",
+        "error": "/assets/swift_theme/sounds/error.mp3",
+        "success": "/assets/swift_theme/sounds/success.mp3",
+        "delete": "/assets/swift_theme/sounds/delete.mp3",
+        "click": "/assets/swift_theme/sounds/click.mp3",
+    }
+    
+    if not sound_file:
+        sound_file = default_sounds.get(event_name, default_sounds.get("click"))
+    
+    return {
+        "enabled": True,
+        "sound": sound_file,
+        "volume": volume,
+        "event": event_name
+    }
+
+
+@frappe.whitelist()
+def get_premium_themes():
+    """Returns the catalog of luxury premium themes available in Swift Theme"""
+    themes_list = []
+    for name, data in PREMIUM_THEMES.items():
+        themes_list.append({
+            "name": name,
+            "value": data["value"],
+            "mode": data["mode"],
+            "colors": data["colors"]
+        })
+    return {"themes": themes_list}
+
+
+@frappe.whitelist()
+def apply_theme(theme_name):
+    """Applies a specific premium theme for the current user session"""
+    if theme_name not in PREMIUM_THEMES:
         frappe.throw("Theme not found")
     
+    selected_theme = PREMIUM_THEMES[theme_name]
+    
     # Set user preference
-    frappe.db.set_value("User", frappe.session.user, "swift_selected_theme", theme_value)
+    frappe.db.set_value("User", frappe.session.user, "swift_selected_theme", theme_name)
     
     # Auto-set Dark/Light Mode based on theme
     mode = selected_theme.get("mode", "light")

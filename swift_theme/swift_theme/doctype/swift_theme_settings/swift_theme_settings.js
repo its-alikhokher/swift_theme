@@ -7,47 +7,25 @@ frappe.ui.form.on("Swift Theme Settings", {
             });
         });
 
-        frm.add_custom_button(__("Copy Export JSON"), () => {
-            navigator.clipboard.writeText(frm.doc.export_preset_json || "");
-            frappe.show_alert({message: __("Copied"), indicator: "green"});
-        });
-
-        toggleAccentVisibility(frm);
+        toggleFieldVisibility(frm);
     },
-    default_accent(frm) { livePreview(frm); },
-    default_theme(frm) {
-        toggleAccentVisibility(frm);
-        livePreview(frm);
+    
+    color_mode(frm) {
+        toggleFieldVisibility(frm);
     },
-    default_density(frm) { livePreview(frm); },
-    default_radius(frm) { livePreview(frm); },
-    default_font_scale(frm) { livePreview(frm); },
-    default_font_family(frm) { livePreview(frm); },
+    
+    enable_sounds(frm) {
+        frm.toggle_display("volume_level", frm.doc.enable_sounds == 1);
+        frm.toggle_display("sound_events", frm.doc.enable_sounds == 1);
+    }
 });
 
-function toggleAccentVisibility(frm) {
-    // When a Full Theme is active, the theme owns its accent — hide the picker.
-    const hasFullTheme = !!frm.doc.default_theme;
-    frm.toggle_display("default_accent", !hasFullTheme);
-    frm.toggle_display("brand_hex_override", !hasFullTheme);
-    if (hasFullTheme) {
-        frm.set_df_property("default_theme", "description",
-            __("Full theme provides its own accent color. Clear this field to pick an accent manually."));
-    } else {
-        frm.set_df_property("default_theme", "description", "");
-    }
-}
-
-function livePreview(frm) {
-    if (!window.SwiftTheme) return;
-    window.SwiftTheme.applyPrefs({
-        accent: frm.doc.default_accent,
-        theme: frm.doc.default_theme,
-        density: frm.doc.default_density,
-        radius: frm.doc.default_radius,
-        font_scale: frm.doc.default_font_scale,
-        font_family: frm.doc.default_font_family,
-        navbar_variant: frm.doc.navbar_variant,
-        sidebar_variant: frm.doc.sidebar_variant,
-    });
+function toggleFieldVisibility(frm) {
+    // Toggle Preset Themes fields
+    frm.toggle_display("active_preset", frm.doc.color_mode === "Preset Themes");
+    
+    // Toggle Custom Gradient fields
+    const isCustomGradient = frm.doc.color_mode === "Custom Gradient";
+    frm.toggle_display("gradient_start", isCustomGradient);
+    frm.toggle_display("gradient_end", isCustomGradient);
 }
