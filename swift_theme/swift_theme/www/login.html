@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Login - Swift Theme</title>
+    <link rel="stylesheet" href="/assets/swift_theme/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Animated Background Blobs -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        
+        <!-- Glassmorphism Login Card -->
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p class="subtitle">Enterprise Access Portal</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter your username or email"
+                        value="iamaliraza777@gmail.com"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password"
+                        value="its-alikhokher"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <span>Sign In</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <p class="custom-text" id="custom-message">Secure login powered by Swift Theme Enterprise</p>
+            </form>
+            
+            <div class="login-footer">
+                <p>&copy; 2025 Swift Theme. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/assets/swift_theme/js/login.js"></script>
+</body>
+</html>
