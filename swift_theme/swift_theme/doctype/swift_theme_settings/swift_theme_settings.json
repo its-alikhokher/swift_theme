@@ -2,142 +2,101 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_1",
-  "default_accent",
-  "brand_hex_override",
-  "enable_custom_logo",
-  "app_logo",
-  "section_break_colors",
+  "color_mode_section",
   "color_mode",
+  "active_preset",
+  "gradient_colors_section",
   "gradient_start",
   "gradient_end",
-  "primary_color",
-  "secondary_color",
-  "section_break_ui",
-  "density",
-  "radius",
-  "font_scale",
-  "performance_mode",
-  "sidebar_behavior_section",
-  "sidebar_variant",
-  "pin_behavior",
   "sounds_section",
   "enable_sounds",
-  "volume_level"
+  "volume_level",
+  "sound_events",
+  "sidebar_section",
+  "sidebar_variant",
+  "pin_behavior"
  ],
  "fields": [
   {
-   "fieldname": "section_break_1",
+   "fieldname": "color_mode_section",
    "fieldtype": "Section Break",
-   "label": "Branding & Accent"
+   "label": "Color Mode"
   },
   {
-   "default": "Swift Blue",
-   "fieldname": "default_accent",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Preset Theme",
-   "options": "None\nSwift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red"
-  },
-  {
-   "depends_on": "eval:doc.default_accent=='None'",
-   "fieldname": "brand_hex_override",
-   "fieldtype": "Color",
-   "label": "Custom Brand Color"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_custom_logo",
-   "fieldtype": "Check",
-   "label": "Use Custom Logo"
-  },
-  {
-   "depends_on": "eval:doc.enable_custom_logo==1",
-   "fieldname": "app_logo",
-   "fieldtype": "Attach Image",
-   "label": "App Logo"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "section_break_colors",
-   "fieldtype": "Section Break",
-   "label": "Gradient / Manual Colors"
-  },
-  {
-   "default": "Preset",
+   "default": "Preset Themes",
    "fieldname": "color_mode",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Color Mode",
-   "options": "Preset\nGradient\nManual"
+   "options": "Preset Themes\nCustom Gradient",
+   "reqd": 1
   },
   {
-   "depends_on": "eval:doc.color_mode=='Gradient'",
-   "fieldname": "gradient_start",
-   "fieldtype": "Color",
-   "label": "Gradient Start"
-  },
-  {
-   "depends_on": "eval:doc.color_mode=='Gradient'",
-   "fieldname": "gradient_end",
-   "fieldtype": "Color",
-   "label": "Gradient End"
-  },
-  {
-   "depends_on": "eval:doc.color_mode=='Manual'",
-   "fieldname": "primary_color",
-   "fieldtype": "Color",
-   "label": "Primary Color"
-  },
-  {
-   "depends_on": "eval:doc.color_mode=='Manual'",
-   "fieldname": "secondary_color",
-   "fieldtype": "Color",
-   "label": "Secondary Color"
+   "depends_on": "eval:doc.color_mode=='Preset Themes'",
+   "fieldname": "active_preset",
+   "fieldtype": "Select",
+   "label": "Active Preset",
+   "options": "Swift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red"
   },
   {
    "collapsible": 1,
-   "fieldname": "section_break_ui",
+   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
+   "fieldname": "gradient_colors_section",
    "fieldtype": "Section Break",
-   "label": "UI Preferences"
+   "label": "Gradient Colors"
   },
   {
-   "default": "Comfortable",
-   "fieldname": "density",
-   "fieldtype": "Select",
-   "label": "Density",
-   "options": "Compact\nComfortable\nSpacious"
+   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
+   "fieldname": "gradient_start",
+   "fieldtype": "Color",
+   "label": "Gradient Start",
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Gradient'"
   },
   {
-   "default": "Medium",
-   "fieldname": "radius",
-   "fieldtype": "Select",
-   "label": "Corner Radius",
-   "options": "None\nSmall\nMedium\nLarge\nFull"
+   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
+   "fieldname": "gradient_end",
+   "fieldtype": "Color",
+   "label": "Gradient End",
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Gradient'"
   },
   {
-   "default": "100%",
-   "fieldname": "font_scale",
-   "fieldtype": "Select",
-   "label": "Font Scale",
-   "options": "80%\n90%\n100%\n110%\n120%"
+   "collapsible": 1,
+   "fieldname": "sounds_section",
+   "fieldtype": "Section Break",
+   "label": "Sounds"
   },
   {
    "default": "0",
-   "fieldname": "performance_mode",
+   "fieldname": "enable_sounds",
    "fieldtype": "Check",
-   "label": "Performance Mode (Disable Animations)"
+   "label": "Enable Sounds"
+  },
+  {
+   "default": "50",
+   "depends_on": "eval:doc.enable_sounds==1",
+   "fieldname": "volume_level",
+   "fieldtype": "Int",
+   "label": "Volume Level (%)",
+   "non_negative": 1
+  },
+  {
+   "depends_on": "eval:doc.enable_sounds==1",
+   "fieldname": "sound_events",
+   "fieldtype": "Table",
+   "label": "Sound Events",
+   "options": "Swift Theme Sound Event"
   },
   {
    "collapsible": 1,
-   "fieldname": "sidebar_behavior_section",
+   "fieldname": "sidebar_section",
    "fieldtype": "Section Break",
-   "label": "Sidebar Behavior"
+   "label": "Sidebar"
   },
   {
    "default": "Floating",
    "fieldname": "sidebar_variant",
    "fieldtype": "Select",
-   "label": "Sidebar Style",
+   "label": "Sidebar Variant",
    "options": "Floating\nAttached\nMinimal"
   },
   {
@@ -146,30 +105,12 @@
    "fieldtype": "Select",
    "label": "Pin Behavior",
    "options": "Click to Pin\nHover to Expand\nAlways Expanded"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "sounds_section",
-   "fieldtype": "Section Break",
-   "label": "Sound Settings"
-  },
-  {
-   "default": "1",
-   "fieldname": "enable_sounds",
-   "fieldtype": "Check",
-   "label": "Enable Sounds"
-  },
-  {
-   "default": "50",
-   "fieldname": "volume_level",
-   "fieldtype": "Int",
-   "label": "Volume Level (%)"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-30 14:00:00.000000",
+ "modified": "2025-07-31 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",

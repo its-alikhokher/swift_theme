@@ -3,6 +3,11 @@
 
 {% block page_content %}
 <div class="login-page-wrapper">
+    <!-- Animated Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    
     <div class="login-box">
         <!-- Logo Section -->
         <div class="login-logo">
@@ -10,7 +15,7 @@
                 <img src="{{ logo }}" alt="Logo" />
             {% else %}
                 <svg class="app-logo" width="60" height="60" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="12" fill="var(--primary-color)"/>
+                    <rect width="40" height="40" rx="12" fill="var(--primary)"/>
                     <path d="M12 20L18 26L28 14" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             {% endif %}
@@ -60,9 +65,10 @@
 
 <style>
     :root {
-        --primary-color: #0b84f3; /* Default Swift Blue */
-        --bg-gradient-1: #0f172a;
-        --bg-gradient-2: #1e293b;
+        --primary: #0b84f3;
+        --secondary: #0056b3;
+        --bg1: #0f172a;
+        --bg2: #1e293b;
         --card-bg: rgba(255, 255, 255, 0.95);
         --text-main: #1e293b;
         --text-muted: #64748b;
@@ -70,11 +76,10 @@
         --input-border: #e2e8f0;
     }
 
-    /* Dynamic Background if no image is set */
     body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+        background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -83,12 +88,9 @@
         position: relative;
     }
 
-    /* Animated Blobs for Premium Look */
-    body::before, body::after {
-        content: '';
+    /* Animated Blobs */
+    .blob {
         position: absolute;
-        width: 600px;
-        height: 600px;
         border-radius: 50%;
         filter: blur(80px);
         opacity: 0.4;
@@ -96,22 +98,36 @@
         animation: float 10s infinite ease-in-out;
     }
 
-    body::before {
-        background: #3b82f6;
+    .blob-1 {
+        width: 600px;
+        height: 600px;
+        background: var(--primary);
         top: -100px;
         left: -100px;
     }
 
-    body::after {
-        background: #8b5cf6;
+    .blob-2 {
+        width: 500px;
+        height: 500px;
+        background: var(--secondary);
         bottom: -100px;
         right: -100px;
         animation-delay: -5s;
     }
 
+    .blob-3 {
+        width: 400px;
+        height: 400px;
+        background: var(--primary);
+        top: 50%;
+        left: 50%;
+        animation-delay: -2s;
+        opacity: 0.3;
+    }
+
     @keyframes float {
-        0%, 100% { transform: translate(0, 0); }
-        50% { transform: translate(30px, 50px); }
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(30px, 50px) scale(1.05); }
     }
 
     .login-page-wrapper {
@@ -182,7 +198,7 @@
     }
 
     .form-control:focus {
-        border-color: var(--primary-color);
+        border-color: var(--primary);
         box-shadow: 0 0 0 4px rgba(11, 132, 243, 0.1);
         background: #fff;
     }
@@ -223,7 +239,7 @@
     }
 
     .forgot-password {
-        color: var(--primary-color);
+        color: var(--primary);
         text-decoration: none;
         font-weight: 600;
     }
@@ -231,7 +247,7 @@
     .btn-primary {
         width: 100%;
         padding: 14px;
-        background: var(--primary-color);
+        background: var(--primary);
         color: white;
         border: none;
         border-radius: 12px;
@@ -243,7 +259,7 @@
     }
 
     .btn-primary:hover {
-        background: #096fc9;
+        background: var(--secondary);
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(11, 132, 243, 0.4);
     }
@@ -255,7 +271,7 @@
     }
 
     .signup-link a {
-        color: var(--primary-color);
+        color: var(--primary);
         font-weight: 600;
         text-decoration: none;
     }
@@ -267,14 +283,17 @@
         opacity: 0.7;
     }
 
-    /* Responsive */
     @media (max-width: 480px) {
         .login-box {
             padding: 30px 20px;
         }
-        body::before, body::after {
+        .blob-1, .blob-2 {
             width: 300px;
             height: 300px;
+        }
+        .blob-3 {
+            width: 200px;
+            height: 200px;
         }
     }
 </style>
@@ -292,13 +311,43 @@
         }
     }
 
-    // Auto-detect theme preference for login page background
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.style.setProperty('--card-bg', 'rgba(30, 41, 59, 0.95)');
-        document.documentElement.style.setProperty('--text-main', '#f1f5f9');
-        document.documentElement.style.setProperty('--text-muted', '#94a3b8');
-        document.documentElement.style.setProperty('--input-bg', '#1e293b');
-        document.documentElement.style.setProperty('--input-border', '#334155');
-    }
+    // Fetch theme config and apply dynamically on load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/method/swift_theme.doctype.swift_theme_settings.swift_theme_settings.get_active_theme_config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    const config = data.message;
+                    const root = document.documentElement;
+                    
+                    // Apply colors based on mode
+                    if (config.color_mode === 'Preset Themes' && config.colors) {
+                        root.style.setProperty('--primary', config.colors.primary);
+                        root.style.setProperty('--secondary', config.colors.secondary);
+                        root.style.setProperty('--bg1', config.colors.bg_body);
+                        root.style.setProperty('--bg2', config.colors.bg_card);
+                        root.style.setProperty('--text-main', config.colors.text_main);
+                        root.style.setProperty('--text-muted', config.colors.text_muted);
+                        
+                        // Auto-switch dark/light based on theme mode
+                        if (config.mode === 'dark') {
+                            root.style.setProperty('--card-bg', 'rgba(30, 41, 59, 0.95)');
+                            root.style.setProperty('--input-bg', '#1e293b');
+                            root.style.setProperty('--input-border', '#334155');
+                        } else {
+                            root.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.95)');
+                            root.style.setProperty('--input-bg', '#f8fafc');
+                            root.style.setProperty('--input-border', '#e2e8f0');
+                        }
+                    } else if (config.color_mode === 'Custom Gradient') {
+                        root.style.setProperty('--primary', config.gradient_start || '#0b84f3');
+                        root.style.setProperty('--secondary', config.gradient_end || '#0056b3');
+                        root.style.setProperty('--bg1', config.gradient_start || '#0f172a');
+                        root.style.setProperty('--bg2', config.gradient_end || '#1e293b');
+                    }
+                }
+            })
+            .catch(err => console.log('Theme config load error:', err));
+    });
 </script>
 {% endblock %}
