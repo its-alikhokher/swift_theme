@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_bulk_edit": 1,
  "allow_rename": 1,
  "autoname": "field:event_key",
  "creation": "2025-07-31 12:00:00",
@@ -46,15 +47,15 @@
    "label": "Description"
   }
  ],
- "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2025-07-31 12:00:00",
+ "modified": "2026-07-31 19:25:55.597110",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Sound Event",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
