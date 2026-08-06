@@ -66,37 +66,77 @@ function applyTheme(config) {
 
 function setupLoginForm() {
     const loginForm = document.getElementById('login-form');
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const remember = document.querySelector('input[name="remember"]').checked;
-            
-            // Play submit sound if enabled
-            await playSound('submit');
-            
-            // Here you would typically make an API call to Frappe's login endpoint
-            // For now, we'll just log the credentials
-            console.log('Login attempt:', { username, remember });
-            
-            // Show loading state
-            const submitBtn = loginForm.querySelector('.login-btn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span>Signing In...</span>';
-            submitBtn.disabled = true;
-            
-            // Simulate API call (replace with actual Frappe login)
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                
-                // Redirect or show success message
-                alert('Login functionality would connect to Frappe auth system here.');
-            }, 1500);
-        });
+
+    if (!loginForm) return;
+
+    loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const remember = document.querySelector('input[name="remember"]').checked;
+
+        await playSound('submit');
+
+        const submitBtn = loginForm.querySelector('.login-btn');
+        const originalText = submitBtn.innerHTML;
+
+        submitBtn.innerHTML = "<span>Signing In...</span>";
+        submitBtn.disabled = true;
+
+        try {
+            const body = new URLSearchParams();
+            body.append("usr", username);
+            body.append("pwd", password);
+
+            const response = await fetch("/api/method/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: body.toString(),
+                credentials: "same-origin"
+            });
+
+            const data = await response.json();
+
+            if (data.exc) {
+                throw new Error("Invalid username or password.");
+            }
+
+            if (remember) {
+                localStorage.setItem("remember_username", username);
+            } else {
+                localStorage.removeItem("remember_username");
+            }
+
+            window.location.href = "/app";
+
+        } catch (err) {
+            console.error(err);
+
+            alert(
+                err.message ||
+                "Login failed. Please check your username and password."
+            );
+
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    const savedUser = localStorage.getItem("remember_username");
+
+    if (savedUser) {
+        document.getElementById("username").value = savedUser;
+
+        const rememberBox = document.querySelector(
+            'input[name="remember"]'
+        );
+
+        if (rememberBox) {
+            rememberBox.checked = true;
+        }
     }
 }
 
