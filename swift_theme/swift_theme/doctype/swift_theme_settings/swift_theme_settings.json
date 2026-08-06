@@ -2,6 +2,46 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "settings_section",
+  "settings_schema_version",
+  "theme_section",
+  "default_accent",
+  "default_theme",
+  "default_density",
+  "default_radius",
+  "default_font_scale",
+  "default_font_family",
+  "navbar_variant",
+  "sidebar_variant",
+  "brand_hex_override",
+  "features_section",
+  "enable_switcher",
+  "enable_command_palette",
+  "enable_focus_mode",
+  "enable_perf_mode",
+  "enable_styled_scrollbar",
+  "enable_toast_theming",
+  "enable_print_theming",
+  "brand_section",
+  "brand_name",
+  "brand_logo",
+  "brand_logo_dark",
+  "brand_favicon",
+  "login_section",
+  "login_layout",
+  "login_bg_image",
+  "login_tagline",
+  "login_show_signup",
+  "auto_dark_section",
+  "enable_auto_dark",
+  "auto_dark_start",
+  "auto_dark_end",
+  "injection_section",
+  "custom_css",
+  "custom_js",
+  "print_section",
+  "print_font_family",
+  "legacy_section",
   "color_mode_section",
   "color_mode",
   "active_preset",
@@ -13,10 +53,243 @@
   "volume_level",
   "sound_events",
   "sidebar_section",
-  "sidebar_variant",
   "pin_behavior"
  ],
  "fields": [
+  {
+   "fieldname": "settings_section",
+   "fieldtype": "Section Break",
+   "label": "Settings"
+  },
+  {
+   "default": "2",
+   "fieldname": "settings_schema_version",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Settings Schema Version"
+  },
+  {
+   "fieldname": "theme_section",
+   "fieldtype": "Section Break",
+   "label": "Theme"
+  },
+  {
+   "default": "indigo",
+   "fieldname": "default_accent",
+   "fieldtype": "Select",
+   "label": "Default Accent",
+   "options": "\nindigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate"
+  },
+  {
+   "default": "",
+   "fieldname": "default_theme",
+   "fieldtype": "Select",
+   "label": "Default Full Theme",
+   "options": "\nemerald\nsapphire\nobsidian\nmidnight\naurora\ngraphite\ncarbon\nivory\nporcelain\nrose-gold\nmonochrome\nsandstone"
+  },
+  {
+   "default": "Comfortable",
+   "fieldname": "default_density",
+   "fieldtype": "Select",
+   "label": "Default Density",
+   "options": "Compact\nComfortable\nCozy"
+  },
+  {
+   "default": "Rounded",
+   "fieldname": "default_radius",
+   "fieldtype": "Select",
+   "label": "Default Shape",
+   "options": "Sharp\nRounded\nPill"
+  },
+  {
+   "default": "M",
+   "fieldname": "default_font_scale",
+   "fieldtype": "Select",
+   "label": "Default Font Scale",
+   "options": "S\nM\nL\nXL"
+  },
+  {
+   "default": "Inter",
+   "fieldname": "default_font_family",
+   "fieldtype": "Select",
+   "label": "Default Font Family",
+   "options": "Inter\nPoppins\nManrope\nRoboto\nSystem"
+  },
+  {
+   "default": "Solid",
+   "fieldname": "navbar_variant",
+   "fieldtype": "Select",
+   "label": "Navbar Variant",
+   "options": "Solid\nGlass\nTransparent"
+  },
+  {
+   "default": "Attached",
+   "fieldname": "sidebar_variant",
+   "fieldtype": "Select",
+   "label": "Sidebar Variant",
+   "options": "Attached\nFloating\nIcon-only"
+  },
+  {
+   "fieldname": "brand_hex_override",
+   "fieldtype": "Color",
+   "label": "Brand Hex Override"
+  },
+  {
+   "fieldname": "features_section",
+   "fieldtype": "Section Break",
+   "label": "Features"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_switcher",
+   "fieldtype": "Check",
+   "label": "Enable Switcher"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_command_palette",
+   "fieldtype": "Check",
+   "label": "Enable Command Palette"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_focus_mode",
+   "fieldtype": "Check",
+   "label": "Enable Focus Mode"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_perf_mode",
+   "fieldtype": "Check",
+   "label": "Enable Performance Mode"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_styled_scrollbar",
+   "fieldtype": "Check",
+   "label": "Enable Styled Scrollbar"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_toast_theming",
+   "fieldtype": "Check",
+   "label": "Enable Toast Theming"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_print_theming",
+   "fieldtype": "Check",
+   "label": "Enable Print Theming"
+  },
+  {
+   "fieldname": "brand_section",
+   "fieldtype": "Section Break",
+   "label": "Brand"
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "brand_logo",
+   "fieldtype": "Data",
+   "label": "Brand Logo (light)"
+  },
+  {
+   "fieldname": "brand_logo_dark",
+   "fieldtype": "Data",
+   "label": "Brand Logo (dark)"
+  },
+  {
+   "fieldname": "brand_favicon",
+   "fieldtype": "Data",
+   "label": "Brand Favicon"
+  },
+  {
+   "fieldname": "login_section",
+   "fieldtype": "Section Break",
+   "label": "Login"
+  },
+  {
+   "default": "Split",
+   "fieldname": "login_layout",
+   "fieldtype": "Select",
+   "label": "Login Layout",
+   "options": "Split\nCentered\nMinimal"
+  },
+  {
+   "fieldname": "login_bg_image",
+   "fieldtype": "Data",
+   "label": "Login Background Image"
+  },
+  {
+   "fieldname": "login_tagline",
+   "fieldtype": "Data",
+   "label": "Login Tagline"
+  },
+  {
+   "default": "0",
+   "fieldname": "login_show_signup",
+   "fieldtype": "Check",
+   "label": "Show Signup Link"
+  },
+  {
+   "fieldname": "auto_dark_section",
+   "fieldtype": "Section Break",
+   "label": "Auto Dark"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_auto_dark",
+   "fieldtype": "Check",
+   "label": "Enable Auto Dark"
+  },
+  {
+   "default": "19:00:00",
+   "fieldname": "auto_dark_start",
+   "fieldtype": "Time",
+   "label": "Auto Dark Start"
+  },
+  {
+   "default": "07:00:00",
+   "fieldname": "auto_dark_end",
+   "fieldtype": "Time",
+   "label": "Auto Dark End"
+  },
+  {
+   "fieldname": "injection_section",
+   "fieldtype": "Section Break",
+   "label": "Custom Injection"
+  },
+  {
+   "fieldname": "custom_css",
+   "fieldtype": "Text",
+   "label": "Custom CSS"
+  },
+  {
+   "fieldname": "custom_js",
+   "fieldtype": "Text",
+   "label": "Custom JS"
+  },
+  {
+   "fieldname": "print_section",
+   "fieldtype": "Section Break",
+   "label": "Print"
+  },
+  {
+   "default": "Inter",
+   "fieldname": "print_font_family",
+   "fieldtype": "Select",
+   "label": "Print Font Family",
+   "options": "Inter\nPoppins\nManrope\nRoboto\nSystem"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "legacy_section",
+   "fieldtype": "Section Break",
+   "label": "Legacy (deprecated)"
+  },
   {
    "fieldname": "color_mode_section",
    "fieldtype": "Section Break",
@@ -93,13 +366,6 @@
    "label": "Sidebar"
   },
   {
-   "default": "Floating",
-   "fieldname": "sidebar_variant",
-   "fieldtype": "Select",
-   "label": "Sidebar Variant",
-   "options": "Floating\nAttached\nMinimal"
-  },
-  {
    "default": "Click to Pin",
    "fieldname": "pin_behavior",
    "fieldtype": "Select",
@@ -110,7 +376,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-31 12:00:00.000000",
+ "modified": "2026-08-06 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",

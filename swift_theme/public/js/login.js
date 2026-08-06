@@ -8,13 +8,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupLoginForm();
 });
 
+// Read a cookie value (used to obtain the Frappe CSRF token).
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()\[\]\\\/+^])/g, "\\$1") + "=([^;]*)"));
+    return match ? decodeURIComponent(match[1]) : null;
+}
+
 async function loadThemeConfig() {
     try {
         const response = await fetch('/api/method/swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings.get_active_theme_config');
-        
+
         if (response.ok) {
             const config = await response.json();
-            
+
             if (config.message) {
                 applyTheme(config.message);
             }
@@ -89,19 +95,38 @@ function setupLoginForm() {
             body.append("usr", username);
             body.append("pwd", password);
 
+            // Frappe v16 requires the CSRF token on POSTs made from a browser that
+            // already holds a (non-guest) session cookie. Read it from the cookie
+            // and send it as the X-Frappe-CSRF-Token header, or the login will be
+            // rejected and the user left in a Guest session (every later Desk API
+            // call then fails with 403 "not whitelisted").
+            const headers = {
+                "Content-Type": "application/x-www-form-urlencoded",
+            };
+            const csrfToken = getCookie("csrf_token");
+            if (csrfToken) {
+                headers["X-Frappe-CSRF-Token"] = csrfToken;
+            }
+
             const response = await fetch("/api/method/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
+                headers: headers,
                 body: body.toString(),
-                credentials: "same-origin"
+                // "include" ensures the sid / csrf_token cookies set by the login
+                // response are stored and later re-sent on the /app navigation and
+                // on every API call from the Desk, keeping the session alive.
+                credentials: "include"
             });
 
             const data = await response.json();
 
-            if (data.exc) {
+            if (!response.ok || data.exc) {
                 throw new Error("Invalid username or password.");
+            }
+
+            // Only navigate once Frappe confirms the session was created.
+            if (data.message !== "Logged In") {
+                throw new Error("Login could not be completed. Please try again.");
             }
 
             if (remember) {
@@ -110,7 +135,9 @@ function setupLoginForm() {
                 localStorage.removeItem("remember_username");
             }
 
-            window.location.href = "/app";
+            window.location.href = data.home_page && data.home_page !== "desk"
+                ? "/" + data.home_page
+                : "/app";
 
         } catch (err) {
             console.error(err);

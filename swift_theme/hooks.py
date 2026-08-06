@@ -28,6 +28,33 @@ app_include_js = [
     "/assets/swift_theme/js/swift-sidebar.js",
     "/assets/swift_theme/js/swift-focus.js",
     "/assets/swift_theme/js/swift-perf.js",
+    # GoldElite runtime foundation (Phase 3.1) — dependency-ordered, non-breaking.
+    "/assets/swift_theme/js/goldelite/core/namespace.js",
+    "/assets/swift_theme/js/goldelite/utilities/util.js",
+    "/assets/swift_theme/js/goldelite/core/log.js",
+    "/assets/swift_theme/js/goldelite/core/events.js",
+    "/assets/swift_theme/js/goldelite/core/errors.js",
+    "/assets/swift_theme/js/goldelite/core/registry.js",
+    "/assets/swift_theme/js/goldelite/systems/settings.js",
+    "/assets/swift_theme/js/goldelite/systems/flags.js",
+    "/assets/swift_theme/js/goldelite/services/compat.js",
+    # GoldElite layout engine foundation (D-003) — before lifecycle, non-breaking.
+    "/assets/swift_theme/js/goldelite/systems/layout/manager.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/layers.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/regions.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/responsive.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/context.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/frappe-chrome.js",
+    "/assets/swift_theme/js/goldelite/systems/layout/index.js",
+    # GoldElite component runtime (D-004) — before lifecycle, non-breaking.
+    "/assets/swift_theme/js/goldelite/systems/components.js",
+    # GoldElite design token engine (D-005) — before lifecycle, non-breaking.
+    "/assets/swift_theme/js/goldelite/systems/tokens/registry.js",
+    "/assets/swift_theme/js/goldelite/systems/tokens/resolver.js",
+    "/assets/swift_theme/js/goldelite/systems/tokens/io.js",
+    "/assets/swift_theme/js/goldelite/systems/tokens/css-bridge.js",
+    "/assets/swift_theme/js/goldelite/systems/tokens/index.js",
+    "/assets/swift_theme/js/goldelite/core/lifecycle.js",
 ]
 
 # ---- Website / portal assets ----
@@ -46,8 +73,8 @@ web_include_js = [
 ]
 
 # ---- Boot info ----
+# Single boot path: extend_bootinfo only (duplicate boot_session removed).
 extend_bootinfo = "swift_theme.api.boot.extend_bootinfo"
-boot_session = "swift_theme.api.boot.boot_session"
 
 # ---- Website context (login/portal) ----
 website_context = {

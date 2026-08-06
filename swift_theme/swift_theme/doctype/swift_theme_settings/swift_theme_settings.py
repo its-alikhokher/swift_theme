@@ -2,6 +2,8 @@ import json
 import frappe
 from frappe.model.document import Document
 
+from swift_theme.settings_engine import adapter, schema, validation
+
 
 PREMIUM_THEMES = {
     "Swift Blue": {
@@ -165,7 +167,12 @@ PREMIUM_THEMES = {
 
 class SwiftThemeSettings(Document):
     def validate(self):
-        # Validate Custom Gradient mode requires both colors
+        # Canonical settings validation (centralized in settings_engine).
+        errors = validation.validate_doc(self)
+        if errors:
+            frappe.throw("Invalid settings: " + "; ".join(errors))
+
+        # Legacy (v1) validation retained for the deprecated fields.
         if self.color_mode == "Custom Gradient":
             if not self.gradient_start or not self.gradient_end:
                 frappe.throw(
@@ -179,7 +186,8 @@ class SwiftThemeSettings(Document):
 
 @frappe.whitelist()
 def get_active_theme_config():
-    """Returns JSON with colors/mode based on current settings selection"""
+    """DEPRECATED (v1). Returns JSON with colors/mode based on v1 settings."""
+    adapter.warn_deprecated("get_active_theme_config", usage="call")
     settings = frappe.get_single("Swift Theme Settings")
     
     config = {
@@ -214,7 +222,8 @@ def get_active_theme_config():
 
 @frappe.whitelist()
 def play_sound(event_name):
-    """Checks settings and returns sound file/volume for the given event"""
+    """DEPRECATED (v1). Checks v1 settings and returns a sound for an event."""
+    adapter.warn_deprecated("play_sound", usage="call")
     settings = frappe.get_single("Swift Theme Settings")
     
     if not settings.enable_sounds:
@@ -253,7 +262,8 @@ def play_sound(event_name):
 
 @frappe.whitelist()
 def get_premium_themes():
-    """Returns the catalog of luxury premium themes available in Swift Theme"""
+    """DEPRECATED (v1). Returns the catalog of v1 premium themes."""
+    adapter.warn_deprecated("get_premium_themes", usage="call")
     themes_list = []
     for name, data in PREMIUM_THEMES.items():
         themes_list.append({
@@ -267,21 +277,31 @@ def get_premium_themes():
 
 @frappe.whitelist()
 def apply_theme(theme_name):
-    """Applies a specific premium theme for the current user session"""
+    """DEPRECATED (v1). Applies a v1 premium theme for the current user.
+
+    Legacy ``swift_selected_theme`` is still written (backward compat); the
+    canonical ``swift_theme`` override is written too when a mapping exists.
+    """
+    adapter.warn_deprecated("apply_theme", usage="call")
     if theme_name not in PREMIUM_THEMES:
         frappe.throw("Theme not found")
-    
+
     selected_theme = PREMIUM_THEMES[theme_name]
-    
-    # Set user preference
+
+    # Set user preference (legacy + canonical when mapped)
     frappe.db.set_value("User", frappe.session.user, "swift_selected_theme", theme_name)
-    
+    preset_map = schema.PRESET_MAP.get(theme_name)
+    if preset_map:
+        canonical_theme = preset_map.get("default_theme")
+        if canonical_theme:
+            frappe.db.set_value("User", frappe.session.user, "swift_theme", canonical_theme)
+
     # Auto-set Dark/Light Mode based on theme
     mode = selected_theme.get("mode", "light")
     frappe.db.set_value("User", frappe.session.user, "desk_theme", mode)
-    
+
     frappe.clear_cache(user=frappe.session.user)
-    
+
     return {
         "success": True,
         "theme": selected_theme,
