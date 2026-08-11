@@ -8,13 +8,52 @@
   "gradient_colors_section",
   "gradient_start",
   "gradient_end",
+  "defaults_section",
+  "default_accent",
+  "default_theme",
+  "brand_hex_override",
+  "defaults_col_break",
+  "default_density",
+  "default_radius",
+  "default_font_scale",
+  "default_font_family",
+  "features_section",
+  "enable_switcher",
+  "enable_command_palette",
+  "enable_focus_mode",
+  "features_col_break",
+  "enable_perf_mode",
+  "enable_styled_scrollbar",
+  "enable_toast_theming",
+  "enable_print_theming",
+  "print_font_family",
+  "brand_section",
+  "brand_name",
+  "brand_favicon",
+  "brand_col_break",
+  "brand_logo",
+  "brand_logo_dark",
+  "login_section",
+  "login_layout",
+  "login_tagline",
+  "login_show_signup",
+  "login_col_break",
+  "login_bg_image",
+  "auto_dark_section",
+  "enable_auto_dark",
+  "auto_dark_start",
+  "auto_dark_end",
   "sounds_section",
   "enable_sounds",
   "volume_level",
   "sound_events",
   "sidebar_section",
+  "navbar_variant",
   "sidebar_variant",
-  "pin_behavior"
+  "pin_behavior",
+  "custom_code_section",
+  "custom_css",
+  "custom_js"
  ],
  "fields": [
   {
@@ -61,6 +100,220 @@
   },
   {
    "collapsible": 1,
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Desk Defaults"
+  },
+  {
+   "default": "indigo",
+   "description": "Default accent for users who have not picked their own.",
+   "fieldname": "default_accent",
+   "fieldtype": "Select",
+   "label": "Default Accent",
+   "options": "\nindigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate"
+  },
+  {
+   "description": "A full theme overrides the accent. Leave blank to use accent + Frappe's Light/Dark mode.",
+   "fieldname": "default_theme",
+   "fieldtype": "Select",
+   "label": "Default Full Theme",
+   "options": "\nemerald\nsapphire\nobsidian\nmidnight\naurora\ngraphite\ncarbon\nivory\nporcelain\nrose-gold\nmonochrome\nsandstone"
+  },
+  {
+   "description": "Force a specific accent colour site-wide. Leave blank to use the named accent above.",
+   "fieldname": "brand_hex_override",
+   "fieldtype": "Color",
+   "label": "Brand Accent Override"
+  },
+  {
+   "fieldname": "defaults_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Comfortable",
+   "fieldname": "default_density",
+   "fieldtype": "Select",
+   "label": "Default Density",
+   "options": "\nCompact\nComfortable\nCozy"
+  },
+  {
+   "default": "Rounded",
+   "fieldname": "default_radius",
+   "fieldtype": "Select",
+   "label": "Default Shape",
+   "options": "\nSharp\nRounded\nPill"
+  },
+  {
+   "default": "M",
+   "fieldname": "default_font_scale",
+   "fieldtype": "Select",
+   "label": "Default Font Scale",
+   "options": "\nS\nM\nL\nXL"
+  },
+  {
+   "default": "Inter",
+   "fieldname": "default_font_family",
+   "fieldtype": "Select",
+   "label": "Default Font Family",
+   "options": "\nInter\nPoppins\nManrope\nRoboto\nSystem"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "features_section",
+   "fieldtype": "Section Break",
+   "label": "Features"
+  },
+  {
+   "default": "1",
+   "description": "Show the Theme chip in the navbar so users can switch theme themselves.",
+   "fieldname": "enable_switcher",
+   "fieldtype": "Check",
+   "label": "Enable Theme Switcher"
+  },
+  {
+   "default": "1",
+   "description": "Ctrl+Shift+T opens the Swift command palette.",
+   "fieldname": "enable_command_palette",
+   "fieldtype": "Check",
+   "label": "Enable Command Palette"
+  },
+  {
+   "default": "1",
+   "description": "F toggles focus mode, R toggles reading mode.",
+   "fieldname": "enable_focus_mode",
+   "fieldtype": "Check",
+   "label": "Enable Focus / Reading Mode"
+  },
+  {
+   "fieldname": "features_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_perf_mode",
+   "fieldtype": "Check",
+   "label": "Enable Performance Mode"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_styled_scrollbar",
+   "fieldtype": "Check",
+   "label": "Enable Styled Scrollbar"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_toast_theming",
+   "fieldtype": "Check",
+   "label": "Enable Toast Theming"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_print_theming",
+   "fieldtype": "Check",
+   "label": "Enable Print Theming"
+  },
+  {
+   "default": "Inter",
+   "depends_on": "eval:doc.enable_print_theming==1",
+   "fieldname": "print_font_family",
+   "fieldtype": "Select",
+   "label": "Print Font Family",
+   "options": "\nInter\nPoppins\nManrope\nRoboto\nSystem"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "brand_section",
+   "fieldtype": "Section Break",
+   "label": "Branding"
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "brand_favicon",
+   "fieldtype": "Attach Image",
+   "label": "Brand Favicon"
+  },
+  {
+   "fieldname": "brand_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "brand_logo",
+   "fieldtype": "Attach Image",
+   "label": "Brand Logo"
+  },
+  {
+   "description": "Used when the viewer is in dark mode. Falls back to Brand Logo.",
+   "fieldname": "brand_logo_dark",
+   "fieldtype": "Attach Image",
+   "label": "Brand Logo (Dark)"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "login_section",
+   "fieldtype": "Section Break",
+   "label": "Login Page"
+  },
+  {
+   "default": "Split",
+   "fieldname": "login_layout",
+   "fieldtype": "Select",
+   "label": "Login Layout",
+   "options": "Split\nCentered\nMinimal"
+  },
+  {
+   "description": "Shown under the login heading.",
+   "fieldname": "login_tagline",
+   "fieldtype": "Data",
+   "label": "Login Tagline"
+  },
+  {
+   "default": "0",
+   "fieldname": "login_show_signup",
+   "fieldtype": "Check",
+   "label": "Show Sign Up Link"
+  },
+  {
+   "fieldname": "login_col_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "login_bg_image",
+   "fieldtype": "Attach Image",
+   "label": "Login Background Image"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "auto_dark_section",
+   "fieldtype": "Section Break",
+   "label": "Auto Dark Mode"
+  },
+  {
+   "default": "0",
+   "description": "Switch the desk to dark mode between the times below.",
+   "fieldname": "enable_auto_dark",
+   "fieldtype": "Check",
+   "label": "Enable Auto Dark"
+  },
+  {
+   "default": "19:00:00",
+   "depends_on": "eval:doc.enable_auto_dark==1",
+   "fieldname": "auto_dark_start",
+   "fieldtype": "Time",
+   "label": "Dark Mode Starts"
+  },
+  {
+   "default": "07:00:00",
+   "depends_on": "eval:doc.enable_auto_dark==1",
+   "fieldname": "auto_dark_end",
+   "fieldtype": "Time",
+   "label": "Dark Mode Ends"
+  },
+  {
+   "collapsible": 1,
    "fieldname": "sounds_section",
    "fieldtype": "Section Break",
    "label": "Sounds"
@@ -81,6 +334,7 @@
   },
   {
    "depends_on": "eval:doc.enable_sounds==1",
+   "description": "Attach a sound file per event key (save, submit, error, success, delete, click). Events without a file stay silent.",
    "fieldname": "sound_events",
    "fieldtype": "Table",
    "label": "Sound Events",
@@ -90,7 +344,14 @@
    "collapsible": 1,
    "fieldname": "sidebar_section",
    "fieldtype": "Section Break",
-   "label": "Sidebar"
+   "label": "Navigation"
+  },
+  {
+   "default": "Solid",
+   "fieldname": "navbar_variant",
+   "fieldtype": "Select",
+   "label": "Navbar Variant",
+   "options": "Solid\nTransparent\nBordered"
   },
   {
    "default": "Floating",
@@ -105,12 +366,33 @@
    "fieldtype": "Select",
    "label": "Pin Behavior",
    "options": "Click to Pin\nHover to Expand\nAlways Expanded"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:doc.custom_css||doc.custom_js",
+   "fieldname": "custom_code_section",
+   "fieldtype": "Section Break",
+   "label": "Custom Code"
+  },
+  {
+   "description": "Injected into every desk page. Use with care.",
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS"
+  },
+  {
+   "description": "Injected into every desk page. Use with care.",
+   "fieldname": "custom_js",
+   "fieldtype": "Code",
+   "label": "Custom JS",
+   "options": "JS"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-31 12:00:00.000000",
+ "modified": "2026-08-12 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",

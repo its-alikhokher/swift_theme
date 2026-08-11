@@ -28,6 +28,7 @@ app_include_js = [
     "/assets/swift_theme/js/swift-sidebar.js",
     "/assets/swift_theme/js/swift-focus.js",
     "/assets/swift_theme/js/swift-perf.js",
+    "/assets/swift_theme/js/swift-sounds.js",
 ]
 
 # ---- Website / portal assets ----
@@ -46,8 +47,9 @@ web_include_js = [
 ]
 
 # ---- Boot info ----
+# extend_bootinfo alone is enough; also registering boot_session would compute
+# the same preferences a second time on every desk load.
 extend_bootinfo = "swift_theme.api.boot.extend_bootinfo"
-boot_session = "swift_theme.api.boot.boot_session"
 
 # ---- Website context (login/portal) ----
 website_context = {

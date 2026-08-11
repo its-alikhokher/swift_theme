@@ -1,76 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-swift-login-layout="{{ login_layout }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Login - Swift Theme</title>
+    <title>{{ _("Login") }}{% if brand_name %} · {{ brand_name }}{% endif %}</title>
     <link rel="stylesheet" href="/assets/swift_theme/css/login.css">
+    <style>
+        :root {
+            --primary: {{ colors.get("primary") or "#3b82f6" }};
+            --secondary: {{ colors.get("secondary") or "#8b5cf6" }};
+            --bg1: {{ colors.get("bg1") or "#0f172a" }};
+            --bg2: {{ colors.get("bg2") or "#1e293b" }};
+        }
+        {% if login_bg_image %}
+        .login-container { --swift-login-bg: url('{{ login_bg_image }}'); }
+        {% endif %}
+    </style>
 </head>
-<body>
+<body class="{{ 'dark-mode' if is_dark_mode else 'light-mode' }}"
+      data-csrf-token="{{ csrf_token }}"
+      data-redirect-to="{{ redirect_to }}"
+      data-sounds-enabled="{{ 1 if theme.get('enable_sounds') else 0 }}">
     <div class="login-container">
         <!-- Animated Background Blobs -->
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
-        
+
         <!-- Glassmorphism Login Card -->
         <div class="login-card">
             <div class="login-header">
-                <h1>Welcome Back</h1>
-                <p class="subtitle">Enterprise Access Portal</p>
+                {% if brand_logo %}
+                <img class="login-logo" src="{{ brand_logo }}" alt="{{ brand_name }}">
+                {% endif %}
+                <h1>{{ _("Welcome Back") }}</h1>
+                <p class="subtitle">{{ login_tagline or _("Enterprise Access Portal") }}</p>
             </div>
-            
-            <form id="login-form" class="login-form">
+
+            <form id="login-form" class="login-form" method="POST" action="/api/method/login" novalidate>
+                <div class="alert-error" id="login-error" role="alert" aria-live="polite" hidden></div>
+
                 <div class="form-group">
-                    <label for="username">Username or Email</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        placeholder="Enter your username or email"
-                        value="iamaliraza777@gmail.com"
+                    <label for="usr">{{ _("Username or Email") }}</label>
+                    <input
+                        type="text"
+                        id="usr"
+                        name="usr"
+                        placeholder="{{ _('Enter your username or email') }}"
                         autocomplete="username"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        autofocus
                         required
                     >
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Enter your password"
-                        value="its-alikhokher"
+                    <label for="pwd">{{ _("Password") }}</label>
+                    <input
+                        type="password"
+                        id="pwd"
+                        name="pwd"
+                        placeholder="{{ _('Enter your password') }}"
                         autocomplete="current-password"
                         required
                     >
                 </div>
-                
+
                 <div class="form-options">
                     <label class="remember-me">
-                        <input type="checkbox" name="remember" checked>
-                        <span>Remember me</span>
+                        <input type="checkbox" id="remember_me" name="remember_me" value="1">
+                        <span>{{ _("Remember me") }}</span>
                     </label>
-                    <a href="#" class="forgot-password">Forgot Password?</a>
+                    <a href="/update-password?new=1" class="forgot-password">{{ _("Forgot Password?") }}</a>
                 </div>
-                
+
                 <button type="submit" class="login-btn">
-                    <span>Sign In</span>
+                    <span>{{ _("Sign In") }}</span>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </button>
-                
-                <p class="custom-text" id="custom-message">Secure login powered by Swift Theme Enterprise</p>
+
+                {% if show_signup %}
+                <p class="signup-link"><a href="/signup">{{ _("Don't have an account? Sign up") }}</a></p>
+                {% endif %}
+
+                <p class="custom-text" id="custom-message">{{ custom_login_text }}</p>
             </form>
-            
+
             <div class="login-footer">
-                <p>&copy; 2025 Swift Theme. All rights reserved.</p>
+                <p>&copy; {{ current_year }} {{ brand_name or "Swift Theme" }}. {{ _("All rights reserved.") }}</p>
             </div>
         </div>
     </div>
-    
+
     <script src="/assets/swift_theme/js/login.js"></script>
 </body>
 </html>

@@ -1,8 +1,15 @@
 /* Swift Theme — Command Palette (Ctrl+Shift+T) */
 
 (function () {
+    function isEnabled() {
+        var boot = window.frappe && frappe.boot && frappe.boot.swift_theme;
+        // Default to on until bootinfo lands, matching the other Swift modules.
+        return !boot || !!boot.enable_command_palette;
+    }
+
     document.addEventListener("keydown", function (e) {
         if (e.ctrlKey && e.shiftKey && (e.key === "T" || e.key === "t")) {
+            if (!isEnabled()) return;
             e.preventDefault();
             openCmdk();
         }
@@ -10,6 +17,7 @@
     document.addEventListener("swift:cmdk:open", openCmdk);
 
     function openCmdk() {
+        if (!isEnabled()) return;
         if (document.querySelector(".swift-cmdk-backdrop")) return;
 
         var boot = (window.frappe && frappe.boot && frappe.boot.swift_theme) || {};
