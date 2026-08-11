@@ -1,4 +1,5 @@
-import json
+import os
+
 import frappe
 from frappe.model.document import Document
 
@@ -177,77 +178,116 @@ class SwiftThemeSettings(Document):
         frappe.publish_realtime("swift_theme_updated", {}, after_commit=True)
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_active_theme_config():
-    """Returns JSON with colors/mode based on current settings selection"""
-    settings = frappe.get_single("Swift Theme Settings")
-    
+    """Returns JSON with colors/mode based on current settings selection.
+
+    Guest-accessible because the login page renders before a session exists.
+    Only presentation values are exposed here — never settings that could leak
+    configuration to anonymous visitors.
+    """
+    settings = frappe.get_cached_doc("Swift Theme Settings")
+
     config = {
         "color_mode": settings.color_mode,
         "sidebar_variant": settings.sidebar_variant,
         "pin_behavior": settings.pin_behavior,
-        "enable_sounds": settings.enable_sounds,
+        "enable_sounds": int(settings.enable_sounds or 0),
         "volume_level": settings.volume_level or 50,
+        "custom_login_text": settings.login_tagline or "",
     }
-    
-    if settings.color_mode == "Preset Themes":
-        preset_name = settings.active_preset or "Swift Blue"
-        theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES["Swift Blue"])
-        config["theme"] = theme_data
-        config["mode"] = theme_data["mode"]
-        config["colors"] = theme_data["colors"]
-        config["gradient_start"] = None
-        config["gradient_end"] = None
-    elif settings.color_mode == "Custom Gradient":
-        config["gradient_start"] = settings.gradient_start
-        config["gradient_end"] = settings.gradient_end
-        config["mode"] = "custom"
-        config["colors"] = {
+
+    if settings.color_mode == "Custom Gradient":
+        colors = {
             "primary": settings.gradient_start or "#0b84f3",
             "secondary": settings.gradient_end or "#0056b3",
             "bg1": settings.gradient_start or "#0f172a",
             "bg2": settings.gradient_end or "#1e293b",
         }
-    
+        config["gradient_start"] = settings.gradient_start
+        config["gradient_end"] = settings.gradient_end
+        config["mode"] = "custom"
+        config["colors"] = colors
+        # A custom gradient has no inherent brightness; keep the page's default.
+        config["is_dark_mode"] = None
+    else:
+        preset_name = settings.active_preset or "Swift Blue"
+        theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES["Swift Blue"])
+        colors = dict(theme_data["colors"])
+        colors.setdefault("bg1", colors.get("bg_body"))
+        colors.setdefault("bg2", colors.get("bg_card"))
+        config["theme"] = theme_data
+        config["mode"] = theme_data["mode"]
+        config["colors"] = colors
+        config["gradient_start"] = None
+        config["gradient_end"] = None
+        config["is_dark_mode"] = theme_data["mode"] == "dark"
+
+    # Flattened aliases so clients can read colours without digging into
+    # config.colors — the login page relies on these.
+    config.update(colors)
+
     return config
 
 
-@frappe.whitelist()
+DEFAULT_SOUNDS = {
+    "save": "save.mp3",
+    "submit": "submit.mp3",
+    "cancel": "cancel.mp3",
+    "error": "error.mp3",
+    "success": "success.mp3",
+    "delete": "delete.mp3",
+    "notification": "notification.mp3",
+    "click": "click.mp3",
+    "login": "login.mp3",
+}
+
+
+def _bundled_sound(event_name):
+    """Path to a bundled sound, but only if the file is actually shipped.
+
+    The app ships no audio by default, so returning a path unconditionally
+    would make every client request a 404. Resolving against disk means these
+    light up automatically if sound files are later added to public/sounds/.
+    """
+    filename = DEFAULT_SOUNDS.get(event_name)
+    if not filename:
+        return None
+    if not os.path.exists(frappe.get_app_path("swift_theme", "public", "sounds", filename)):
+        return None
+    return f"/assets/swift_theme/sounds/{filename}"
+
+
+@frappe.whitelist(allow_guest=True)
 def play_sound(event_name):
-    """Checks settings and returns sound file/volume for the given event"""
-    settings = frappe.get_single("Swift Theme Settings")
-    
+    """Returns the sound file and volume configured for the given event.
+
+    Returns sound_file=None when nothing is configured for the event; the
+    client then stays silent rather than requesting a file that isn't there.
+    """
+    settings = frappe.get_cached_doc("Swift Theme Settings")
+
     if not settings.enable_sounds:
-        return {"enabled": False, "sound": None, "volume": 0}
-    
-    volume = (settings.volume_level or 50) / 100.0
-    
-    # Look for custom sound in sound_events table
+        return {"enabled": False, "sound_file": None, "volume": 0, "event": event_name}
+
+    # Clamp so a stray value in Settings can't produce an invalid HTML volume.
+    volume = min(max(int(settings.volume_level or 50), 0), 100) / 100.0
+
+    # An uploaded file for this event wins over the bundled default.
     sound_file = None
-    if settings.sound_events:
-        for event in settings.sound_events:
-            if event.event_key == event_name:
-                sound_file = event.sound_file
-                break
-    
-    # Default sounds mapping if no custom sound found
-    default_sounds = {
-        "save": "/assets/swift_theme/sounds/save.mp3",
-        "submit": "/assets/swift_theme/sounds/submit.mp3",
-        "error": "/assets/swift_theme/sounds/error.mp3",
-        "success": "/assets/swift_theme/sounds/success.mp3",
-        "delete": "/assets/swift_theme/sounds/delete.mp3",
-        "click": "/assets/swift_theme/sounds/click.mp3",
-    }
-    
+    for event in settings.sound_events or []:
+        if event.event_key == event_name and event.sound_file:
+            sound_file = event.sound_file
+            break
+
     if not sound_file:
-        sound_file = default_sounds.get(event_name, default_sounds.get("click"))
-    
+        sound_file = _bundled_sound(event_name)
+
     return {
         "enabled": True,
-        "sound": sound_file,
+        "sound_file": sound_file,
         "volume": volume,
-        "event": event_name
+        "event": event_name,
     }
 
 
@@ -269,21 +309,31 @@ def get_premium_themes():
 def apply_theme(theme_name):
     """Applies a specific premium theme for the current user session"""
     if theme_name not in PREMIUM_THEMES:
-        frappe.throw("Theme not found")
-    
+        frappe.throw(frappe._("Theme not found"))
+
+    user = frappe.session.user
+    if not user or user == "Guest":
+        frappe.throw(frappe._("Login required"), frappe.PermissionError)
+
     selected_theme = PREMIUM_THEMES[theme_name]
-    
-    # Set user preference
-    frappe.db.set_value("User", frappe.session.user, "swift_selected_theme", theme_name)
-    
-    # Auto-set Dark/Light Mode based on theme
     mode = selected_theme.get("mode", "light")
-    frappe.db.set_value("User", frappe.session.user, "desk_theme", mode)
-    
-    frappe.clear_cache(user=frappe.session.user)
-    
+
+    frappe.db.set_value(
+        "User",
+        user,
+        {
+            # swift_preset stores the premium preset name; both this and
+            # desk_theme are created/validated by install._ensure_user_fields.
+            "swift_preset": theme_name,
+            # desk_theme is a core Select — its options are capitalised.
+            "desk_theme": mode.capitalize(),
+        },
+    )
+
+    frappe.clear_cache(user=user)
+
     return {
         "success": True,
         "theme": selected_theme,
-        "mode": mode
+        "mode": mode,
     }

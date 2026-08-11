@@ -1,134 +1,157 @@
-// Swift Theme Enterprise Login - Dynamic Theme Engine
+/* Swift Theme Enterprise Login
+   The page is themed server-side (see www/login.py) so it paints correctly on
+   first load; this file handles authentication and the submit sound. */
 
-document.addEventListener('DOMContentLoaded', async function() {
-    // Fetch active theme configuration
-    await loadThemeConfig();
-    
-    // Setup form submission
-    setupLoginForm();
-});
+(function () {
+    var body = document.body;
+    var CSRF_TOKEN = body.getAttribute("data-csrf-token") || "";
+    var REDIRECT_TO = body.getAttribute("data-redirect-to") || "";
+    var SOUNDS_ENABLED = body.getAttribute("data-sounds-enabled") === "1";
 
-async function loadThemeConfig() {
-    try {
-        const response = await fetch('/api/method/swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings.get_active_theme_config');
-        
-        if (response.ok) {
-            const config = await response.json();
-            
-            if (config.message) {
-                applyTheme(config.message);
-            }
-        }
-    } catch (error) {
-        console.log('Using default theme:', error);
-        // Default theme will be applied via CSS variables
-    }
-}
+    document.addEventListener("DOMContentLoaded", setupLoginForm);
 
-function applyTheme(config) {
-    const root = document.documentElement;
-    
-    // Apply colors based on mode
-    if (config.color_mode === 'Custom Gradient') {
-        root.style.setProperty('--primary', config.primary || '#3b82f6');
-        root.style.setProperty('--secondary', config.secondary || '#8b5cf6');
-        root.style.setProperty('--bg1', config.gradient_start || '#0f172a');
-        root.style.setProperty('--bg2', config.gradient_end || '#1e293b');
-    } else {
-        // Preset theme
-        root.style.setProperty('--primary', config.primary || '#3b82f6');
-        root.style.setProperty('--secondary', config.secondary || '#8b5cf6');
-        root.style.setProperty('--bg1', config.bg1 || '#0f172a');
-        root.style.setProperty('--bg2', config.bg2 || '#1e293b');
-    }
-    
-    // Auto-switch dark/light mode based on theme brightness
-    if (config.is_dark_mode !== undefined) {
-        if (config.is_dark_mode) {
-            document.body.classList.add('dark-mode');
-            document.body.classList.remove('light-mode');
-        } else {
-            document.body.classList.add('light-mode');
-            document.body.classList.remove('dark-mode');
-        }
-    }
-    
-    // Update custom text if provided
-    if (config.custom_login_text) {
-        const customTextElement = document.getElementById('custom-message');
-        if (customTextElement) {
-            customTextElement.textContent = config.custom_login_text;
-        }
-    }
-    
-    console.log('Theme applied:', config);
-}
+    function setupLoginForm() {
+        var form = document.getElementById("login-form");
+        if (!form) return;
 
-function setupLoginForm() {
-    const loginForm = document.getElementById('login-form');
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
+        form.addEventListener("submit", function (e) {
             e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const remember = document.querySelector('input[name="remember"]').checked;
-            
-            // Play submit sound if enabled
-            await playSound('submit');
-            
-            // Here you would typically make an API call to Frappe's login endpoint
-            // For now, we'll just log the credentials
-            console.log('Login attempt:', { username, remember });
-            
-            // Show loading state
-            const submitBtn = loginForm.querySelector('.login-btn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span>Signing In...</span>';
-            submitBtn.disabled = true;
-            
-            // Simulate API call (replace with actual Frappe login)
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-                
-                // Redirect or show success message
-                alert('Login functionality would connect to Frappe auth system here.');
-            }, 1500);
+            submitLogin(form);
         });
     }
-}
 
-async function playSound(eventName) {
-    try {
-        const response = await fetch('/api/method/swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings.play_sound', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ event_name: eventName })
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.message && data.message.enabled && data.message.sound_file) {
-                const audio = new Audio(data.message.sound_file);
-                audio.volume = data.message.volume_level / 100;
-                await audio.play();
+    async function submitLogin(form) {
+        var usr = document.getElementById("usr").value.trim();
+        var pwd = document.getElementById("pwd").value;
+        var remember = document.getElementById("remember_me");
+
+        if (!usr || !pwd) {
+            showError("Please enter both your username and password.");
+            return;
+        }
+
+        var btn = form.querySelector(".login-btn");
+        var originalHTML = btn.innerHTML;
+        setBusy(btn, true, "Signing In…");
+        clearError();
+
+        // Fire and forget — a missing sound must never delay or block login.
+        playSound("submit");
+
+        try {
+            var body = new URLSearchParams({ usr: usr, pwd: pwd });
+            if (remember && remember.checked) body.append("remember_me", "1");
+
+            var response = await fetch("/api/method/login", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Accept": "application/json",
+                    "X-Frappe-CSRF-Token": CSRF_TOKEN,
+                },
+                body: body.toString(),
+            });
+
+            var data = await response.json().catch(function () { return {}; });
+
+            if (response.ok) {
+                // Full page load so the desk boots with the new session.
+                window.location.href = REDIRECT_TO || data.home_page || "/app";
+                return;
             }
-        }
-    } catch (error) {
-        console.log('Sound playback failed:', error);
-    }
-}
 
-// Add keyboard shortcut for quick login (Ctrl+Enter)
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key === 'Enter') {
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.dispatchEvent(new Event('submit'));
+            setBusy(btn, false, null, originalHTML);
+            showError(extractMessage(data, response.status));
+        } catch (error) {
+            setBusy(btn, false, null, originalHTML);
+            showError("Could not reach the server. Check your connection and try again.");
+            console.error("Login request failed:", error);
         }
     }
-});
+
+    // Frappe reports auth failures via _server_messages (a JSON-encoded list
+    // of JSON strings) rather than a plain field.
+    function extractMessage(data, status) {
+        try {
+            var messages = JSON.parse(data._server_messages || "[]");
+            for (var i = 0; i < messages.length; i++) {
+                var parsed = JSON.parse(messages[i]);
+                var text = stripHtml(parsed.message || "");
+                if (text) return text;
+            }
+        } catch (e) { /* fall through to the generic message */ }
+
+        if (data.message && typeof data.message === "string") return stripHtml(data.message);
+        if (status === 401) return "Invalid login credentials.";
+        if (status === 417) return "Too many failed attempts. Please try again later.";
+        return "Login failed. Please try again.";
+    }
+
+    function stripHtml(html) {
+        var tmp = document.createElement("div");
+        tmp.innerHTML = html;
+        return (tmp.textContent || "").trim();
+    }
+
+    function setBusy(btn, busy, label, originalHTML) {
+        btn.disabled = busy;
+        if (busy) {
+            btn.innerHTML = "<span>" + label + "</span>";
+        } else if (originalHTML) {
+            btn.innerHTML = originalHTML;
+        }
+    }
+
+    function showError(message) {
+        var box = document.getElementById("login-error");
+        if (!box) return;
+        box.textContent = message;
+        box.hidden = false;
+    }
+
+    function clearError() {
+        var box = document.getElementById("login-error");
+        if (!box) return;
+        box.textContent = "";
+        box.hidden = true;
+    }
+
+    async function playSound(eventName) {
+        if (!SOUNDS_ENABLED) return;
+        try {
+            var response = await fetch(
+                "/api/method/swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings.play_sound",
+                {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Frappe-CSRF-Token": CSRF_TOKEN,
+                    },
+                    body: JSON.stringify({ event_name: eventName }),
+                }
+            );
+            if (!response.ok) return;
+
+            var data = await response.json();
+            var sound = data && data.message;
+            if (!sound || !sound.enabled || !sound.sound_file) return;
+
+            var audio = new Audio(sound.sound_file);
+            audio.volume = sound.volume;   // already 0–1 from the server
+            await audio.play();
+        } catch (error) {
+            // Autoplay policies and missing files are non-fatal.
+            console.debug("Sound playback skipped:", error);
+        }
+    }
+
+    // Ctrl+Enter submits from anywhere on the page.
+    document.addEventListener("keydown", function (e) {
+        if (e.ctrlKey && e.key === "Enter") {
+            var form = document.getElementById("login-form");
+            if (form) form.requestSubmit();
+        }
+    });
+})();

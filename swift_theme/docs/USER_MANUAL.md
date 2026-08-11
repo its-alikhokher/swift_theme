@@ -12,7 +12,7 @@ bench build --app swift_theme
 
 ### 2. First Time Setup
 
-1. **Login** with your credentials (auto-fill enabled)
+1. **Login** with your credentials
 2. Go to **Swift Theme Settings** from the search bar
 3. Select a **Preset Theme** or use **Gradient Mode**
 
@@ -49,13 +49,18 @@ bench build --app swift_theme
 
 - Enable/Disable sounds globally
 - Adjust volume (0-100%)
-- Sounds play on: Save, Submit, Cancel, Error, Login, Notification
+- Sounds play on: Save, Submit, Cancel, Error, Success, Notification
+
+**The app ships no audio files.** Add a row to the **Sound Events** table for
+each event you want, attach a file, and set its **Event Key** to one of:
+`save`, `submit`, `cancel`, `delete`, `error`, `success`, `notification`,
+`click`, `login`. Events with no file attached stay silent.
 
 ### 6. UI Preferences
 
-- **Density**: Compact, Comfortable, Spacious
-- **Corner Radius**: None, Small, Medium, Large, Full
-- **Font Scale**: 80% to 120%
+- **Density**: Compact, Comfortable, Cozy
+- **Corner Radius**: Sharp, Rounded, Pill
+- **Font Scale**: S, M, L, XL
 - **Performance Mode**: Disables animations for speed
 
 ### 7. Views Coverage
