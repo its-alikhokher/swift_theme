@@ -265,13 +265,101 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         self.assertEqual(prefs["preset"], "emerald-luxury")
         self.assertEqual(prefs["theme_css"], "/assets/swift_theme/css/themes/emerald-luxury.css")
 
+    def test_saving_a_new_colour_clears_stale_user_overrides(self):
+        """The exact bug: Save appeared to do nothing.
+
+        A swift_preset stored on the User outranks this doctype, so once anyone
+        had used the navbar switcher, changing the site colour silently did
+        nothing for them.
+        """
+        user = frappe.session.user
+        previous = frappe.db.get_value("User", user, "swift_preset")
+        # The release is driven by the value actually changing, so pick a
+        # preset that differs from whatever this site is currently on.
+        current = frappe.db.get_single_value("Swift Theme Settings", "active_preset")
+        target = next(n for n in PREMIUM_THEMES if n != current)
+        try:
+            frappe.db.set_value("User", user, "swift_preset", "Midnight Pro")
+
+            with settings_patched(color_mode="Theme Preset", active_preset=target):
+                self.assertIsNone(
+                    frappe.db.get_value("User", user, "swift_preset"),
+                    "changing the site colour must stand user overrides down",
+                )
+                self.assertEqual(get_effective_prefs()["preset_name"], target)
+        finally:
+            frappe.db.set_value("User", user, "swift_preset", previous)
+
+    def test_unrelated_save_keeps_user_overrides(self):
+        """Only a colour change releases them — not every save."""
+        user = frappe.session.user
+        previous = frappe.db.get_value("User", user, "swift_preset")
+        try:
+            frappe.db.set_value("User", user, "swift_preset", "Midnight Pro")
+            with settings_patched(login_tagline="Unrelated change"):
+                self.assertEqual(
+                    frappe.db.get_value("User", user, "swift_preset"), "Midnight Pro"
+                )
+        finally:
+            frappe.db.set_value("User", user, "swift_preset", previous)
+
+    def test_user_can_set_their_own_colour_pair(self):
+        """Picked from the navbar dialog; outranks both presets."""
+        user = frappe.session.user
+        before = frappe.db.get_value(
+            "User", user, ["swift_preset", "swift_primary", "swift_secondary"], as_dict=True
+        )
+        try:
+            frappe.db.set_value(
+                "User", user, {"swift_primary": "#123456", "swift_secondary": "#654321"}
+            )
+            prefs = get_effective_prefs()
+            self.assertEqual(prefs["primary"], "#123456")
+            self.assertEqual(prefs["secondary"], "#654321")
+            self.assertEqual(prefs["color_mode"], "Custom Colors")
+            self.assertEqual(prefs["color_source"], "user")
+            self.assertIsNone(prefs["preset"], "custom colours load no preset stylesheet")
+        finally:
+            frappe.db.set_value("User", user, dict(before))
+
+    def test_user_colours_outrank_a_user_preset(self):
+        user = frappe.session.user
+        before = frappe.db.get_value(
+            "User", user, ["swift_preset", "swift_primary", "swift_secondary"], as_dict=True
+        )
+        try:
+            frappe.db.set_value(
+                "User", user, {"swift_preset": "Crimson Red", "swift_primary": "#0abab5"}
+            )
+            self.assertEqual(get_effective_prefs()["primary"], "#0abab5")
+        finally:
+            frappe.db.set_value("User", user, dict(before))
+
+    def test_site_colour_change_also_clears_user_colour_pairs(self):
+        user = frappe.session.user
+        before = frappe.db.get_value(
+            "User", user, ["swift_preset", "swift_primary", "swift_secondary"], as_dict=True
+        )
+        current = frappe.db.get_single_value("Swift Theme Settings", "active_preset")
+        target = next(n for n in PREMIUM_THEMES if n != current)
+        try:
+            frappe.db.set_value(
+                "User", user, {"swift_primary": "#123456", "swift_secondary": "#654321"}
+            )
+            with settings_patched(color_mode="Theme Preset", active_preset=target):
+                self.assertIsNone(frappe.db.get_value("User", user, "swift_primary"))
+                self.assertEqual(get_effective_prefs()["preset_name"], target)
+        finally:
+            frappe.db.set_value("User", user, dict(before))
+
     def test_user_preset_overrides_the_site_preset(self):
         """A per-user choice must win, but only in Theme Preset mode."""
         user = frappe.session.user
         previous = frappe.db.get_value("User", user, "swift_preset")
         try:
-            frappe.db.set_value("User", user, "swift_preset", "Crimson Red")
+            # Set the override *after* the site colour, so it isn't released.
             with settings_patched(color_mode="Theme Preset", active_preset="Emerald Luxury"):
+                frappe.db.set_value("User", user, "swift_preset", "Crimson Red")
                 self.assertEqual(get_effective_prefs()["preset_name"], "Crimson Red")
 
             with settings_patched(
@@ -498,6 +586,12 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         """Alt+B set data-swift-sidebar="off" but nothing styled it."""
         self.assertIn('data-swift-sidebar="off"', read_css("swift-desk.css"))
 
+    def test_toasts_are_anchored_to_the_top(self):
+        """Frappe pins #alert-container to bottom:0; save confirmations belong up top."""
+        css = read_css("swift-toast.css")
+        self.assertIn("#alert-container", css)
+        self.assertIn("bottom: auto", css)
+
     def test_pin_and_restore_controls_are_styled(self):
         css = read_css("swift-desk.css")
         for selector in (".swift-pin-btn", ".swift-pinned", ".swift-sidebar-restore"):
@@ -548,6 +642,30 @@ class TestSwiftThemeClientContract(IntegrationTestCase):
         js = read_js("swift-sidebar.js")
         self.assertIn("withObserverPaused", js)
         self.assertIn("takeRecords", js)
+
+    def test_presets_are_offered_in_frappes_own_theme_dialog(self):
+        """One place to switch theme, not two competing ones."""
+        js = read_js("swift-theme-dialog.js")
+        self.assertIn("frappe.ui.ThemeSwitcher", js)
+        self.assertIn("setup_dialog", js)
+        self.assertIn("setCustomColors", js, "custom pair must be pickable there too")
+        self.assertIn("clearPersonalTheme", js, "and a way back to the site default")
+
+    def test_theme_dialog_is_loaded_on_the_desk(self):
+        self.assertIn(
+            "/assets/swift_theme/js/swift-theme-dialog.js",
+            frappe.get_hooks("app_include_js") or [],
+        )
+
+    def test_theme_dialog_elements_are_styled(self):
+        css = read_css("swift-desk.css")
+        for selector in (".swift-swatch", ".swift-custom", ".swift-switch-grid"):
+            self.assertIn(selector, css, f"{selector} is built by JS but never styled")
+
+    def test_boot_exposes_a_custom_colour_api(self):
+        js = read_js("swift-boot.js")
+        self.assertIn("setCustomColors", js)
+        self.assertIn("swift_primary", js)
 
     def test_boot_swaps_a_single_theme_stylesheet(self):
         """Presets must retarget one <link>, not stack stylesheets."""

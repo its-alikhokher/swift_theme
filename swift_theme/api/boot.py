@@ -37,7 +37,8 @@ def extend_bootinfo(bootinfo):
 # Keys a signed-out visitor may see. The login page needs branding and layout;
 # it has no business receiving custom CSS/JS or anything else site-internal.
 GUEST_KEYS = {
-    "color_mode", "preset", "preset_name", "theme_css", "primary", "secondary", "is_dark",
+    "color_mode", "color_source", "preset", "preset_name",
+    "theme_css", "primary", "secondary", "is_dark",
     "density", "radius", "font_scale", "font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
@@ -65,6 +66,7 @@ def get_effective_prefs():
         "follow_frappe": follow,
         "mode": mode,
         "color_mode":  colors["color_mode"],
+        "color_source": colors["color_source"],
         "preset":      colors["preset"],
         "preset_name": colors["preset_name"],
         "theme_css":   colors["theme_css"],
@@ -132,6 +134,7 @@ def set_user_pref(field, value):
     """Save a single user preference. Whitelisted subset only."""
     ALLOWED = {
         "swift_follow_frappe", "swift_mode", "swift_preset",
+        "swift_primary", "swift_secondary",
         "swift_density", "swift_radius", "swift_font_scale", "swift_font_family",
     }
     if field not in ALLOWED:
@@ -145,31 +148,47 @@ def set_user_pref(field, value):
     return {"ok": True, "field": field, "value": value}
 
 
+def _custom_colors(primary, secondary, source):
+    return {
+        "color_mode": "Custom Colors",
+        "color_source": source,
+        "preset": None,
+        "preset_name": None,
+        "theme_css": None,
+        "primary": primary or "#0b84f3",
+        "secondary": secondary or "#0056b3",
+        "is_dark": 1,
+    }
+
+
 def _colors(s, u):
     """Resolve the active colour scheme.
 
-    A user's own preset choice wins over the site preset, but only in preset
-    mode — if the site is on Custom Colors, that brand pair applies to everyone.
+    Most specific choice wins:
+      1. the user's own colour pair, picked from the navbar switcher
+      2. the user's chosen preset
+      3. whatever the site is configured for
+    Saving a new site colour clears 1 and 2, so an admin change still lands.
     """
-    color_mode = s.get("color_mode") or "Theme Preset"
+    if u.get("swift_primary"):
+        return _custom_colors(u.get("swift_primary"), u.get("swift_secondary"), "user")
 
-    if color_mode == "Custom Colors":
-        return {
-            "color_mode": "Custom Colors",
-            "preset": None,
-            "preset_name": None,
-            "theme_css": None,
-            "primary": s.get("primary_color") or "#0b84f3",
-            "secondary": s.get("secondary_color") or "#0056b3",
-            "is_dark": 1,
-        }
+    if u.get("swift_preset"):
+        return _preset_colors(u["swift_preset"], "user")
 
-    name = u.get("swift_preset") or s.get("active_preset") or DEFAULT_PRESET
+    if (s.get("color_mode") or "Theme Preset") == "Custom Colors":
+        return _custom_colors(s.get("primary_color"), s.get("secondary_color"), "site")
+
+    return _preset_colors(s.get("active_preset") or DEFAULT_PRESET, "site")
+
+
+def _preset_colors(name, source):
     data = PREMIUM_THEMES.get(name) or PREMIUM_THEMES[DEFAULT_PRESET]
     return {
         "color_mode": "Theme Preset",
+        "color_source": source,
         "preset": data["value"],
-        "preset_name": name,
+        "preset_name": name if name in PREMIUM_THEMES else DEFAULT_PRESET,
         "theme_css": preset_stylesheet(data["value"]),
         "primary": data["colors"]["primary"],
         "secondary": data["colors"]["secondary"],
@@ -207,6 +226,7 @@ def _user_prefs():
         return {}
     fields = [
         "swift_follow_frappe", "swift_mode", "swift_preset",
+        "swift_primary", "swift_secondary",
         "swift_density", "swift_radius", "swift_font_scale", "swift_font_family",
     ]
     try:
