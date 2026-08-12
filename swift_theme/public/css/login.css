@@ -1,15 +1,23 @@
-/* Swift Theme Enterprise Login - Glassmorphism Design */
+/* Swift Theme — Enterprise Login
+   Three layouts, driven by Swift Theme Settings -> Login Layout:
+     Split     — brand panel beside the form (default, enterprise look)
+     Centered  — single glass card on the gradient
+     Minimal   — flat, no blobs, no brand panel
+   Colours arrive as --primary/--secondary/--bg1/--bg2, rendered server-side. */
 
 :root {
     --primary: #3b82f6;
     --secondary: #8b5cf6;
     --bg1: #0f172a;
     --bg2: #1e293b;
+
     --text-primary: #ffffff;
     --text-secondary: #94a3b8;
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.16);
+    --field-bg: rgba(255, 255, 255, 0.06);
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    --radius: 18px;
 }
 
 * {
@@ -18,165 +26,294 @@
     box-sizing: border-box;
 }
 
+html,
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+    color: var(--text-primary);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
     position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Animated Background Blobs */
+/* ---------- Ambient background ---------- */
 .blob {
-    position: absolute;
+    position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.6;
-    animation: float 20s infinite ease-in-out;
+    filter: blur(90px);
+    opacity: 0.5;
+    animation: float 22s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .blob-1 {
-    width: 400px;
-    height: 400px;
+    width: 420px;
+    height: 420px;
     background: var(--primary);
-    top: -100px;
-    left: -100px;
-    animation-delay: 0s;
+    top: -120px;
+    left: -120px;
 }
 
 .blob-2 {
-    width: 300px;
-    height: 300px;
+    width: 320px;
+    height: 320px;
     background: var(--secondary);
-    bottom: -50px;
-    right: -50px;
+    bottom: -80px;
+    right: -60px;
     animation-delay: -7s;
 }
 
 .blob-3 {
-    width: 350px;
-    height: 350px;
+    width: 360px;
+    height: 360px;
     background: linear-gradient(45deg, var(--primary), var(--secondary));
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 45%;
+    left: 55%;
     animation-delay: -14s;
 }
 
 @keyframes float {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    25% {
-        transform: translate(50px, -50px) scale(1.1);
-    }
-    50% {
-        transform: translate(-30px, 30px) scale(0.9);
-    }
-    75% {
-        transform: translate(40px, 20px) scale(1.05);
-    }
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25%      { transform: translate(50px, -50px) scale(1.1); }
+    50%      { transform: translate(-30px, 30px) scale(0.9); }
+    75%      { transform: translate(40px, 20px) scale(1.05); }
 }
 
-/* Login Container */
+/* ---------- Shell ---------- */
 .login-container {
     position: relative;
     z-index: 10;
     width: 100%;
     max-width: 420px;
-    padding: 20px;
+    padding: 24px;
 }
 
-/* Glassmorphism Card */
+/* Split layout: brand panel + form side by side */
+html[data-swift-login-layout="Split"] .login-container {
+    max-width: 980px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: stretch;
+    gap: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    padding: 0;
+}
+
+html[data-swift-login-layout="Split"] .login-card {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Brand panel — only rendered in Split */
+.login-brand-panel {
+    display: none;
+    position: relative;
+    padding: 48px 44px;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(150deg,
+        color-mix(in oklab, var(--primary) 88%, transparent),
+        color-mix(in oklab, var(--secondary) 88%, transparent));
+    color: #fff;
+    overflow: hidden;
+}
+
+html[data-swift-login-layout="Split"] .login-brand-panel {
+    display: flex;
+}
+
+.login-brand-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.22), transparent 55%);
+    pointer-events: none;
+}
+
+.login-brand-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+.brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.brand-mark img {
+    max-height: 40px;
+    max-width: 150px;
+    object-fit: contain;
+}
+
+.brand-pitch h2 {
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+}
+
+.brand-pitch p {
+    font-size: 14.5px;
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 38ch;
+}
+
+.brand-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13.5px;
+    opacity: 0.95;
+}
+
+.brand-points li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-points svg {
+    flex: 0 0 auto;
+    opacity: 0.9;
+}
+
+/* ---------- Card ---------- */
 .login-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 40px;
     box-shadow: var(--shadow);
-    animation: slideUp 0.6s ease-out;
+    animation: slideUp 0.5s ease-out;
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Header */
 .login-header {
+    margin-bottom: 28px;
+}
+
+html[data-swift-login-layout="Centered"] .login-header,
+html[data-swift-login-layout="Minimal"] .login-header {
     text-align: center;
-    margin-bottom: 32px;
+}
+
+.login-logo {
+    max-height: 46px;
+    max-width: 170px;
+    object-fit: contain;
+    margin-bottom: 18px;
+}
+
+html[data-swift-login-layout="Centered"] .login-logo,
+html[data-swift-login-layout="Minimal"] .login-logo {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+/* The brand panel already carries the logo in Split */
+html[data-swift-login-layout="Split"] .login-logo {
+    display: none;
 }
 
 .login-header h1 {
     color: var(--text-primary);
-    font-size: 28px;
+    font-size: 27px;
     font-weight: 700;
-    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
 }
 
 .subtitle {
     color: var(--text-secondary);
     font-size: 14px;
-    font-weight: 400;
 }
 
-/* Form Styles */
+/* ---------- Form ---------- */
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
 .form-group label {
     color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 550;
 }
 
 .form-group input {
-    background: rgba(255, 255, 255, 0.05);
+    width: 100%;
+    background: var(--field-bg);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 14px 16px;
+    border-radius: 11px;
+    padding: 13px 15px;
     color: var(--text-primary);
     font-size: 15px;
-    transition: all 0.3s ease;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     outline: none;
 }
 
 .form-group input:focus {
     border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: color-mix(in oklab, var(--field-bg) 60%, var(--primary) 8%);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 28%, transparent);
 }
 
 .form-group input::placeholder {
     color: var(--text-secondary);
+    opacity: 0.75;
 }
 
-/* Form Options */
 .form-options {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     font-size: 13px;
 }
 
@@ -186,11 +323,12 @@ body {
     gap: 8px;
     color: var(--text-secondary);
     cursor: pointer;
+    user-select: none;
 }
 
 .remember-me input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     accent-color: var(--primary);
     cursor: pointer;
 }
@@ -198,55 +336,94 @@ body {
 .forgot-password {
     color: var(--primary);
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: 500;
 }
 
 .forgot-password:hover {
-    color: var(--secondary);
+    text-decoration: underline;
 }
 
-/* Login Button */
 .login-btn {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none;
-    border-radius: 12px;
-    padding: 14px 24px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    gap: 9px;
+    width: 100%;
+    margin-top: 2px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 8px 22px color-mix(in oklab, var(--primary) 38%, transparent);
 }
 
-.login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+.login-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px color-mix(in oklab, var(--primary) 48%, transparent);
 }
 
-.login-btn:active {
+.login-btn:active:not(:disabled) {
     transform: translateY(0);
 }
 
-/* Custom Text */
+.login-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Feedback ---------- */
+.alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.42);
+    border-radius: 11px;
+    padding: 12px 14px;
+    color: #fecaca;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.alert-error[hidden] {
+    display: none;
+}
+
+.signup-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.signup-link a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
 .custom-text {
     text-align: center;
     color: var(--text-secondary);
     font-size: 12px;
-    margin-top: 8px;
     padding-top: 16px;
     border-top: 1px solid var(--glass-border);
 }
 
-/* Footer */
 .login-footer {
     text-align: center;
-    margin-top: 24px;
-    padding-top: 24px;
+    margin-top: 22px;
+    padding-top: 20px;
     border-top: 1px solid var(--glass-border);
 }
 
@@ -255,71 +432,86 @@ body {
     font-size: 12px;
 }
 
-/* Brand logo */
-.login-logo {
-    max-height: 48px;
-    max-width: 180px;
-    object-fit: contain;
-    margin: 0 auto 16px;
-    display: block;
+html[data-swift-login-layout="Split"] .login-footer {
+    border-top: none;
+    margin-top: 16px;
+    padding-top: 8px;
 }
 
-/* Error message */
-.alert-error {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    border-radius: 12px;
-    padding: 12px 14px;
-    color: #fecaca;
-    font-size: 13px;
-    line-height: 1.4;
-}
-
-.alert-error[hidden] {
+/* ---------- Minimal ---------- */
+html[data-swift-login-layout="Minimal"] .blob {
     display: none;
 }
 
-/* Sign up link */
-.signup-link {
-    text-align: center;
-    font-size: 13px;
+html[data-swift-login-layout="Minimal"] .login-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--glass-bg);
+    box-shadow: none;
+    animation: none;
 }
 
-.signup-link a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-.signup-link a:hover {
-    text-decoration: underline;
-}
-
-.login-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Light presets — the card defaults to light-on-dark, so invert the text
-   colours and glass tints when the active theme is a light one. */
+/* ---------- Light presets ---------- */
 body.light-mode {
     --text-primary: #0f172a;
     --text-secondary: #475569;
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-border: rgba(15, 23, 42, 0.12);
-    --shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+    --glass-bg: rgba(255, 255, 255, 0.62);
+    --glass-border: rgba(15, 23, 42, 0.1);
+    --field-bg: rgba(255, 255, 255, 0.75);
+    --shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
 }
 
-body.light-mode .form-group input {
-    background: rgba(255, 255, 255, 0.6);
+body.light-mode .blob {
+    opacity: 0.34;
 }
 
 body.light-mode .alert-error {
-    background: rgba(239, 68, 68, 0.12);
+    background: rgba(239, 68, 68, 0.1);
     color: #991b1b;
 }
 
-/* Respect reduced-motion preferences */
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    html[data-swift-login-layout="Split"] .login-container {
+        max-width: 460px;
+        grid-template-columns: 1fr;
+    }
+
+    html[data-swift-login-layout="Split"] .login-brand-panel {
+        display: none;
+    }
+
+    html[data-swift-login-layout="Split"] .login-logo {
+        display: block;
+    }
+
+    html[data-swift-login-layout="Split"] .login-card {
+        padding: 38px 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 16px;
+    }
+
+    .login-card,
+    html[data-swift-login-layout="Split"] .login-card {
+        padding: 30px 22px;
+    }
+
+    .login-header h1 {
+        font-size: 23px;
+    }
+
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* ---------- Accessibility ---------- */
 @media (prefers-reduced-motion: reduce) {
     .blob,
     .login-card {
@@ -331,19 +523,7 @@ body.light-mode .alert-error {
     }
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-    .login-card {
-        padding: 30px 24px;
-    }
-
-    .login-header h1 {
-        font-size: 24px;
-    }
-
-    .form-options {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-    }
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }

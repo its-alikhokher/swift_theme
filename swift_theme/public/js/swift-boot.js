@@ -69,6 +69,7 @@
             if ("font_scale" in p)      { applyAttr("font-scale", p.font_scale); set("font_scale", p.font_scale); }
             if ("navbar_variant" in p)  { applyAttr("navbar", p.navbar_variant); set("navbar", p.navbar_variant); }
             if ("sidebar_variant" in p) { applyAttr("sidebar-variant", p.sidebar_variant); set("sidebar", p.sidebar_variant); }
+            if ("pin_behavior" in p)    { applyAttr("pin", pinKey(p.pin_behavior)); }
             if (p.hex_override) {
                 html.style.setProperty("--swift-accent", p.hex_override);
                 set("hex", p.hex_override);
@@ -119,15 +120,25 @@
         } catch (e) {}
     }
 
+    // "Click to Pin" -> "click", so CSS can key off a short token.
+    function pinKey(v) {
+        var map = { "Click to Pin": "click", "Hover to Expand": "hover", "Always Expanded": "always" };
+        return map[v] || "";
+    }
+
     // ---- Sync with server-side prefs when bootinfo lands ----
     document.addEventListener("app_ready", syncFromBoot);
     document.addEventListener("DOMContentLoaded", syncFromBoot);
 
     function syncFromBoot() {
-        try {
-            var boot = window.frappe && frappe.boot && frappe.boot.swift_theme;
-            if (!boot) return;
+        var boot = window.frappe && frappe.boot && frappe.boot.swift_theme;
+        if (boot) applyAll(boot);
+    }
 
+    // Applies every server-side setting. Safe to re-run at any time, which is
+    // what makes saving Swift Theme Settings take effect without a reload.
+    function applyAll(boot) {
+        try {
             API.applyPrefs({
                 accent: boot.accent,
                 theme: boot.theme,
@@ -137,6 +148,7 @@
                 font_scale: boot.font_scale,
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
+                pin_behavior: boot.pin_behavior,
                 hex_override: boot.hex_override,
                 enable_perf_mode: boot.enable_perf_mode,
                 enable_styled_scrollbar: boot.enable_styled_scrollbar,
@@ -147,8 +159,8 @@
             if (boot.auto_dark) applyAutoDark(boot.auto_dark_start, boot.auto_dark_end);
 
             // Custom CSS/JS injection
-            if (boot.custom_css) injectCSS(boot.custom_css);
-            if (boot.custom_js)  injectJS(boot.custom_js);
+            injectCSS(boot.custom_css || "");
+            if (boot.custom_js) injectJS(boot.custom_js);
 
             // Custom favicon
             if (boot.brand_favicon) {
@@ -158,8 +170,37 @@
             }
 
             window.SwiftTheme._boot = boot;
+
+            // Let the switcher, sidebar and sound engine react to the new values.
+            document.dispatchEvent(new CustomEvent("swift:prefs:applied", { detail: boot }));
         } catch (e) { console.warn("SwiftTheme sync failed", e); }
     }
+    API.applyAll = applyAll;
+
+    // ---- Live update when Swift Theme Settings is saved ----
+    // The doctype's on_update broadcasts to every desk user, so a change made
+    // by an admin lands on all open sessions without anyone refreshing.
+    API.reload = function () {
+        if (!(window.frappe && frappe.call)) return;
+        return frappe.call({ method: "swift_theme.api.boot.get_effective_prefs", freeze: false })
+            .then(function (r) {
+                if (!r || !r.message) return;
+                if (frappe.boot) frappe.boot.swift_theme = r.message;
+                applyAll(r.message);
+            })
+            .catch(function () {});
+    };
+
+    function bindRealtime() {
+        if (!(window.frappe && frappe.realtime && frappe.realtime.on)) return;
+        if (bindRealtime._done) return;
+        bindRealtime._done = true;
+        try {
+            frappe.realtime.on("swift_theme_updated", function () { API.reload(); });
+        } catch (e) {}
+    }
+    document.addEventListener("app_ready", bindRealtime);
+    if (window.frappe && frappe.after_ajax) frappe.after_ajax(bindRealtime);
 
     function applyAutoDark(start, end) {
         // Only if user hasn't overridden Frappe's theme via 'Force ...'
@@ -178,12 +219,16 @@
         return (+p[0]) * 60 + (+p[1] || 0);
     }
 
+    // Replaces rather than skips, so edits to Custom CSS apply on save.
     function injectCSS(css) {
-        if (document.getElementById("swift-custom-css")) return;
-        var s = document.createElement("style");
-        s.id = "swift-custom-css";
-        s.textContent = css;
-        document.head.appendChild(s);
+        var s = document.getElementById("swift-custom-css");
+        if (!s) {
+            if (!css) return;
+            s = document.createElement("style");
+            s.id = "swift-custom-css";
+            document.head.appendChild(s);
+        }
+        if (s.textContent !== css) s.textContent = css;
     }
     function injectJS(js) {
         if (document.getElementById("swift-custom-js")) return;

@@ -21,11 +21,39 @@
       data-csrf-token="{{ csrf_token }}"
       data-redirect-to="{{ redirect_to }}"
       data-sounds-enabled="{{ 1 if theme.get('enable_sounds') else 0 }}">
+    <!-- Animated Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
     <div class="login-container">
-        <!-- Animated Background Blobs -->
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
+        <!-- Brand panel (Split layout only) -->
+        <aside class="login-brand-panel">
+            <div class="brand-mark">
+                {% if brand_logo %}<img src="{{ brand_logo }}" alt="{{ brand_name }}">{% endif %}
+                <span>{{ brand_name or "Swift Theme" }}</span>
+            </div>
+
+            <div class="brand-pitch">
+                <h2>{{ login_tagline or _("Your workspace, exactly the way your team works.") }}</h2>
+                <p>{{ _("Sign in to access dashboards, approvals and reports from one secure place.") }}</p>
+            </div>
+
+            <ul class="brand-points">
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span>{{ _("Role-based access control") }}</span>
+                </li>
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span>{{ _("Encrypted sessions and audit trails") }}</span>
+                </li>
+                <li>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+                    <span>{{ _("Single sign-on ready") }}</span>
+                </li>
+            </ul>
+        </aside>
 
         <!-- Glassmorphism Login Card -->
         <div class="login-card">
@@ -34,7 +62,14 @@
                 <img class="login-logo" src="{{ brand_logo }}" alt="{{ brand_name }}">
                 {% endif %}
                 <h1>{{ _("Welcome Back") }}</h1>
-                <p class="subtitle">{{ login_tagline or _("Enterprise Access Portal") }}</p>
+                {# In Split the tagline headlines the brand panel, so don't repeat it here. #}
+                <p class="subtitle">
+                    {%- if login_layout == "Split" -%}
+                        {{ _("Sign in to continue") }}
+                    {%- else -%}
+                        {{ login_tagline or _("Enterprise Access Portal") }}
+                    {%- endif -%}
+                </p>
             </div>
 
             <form id="login-form" class="login-form" method="POST" action="/api/method/login" novalidate>
