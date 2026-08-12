@@ -49,13 +49,18 @@
         var btn = document.createElement("button");
         btn.type = "button";
         btn.className = "swift-sidebar-restore";
-        btn.title = "Show sidebar";
+        btn.title = "Show sidebar (Alt+B)";
         btn.setAttribute("aria-label", "Show sidebar");
         btn.innerHTML = "▸";
         btn.addEventListener("click", function () {
             window.SwiftSidebar.setOff(false);
         });
         document.body.appendChild(btn);
+    }
+
+    function removeRestoreButton() {
+        var btn = document.querySelector(".swift-sidebar-restore");
+        if (btn) btn.remove();
     }
 
     // ---------------- Sidebar item selector — v16 verified ----------------
@@ -73,9 +78,23 @@
         return nodes;
     }
     function itemLabel(el) {
+        // Cached because once the ★ button is injected, el.textContent would
+        // include it and the label would no longer match the stored pin.
+        if (el._swiftLabel !== undefined) return el._swiftLabel;
+
         var lbl = el.querySelector(".sidebar-item-label, .list-link-label, .tag-label");
-        var text = lbl ? lbl.textContent : el.textContent;
-        return (text || "").trim();
+        var text;
+        if (lbl) {
+            text = lbl.textContent;
+        } else {
+            text = "";
+            Array.prototype.forEach.call(el.childNodes, function (n) {
+                if (n.nodeType === 1 && n.classList && n.classList.contains("swift-pin-btn")) return;
+                text += n.textContent || "";
+            });
+        }
+        el._swiftLabel = (text || "").trim();
+        return el._swiftLabel;
     }
 
     // ---------------- Inject pin buttons + apply pinned state ----------------
@@ -108,14 +127,18 @@
     }
 
     function applyPinnedState() {
-        var pins = getPins();
-        getSidebarItems().forEach(function (el) {
-            decorateItem(el);
-            var lbl = itemLabel(el);
-            if (pins.indexOf(lbl) > -1) el.classList.add("swift-pinned");
-            else                        el.classList.remove("swift-pinned");
+        // Our own DOM edits below would otherwise be seen by the observer and
+        // schedule another pass, looping forever every 120ms.
+        withObserverPaused(function () {
+            var pins = getPins();
+            getSidebarItems().forEach(function (el) {
+                decorateItem(el);
+                var lbl = itemLabel(el);
+                if (pins.indexOf(lbl) > -1) el.classList.add("swift-pinned");
+                else                        el.classList.remove("swift-pinned");
+            });
+            reorderPinnedInParents();
         });
-        reorderPinnedInParents();
     }
 
     // Move pinned items to the top of their parent container, add a divider
@@ -126,30 +149,65 @@
         });
         parents.forEach(function (p) {
             var pinned = Array.prototype.slice.call(p.querySelectorAll(":scope > .swift-pinned"));
-            // Reverse so first-pinned ends up on top after successive prepends
-            pinned.reverse().forEach(function (el) { p.insertBefore(el, p.firstChild); });
+            // Reverse so first-pinned ends up on top after successive prepends.
+            // Skip elements already in place — moving a node to where it
+            // already is still counts as a DOM mutation.
+            pinned.slice().reverse().forEach(function (el) {
+                if (p.firstChild !== el) p.insertBefore(el, p.firstChild);
+            });
             // Add a group class to the last pinned so we get a divider under it
             p.querySelectorAll(":scope > .swift-pinned-group").forEach(function (n) {
                 n.classList.remove("swift-pinned-group");
             });
             if (pinned.length) {
-                pinned[0].classList.add("swift-pinned-group");
+                // Divider belongs under the *last* pinned row, closing the
+                // group — putting it on pinned[0] drew it after the first one.
+                pinned[pinned.length - 1].classList.add("swift-pinned-group");
             }
         });
     }
 
     // ---------------- Observe sidebar mutations (v16 re-renders often) ----------------
     var observer = null;
+    var observeTarget = null;
+    var paused = 0;
+
+    function observeNow() {
+        if (observer && observeTarget) {
+            observer.observe(observeTarget, { childList: true, subtree: true });
+        }
+    }
+
+    // Suspends observation while we mutate the sidebar ourselves.
+    function withObserverPaused(fn) {
+        paused++;
+        if (observer) observer.disconnect();
+        try {
+            fn();
+        } finally {
+            paused--;
+            if (paused <= 0) {
+                paused = 0;
+                // Drain records caused by our own edits before re-arming.
+                if (observer) observer.takeRecords();
+                observeNow();
+            }
+        }
+    }
+
     function startObserver() {
         if (observer) return;
-        var target = document.querySelector(".body-sidebar-container, .layout-side-section, body");
-        if (!target) return;
+        // Scoping to the sidebar matters — falling back to <body> meant
+        // observing the whole desk and re-running on every unrelated render.
+        observeTarget = document.querySelector(".body-sidebar-container, .layout-side-section, .body-sidebar");
+        if (!observeTarget) return;
         observer = new MutationObserver(function () {
+            if (paused) return;
             // Debounce to avoid thrash on heavy re-renders
             clearTimeout(observer._t);
             observer._t = setTimeout(applyPinnedState, 120);
         });
-        observer.observe(target, { childList: true, subtree: true });
+        observeNow();
     }
 
     // ---------------- Public API ----------------
@@ -161,6 +219,9 @@
                 ensureRestoreButton();
             } else {
                 html.removeAttribute("data-swift-sidebar");
+                // Without this the floating restore button stayed on screen
+                // permanently once the sidebar had been hidden even once.
+                removeRestoreButton();
             }
         },
         toggleOff: function () { this.setOff(!getOff()); },
@@ -194,17 +255,26 @@
     } else {
         boot();
     }
-    // Also re-decorate after Frappe finishes booting the desk
-    document.addEventListener("app_ready", function () { setTimeout(applyPinnedState, 200); });
+    // The sidebar mounts after the desk boots, so keep trying to attach the
+    // observer — it now scopes to the sidebar and no longer falls back to body.
+    document.addEventListener("app_ready", function () { setTimeout(boot, 200); });
     if (window.frappe && frappe.after_ajax) {
-        frappe.after_ajax(function () { setTimeout(applyPinnedState, 200); });
+        frappe.after_ajax(function () { setTimeout(boot, 200); });
     }
 
     // ---------------- Keyboard shortcut: Alt+B toggles sidebar off ----------------
     document.addEventListener("keydown", function (e) {
         if (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === "b" || e.key === "B")) {
+            if (isTyping(e.target)) return;
             e.preventDefault();
             window.SwiftSidebar.toggleOff();
         }
     });
+
+    function isTyping(el) {
+        if (!el) return false;
+        var tag = (el.tagName || "").toLowerCase();
+        if (tag === "input" || tag === "textarea" || tag === "select") return true;
+        return !!el.isContentEditable;
+    }
 })();

@@ -3,7 +3,23 @@
 (function () {
     if (!window.frappe) return;
 
-    frappe.after_ajax(function () { setTimeout(injectSwitcher, 200); });
+    frappe.after_ajax(function () { setTimeout(syncSwitcher, 200); });
+
+    // Re-evaluated whenever settings are saved, so toggling "Enable Theme
+    // Switcher" shows or hides the chip without a reload.
+    document.addEventListener("swift:prefs:applied", syncSwitcher);
+
+    function syncSwitcher() {
+        var boot = frappe.boot && frappe.boot.swift_theme;
+        var existing = document.querySelector(".swift-nav-item");
+
+        if (!boot || !boot.enable_switcher) {
+            if (existing) existing.remove();
+            closePalette();
+            return;
+        }
+        injectSwitcher();
+    }
 
     function injectSwitcher() {
         try {

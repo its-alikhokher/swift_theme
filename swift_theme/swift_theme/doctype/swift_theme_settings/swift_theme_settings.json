@@ -351,14 +351,15 @@
    "fieldname": "navbar_variant",
    "fieldtype": "Select",
    "label": "Navbar Variant",
-   "options": "Solid\nTransparent\nBordered"
+   "options": "Solid\nGlass\nTransparent"
   },
   {
    "default": "Floating",
+   "description": "Icon-only collapses the sidebar to icons and expands it on hover.",
    "fieldname": "sidebar_variant",
    "fieldtype": "Select",
    "label": "Sidebar Variant",
-   "options": "Floating\nAttached\nMinimal"
+   "options": "Attached\nFloating\nIcon-only"
   },
   {
    "default": "Click to Pin",
@@ -392,7 +393,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-12 00:00:00.000000",
+ "modified": "2026-08-12 01:30:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",
