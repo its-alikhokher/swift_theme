@@ -7,6 +7,11 @@ frappe.ui.form.on("Swift Theme Settings", {
         });
 
         toggleFieldVisibility(frm);
+        showSoundHint(frm);
+    },
+
+    sound_events(frm) {
+        showSoundHint(frm);
     },
 
     // Saving broadcasts swift_theme_updated to every desk session, but apply it
@@ -21,8 +26,27 @@ frappe.ui.form.on("Swift Theme Settings", {
 
     enable_sounds(frm) {
         toggleFieldVisibility(frm);
+        showSoundHint(frm);
     },
 });
+
+// Sounds enabled with no file attached is a silent no-op — the app ships no
+// audio, so say so on the form instead of letting it look broken.
+function showSoundHint(frm) {
+    frm.dashboard.clear_comment();
+    if (!frm.doc.enable_sounds) return;
+
+    const configured = (frm.doc.sound_events || []).filter((row) => row.sound_file);
+    if (configured.length) return;
+
+    frm.dashboard.add_comment(
+        __(
+            "Sounds are enabled but no sound file is attached. Add a row to <b>Sound Events</b>, pick an <b>Event Key</b> and attach an audio file — events without a file stay silent."
+        ),
+        "yellow",
+        true
+    );
+}
 
 function reloadTheme() {
     if (window.SwiftTheme && window.SwiftTheme.reload) {

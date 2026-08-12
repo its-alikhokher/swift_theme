@@ -155,8 +155,11 @@
                 enable_toast_theming: boot.enable_toast_theming,
             });
 
-            // Auto-dark by time
-            if (boot.auto_dark) applyAutoDark(boot.auto_dark_start, boot.auto_dark_end);
+            // Auto-dark by time — skipped when the user has explicitly forced a
+            // mode, otherwise it silently overrode their own choice.
+            if (boot.auto_dark && !userForcedMode(boot)) {
+                applyAutoDark(boot.auto_dark_start, boot.auto_dark_end);
+            }
 
             // Custom CSS/JS injection
             injectCSS(boot.custom_css || "");
@@ -201,6 +204,14 @@
     }
     document.addEventListener("app_ready", bindRealtime);
     if (window.frappe && frappe.after_ajax) frappe.after_ajax(bindRealtime);
+
+    // "Force Light"/"Force Dark" on the User record, or Frappe's own desk theme
+    // set to something other than Automatic, both count as a deliberate choice.
+    function userForcedMode(boot) {
+        var mode = boot && boot.mode;
+        if (mode === "Force Light" || mode === "Force Dark") return true;
+        return !(boot && boot.follow_frappe);
+    }
 
     function applyAutoDark(start, end) {
         // Only if user hasn't overridden Frappe's theme via 'Force ...'

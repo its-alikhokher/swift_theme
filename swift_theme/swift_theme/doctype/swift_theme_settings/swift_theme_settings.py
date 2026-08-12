@@ -170,11 +170,68 @@ class SwiftThemeSettings(Document):
         if self.color_mode == "Custom Gradient":
             if not self.gradient_start or not self.gradient_end:
                 frappe.throw(
-                    "Both Gradient Start and Gradient End colors are required when using Custom Gradient mode."
+                    frappe._(
+                        "Both Gradient Start and Gradient End colors are required "
+                        "when using Custom Gradient mode."
+                    )
+                )
+
+        self._validate_volume()
+        self._validate_sound_events()
+        self._guard_custom_code()
+
+    def _validate_volume(self):
+        if self.volume_level is None:
+            return
+        if not 0 <= int(self.volume_level) <= 100:
+            frappe.throw(frappe._("Volume Level must be between 0 and 100."))
+
+    def _validate_sound_events(self):
+        """Duplicate keys silently shadow each other — the first row wins."""
+        seen = set()
+        for row in self.sound_events or []:
+            if not row.event_key:
+                continue
+            if row.event_key in seen:
+                frappe.throw(
+                    frappe._("Duplicate sound event {0} in row {1}.").format(
+                        frappe.bold(row.event_key), row.idx
+                    )
+                )
+            seen.add(row.event_key)
+
+    def _guard_custom_code(self):
+        """Custom JS runs on every desk page for every user.
+
+        That is effectively a site-wide script injection point, so restrict
+        edits to Administrator rather than any System Manager.
+        """
+        if self.is_new() or frappe.session.user == "Administrator":
+            return
+        if frappe.flags.in_install or frappe.flags.in_migrate or frappe.flags.in_patch:
+            return
+
+        before = self.get_doc_before_save()
+        if before is None:
+            return
+
+        for field in ("custom_js", "custom_css"):
+            if (before.get(field) or "") != (self.get(field) or ""):
+                frappe.throw(
+                    frappe._("Only Administrator can change {0}.").format(
+                        frappe.bold(self.meta.get_label(field))
+                    ),
+                    frappe.PermissionError,
                 )
 
     def on_update(self):
-        frappe.clear_cache()
+        # Document.save() already invalidates this doc's own cached copy. What
+        # still needs clearing is every user's cached bootinfo, since these
+        # preferences are embedded in it — but only that. The previous
+        # frappe.clear_cache() flushed the entire site cache (roles, defaults,
+        # permissions, metadata) on every theme save.
+        frappe.clear_cache(doctype=self.doctype)
+        frappe.cache.delete_key("bootinfo")
         frappe.publish_realtime("swift_theme_updated", {}, after_commit=True)
 
 
