@@ -56,8 +56,13 @@
         var original = target.save;
         var wrapped = function (frm, action, callback, btn) {
             var withSound = function (r) {
-                if (!(r && r.exc)) play(actionToEvent(action));
-                else play("error");
+                // A fault in the sound layer must never stop a document from
+                // saving, so the original callback runs no matter what.
+                try {
+                    play(r && r.exc ? "error" : actionToEvent(action));
+                } catch (e) {
+                    console.debug("Swift sound skipped:", e);
+                }
                 if (callback) return callback.apply(this, arguments);
             };
             return original.call(this, frm, action, withSound, btn);
@@ -79,7 +84,7 @@
         if (typeof frappe.show_alert === "function" && !frappe.show_alert.__swiftWrapped) {
             var originalAlert = frappe.show_alert;
             var wrappedAlert = function (message) {
-                playForIndicator(message && message.indicator);
+                try { playForIndicator(message && message.indicator); } catch (e) {}
                 return originalAlert.apply(this, arguments);
             };
             copyProps(originalAlert, wrappedAlert);
@@ -92,7 +97,9 @@
         if (typeof frappe.msgprint === "function" && !frappe.msgprint.__swiftWrapped) {
             var originalMsgprint = frappe.msgprint;
             var wrappedMsgprint = function (msg) {
-                if (msg && typeof msg === "object") playForIndicator(msg.indicator);
+                try {
+                    if (msg && typeof msg === "object") playForIndicator(msg.indicator);
+                } catch (e) {}
                 return originalMsgprint.apply(this, arguments);
             };
             copyProps(originalMsgprint, wrappedMsgprint);
