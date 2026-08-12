@@ -1,0 +1,51 @@
+/* Swift Theme — Swift Blue
+   Generated from PREMIUM_THEMES["Swift Blue"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="swift-blue"] {
+  color-scheme: light;
+
+  /* Brand */
+  --swift-primary:      #0b84f3;
+  --swift-secondary:    #0056b3;
+  --swift-primary-soft: rgba(11, 132, 243, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #0b84f3;
+  --swift-accent-hover: #0970cf;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(11, 132, 243, 0.14);
+  --swift-accent-tint:  #3b82f6;
+
+  /* Frappe surface variables */
+  --bg-color:            #f5f7fa;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #f0f8fe;
+  --subtle-accent:       #f8fbff;
+  --control-bg:          #f8fbff;
+  --control-bg-on-gray:  #f0f8fe;
+  --border-color:        rgba(30, 41, 59, 0.12);
+  --text-color:          #1e293b;
+  --text-muted:          #64748b;
+  --text-light:          #64748b;
+  --heading-color:       #1e293b;
+  --sidebar-bg:          #fafbfd;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(11, 132, 243, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(0, 86, 179, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="swift-blue"] .btn-primary {
+  background: linear-gradient(135deg, #0b84f3, #0056b3);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="swift-blue"] .btn-primary:hover {
+  background: linear-gradient(135deg, #0970cf, #0b84f3);
+}

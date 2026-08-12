@@ -44,9 +44,10 @@ SETTINGS_JSON = frappe.get_app_path(
 # Every Settings field read by api/boot.py or the desk JS. If one goes missing
 # again the features it gates fail silently, so assert the whole set.
 REQUIRED_SETTINGS_FIELDS = [
-    "color_mode", "active_preset", "gradient_start", "gradient_end",
-    "default_accent", "default_theme", "default_density", "default_radius",
-    "default_font_scale", "default_font_family", "brand_hex_override",
+    "color_mode", "active_preset",
+    "primary_color", "secondary_color",
+    "default_density", "default_radius",
+    "default_font_scale", "default_font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "enable_switcher", "enable_command_palette", "enable_focus_mode",
     "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
@@ -116,6 +117,18 @@ def settings_patched(**values):
             doc.set(key, value)
         doc.save(ignore_permissions=True)
         frappe.clear_cache()
+
+
+@contextmanager
+def no_user_preset():
+    """Clear the session user's preset so the site setting is what's measured."""
+    user = frappe.session.user
+    previous = frappe.db.get_value("User", user, "swift_preset")
+    frappe.db.set_value("User", user, "swift_preset", None)
+    try:
+        yield
+    finally:
+        frappe.db.set_value("User", user, "swift_preset", previous)
 
 
 @contextmanager
@@ -245,8 +258,30 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         self.assertIn("files", prefs["sounds"])
 
     def test_saved_value_is_visible_to_the_next_read(self):
-        with settings_patched(default_accent="emerald"):
-            self.assertEqual(get_effective_prefs()["accent"], "emerald")
+        with no_user_preset():
+            with settings_patched(active_preset="Emerald Luxury"):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["preset_name"], "Emerald Luxury")
+        self.assertEqual(prefs["preset"], "emerald-luxury")
+        self.assertEqual(prefs["theme_css"], "/assets/swift_theme/css/themes/emerald-luxury.css")
+
+    def test_user_preset_overrides_the_site_preset(self):
+        """A per-user choice must win, but only in Theme Preset mode."""
+        user = frappe.session.user
+        previous = frappe.db.get_value("User", user, "swift_preset")
+        try:
+            frappe.db.set_value("User", user, "swift_preset", "Crimson Red")
+            with settings_patched(color_mode="Theme Preset", active_preset="Emerald Luxury"):
+                self.assertEqual(get_effective_prefs()["preset_name"], "Crimson Red")
+
+            with settings_patched(
+                color_mode="Custom Colors", primary_color="#123456", secondary_color="#654321"
+            ):
+                prefs = get_effective_prefs()
+            self.assertEqual(prefs["primary"], "#123456")
+            self.assertIsNone(prefs["preset"], "custom colours ignore the user preset")
+        finally:
+            frappe.db.set_value("User", user, "swift_preset", previous)
 
     def test_saving_settings_broadcasts_to_open_sessions(self):
         """Without this event the desk only updates on a hard refresh."""
@@ -259,7 +294,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 
         frappe.publish_realtime = spy
         try:
-            with settings_patched(default_accent="emerald"):
+            with settings_patched(active_preset="Emerald Luxury"):
                 pass
         finally:
             frappe.publish_realtime = original
@@ -289,7 +324,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 class TestSwiftThemeColors(IntegrationTestCase):
     def test_theme_config_flattens_colours(self):
         """login.js reads config.primary, not config.colors.primary."""
-        with settings_patched(color_mode="Preset Themes", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             config = get_active_theme_config()
 
         expected = PREMIUM_THEMES["Midnight Pro"]["colors"]
@@ -300,9 +335,9 @@ class TestSwiftThemeColors(IntegrationTestCase):
         self.assertEqual(config["bg2"], expected["bg_card"])
 
     def test_dark_preset_reports_dark_mode(self):
-        with settings_patched(color_mode="Preset Themes", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             self.assertIs(get_active_theme_config()["is_dark_mode"], True)
-        with settings_patched(color_mode="Preset Themes", active_preset="Pearl White"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Pearl White"):
             self.assertIs(get_active_theme_config()["is_dark_mode"], False)
 
     def test_every_preset_defines_the_colours_the_client_reads(self):
@@ -311,32 +346,36 @@ class TestSwiftThemeColors(IntegrationTestCase):
                 self.assertIn(key, data["colors"], f"preset {name} is missing {key}")
             self.assertIn(data["mode"], ("light", "dark"), f"preset {name} has no valid mode")
 
-    def test_custom_gradient_mode_returns_the_chosen_colours(self):
+    def test_custom_colors_mode_returns_the_chosen_pair(self):
         with settings_patched(
-            color_mode="Custom Gradient", gradient_start="#111111", gradient_end="#222222"
+            color_mode="Custom Colors", primary_color="#111111", secondary_color="#222222"
         ):
             config = get_active_theme_config()
-        self.assertEqual(config["bg1"], "#111111")
-        self.assertEqual(config["bg2"], "#222222")
+        self.assertEqual(config["primary"], "#111111")
+        self.assertEqual(config["secondary"], "#222222")
+        self.assertIsNone(config["preset"], "custom colours load no preset stylesheet")
 
-    def test_gradient_mode_requires_both_colours(self):
+    def test_custom_colors_mode_requires_both_colours(self):
         with self.assertRaises(frappe.ValidationError):
             with settings_patched(
-                color_mode="Custom Gradient", gradient_start="#111111", gradient_end=""
+                color_mode="Custom Colors", primary_color="#111111", secondary_color=""
             ):
                 pass
 
     def test_apply_theme_writes_a_valid_desk_theme(self):
         """desk_theme options are Light/Dark/Automatic — lowercase was invalid."""
         user = frappe.session.user
-        previous = frappe.db.get_value("User", user, "desk_theme")
+        previous = frappe.db.get_value("User", user, ["desk_theme", "swift_preset"], as_dict=True)
         try:
             apply_theme("Midnight Pro")
             stored = frappe.db.get_value("User", user, "desk_theme")
             options = frappe.get_meta("User").get_field("desk_theme").options.split("\n")
             self.assertIn(stored, options)
+            self.assertEqual(frappe.db.get_value("User", user, "swift_preset"), "Midnight Pro")
         finally:
-            frappe.db.set_value("User", user, "desk_theme", previous)
+            # swift_preset overrides the site preset, so leaving it set would
+            # leak into every other test that reads the effective preferences.
+            frappe.db.set_value("User", user, dict(previous))
 
     def test_apply_theme_rejects_an_unknown_theme(self):
         with self.assertRaises(frappe.ValidationError):
@@ -426,6 +465,35 @@ class TestSwiftThemeStyling(IntegrationTestCase):
                     f'{attr}="{option}"', css, f"{fieldname} option {option!r} has no CSS rule"
                 )
 
+    def test_every_preset_ships_its_own_stylesheet(self):
+        """Each preset is a separate file so only the active one is loaded."""
+        from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
+            preset_stylesheet,
+        )
+
+        for name, data in PREMIUM_THEMES.items():
+            slug = data["value"]
+            path = frappe.get_app_path(APP, "public", "css", "themes", f"{slug}.css")
+            self.assertTrue(os.path.exists(path), f"{name} has no stylesheet at {path}")
+            self.assertIsNotNone(preset_stylesheet(slug))
+
+            body = COMMENT_RE.sub("", open(path).read())
+            self.assertIn(f'html[data-swift-preset="{slug}"]', body)
+            # A preset file must not style any other preset.
+            for other in PREMIUM_THEMES.values():
+                if other["value"] != slug:
+                    self.assertNotIn(f'data-swift-preset="{other["value"]}"', body)
+
+    def test_preset_dropdown_matches_the_shipped_stylesheets(self):
+        """A preset offered in Settings with no file would silently do nothing."""
+        for option in settings_json_options("active_preset"):
+            self.assertIn(option, PREMIUM_THEMES, f"{option!r} is not a known preset")
+            slug = PREMIUM_THEMES[option]["value"]
+            self.assertTrue(
+                os.path.exists(frappe.get_app_path(APP, "public", "css", "themes", f"{slug}.css")),
+                f"preset {option!r} is selectable but ships no stylesheet",
+            )
+
     def test_hidden_sidebar_has_a_css_rule(self):
         """Alt+B set data-swift-sidebar="off" but nothing styled it."""
         self.assertIn('data-swift-sidebar="off"', read_css("swift-desk.css"))
@@ -481,6 +549,27 @@ class TestSwiftThemeClientContract(IntegrationTestCase):
         self.assertIn("withObserverPaused", js)
         self.assertIn("takeRecords", js)
 
+    def test_boot_swaps_a_single_theme_stylesheet(self):
+        """Presets must retarget one <link>, not stack stylesheets."""
+        js = read_js("swift-boot.js")
+        self.assertIn("swapThemeStylesheet", js)
+        self.assertIn("swift-theme-css", js)
+
+    def test_boot_handles_both_colour_modes(self):
+        js = read_js("swift-boot.js")
+        self.assertIn("--swift-primary", js)
+        self.assertIn("--swift-secondary", js)
+        self.assertIn("data-swift-themed", js)
+
+    def test_no_javascript_still_references_the_removed_accent_system(self):
+        """default_accent / full themes were folded into Color Mode."""
+        for filename in os.listdir(JS_DIR):
+            if not filename.endswith(".js"):
+                continue
+            body = read_js(filename)
+            for dead in ("swift_accent", "data-swift-accent", "setFullTheme", "hex_override"):
+                self.assertNotIn(dead, body, f"{filename} still references {dead}")
+
     def test_sidebar_removes_the_restore_button(self):
         self.assertIn("removeRestoreButton", read_js("swift-sidebar.js"))
 
@@ -509,10 +598,10 @@ class TestSwiftThemeInstall(IntegrationTestCase):
         """after_migrate runs it on every migrate; it must not clobber choices."""
         from swift_theme.install import _seed_settings
 
-        with settings_patched(default_accent="rose", enable_switcher=0):
+        with settings_patched(active_preset="Rose Gold", enable_switcher=0):
             _seed_settings()
             settings = frappe.get_single("Swift Theme Settings")
-            self.assertEqual(settings.default_accent, "rose")
+            self.assertEqual(settings.active_preset, "Rose Gold")
             self.assertEqual(settings.enable_switcher, 0)
 
     def test_user_preference_fields_exist(self):
@@ -561,13 +650,13 @@ class TestSwiftThemeLoginPage(IntegrationTestCase):
         self.assertIn('action="/api/method/login"', self.render())
 
     def test_login_page_is_themed_server_side(self):
-        with settings_patched(color_mode="Preset Themes", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             html = self.render()
         primary = PREMIUM_THEMES["Midnight Pro"]["colors"]["primary"]
         self.assertIn(f"--primary: {primary}", html)
 
     def test_login_page_marks_dark_presets(self):
-        with settings_patched(color_mode="Preset Themes", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             self.assertIn("dark-mode", self.render())
 
     def test_login_layout_reaches_the_markup(self):

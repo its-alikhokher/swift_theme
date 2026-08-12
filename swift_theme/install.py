@@ -5,8 +5,6 @@ from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings i
 )
 
 
-ACCENTS = ["indigo", "violet", "blue", "sky", "teal", "emerald", "amber", "rose", "pink", "slate"]
-THEMES = ["", "emerald", "sapphire", "obsidian", "midnight", "aurora", "graphite", "carbon", "ivory", "porcelain", "rose-gold", "monochrome", "sandstone"]
 MODES = ["Follow Frappe", "Force Light", "Force Dark", "Auto (time-based)"]
 DENSITIES = ["Compact", "Comfortable", "Cozy"]
 RADII = ["Sharp", "Rounded", "Pill"]
@@ -17,9 +15,7 @@ PRESETS = list(PREMIUM_THEMES.keys())
 USER_FIELDS = [
     ("swift_follow_frappe", "Check",  "Follow Frappe's Theme Mode", None, "1"),
     ("swift_mode",          "Select", "Swift Mode Override",         "\n".join(MODES), "Follow Frappe"),
-    ("swift_accent",        "Select", "Swift Accent",                "\n".join([""] + ACCENTS), ""),
-    ("swift_theme",         "Select", "Swift Full Theme (overrides accent)", "\n".join(THEMES), ""),
-    ("swift_preset",        "Select", "Swift Premium Preset",        "\n".join([""] + PRESETS), ""),
+    ("swift_preset",        "Select", "Swift Theme Preset",          "\n".join([""] + PRESETS), ""),
     ("swift_density",       "Select", "Swift Density",               "\n".join([""] + DENSITIES), ""),
     ("swift_radius",        "Select", "Swift Shape",                 "\n".join([""] + RADII), ""),
     ("swift_font_scale",    "Select", "Swift Font Scale",            "\n".join([""] + FONT_SCALES), ""),
@@ -30,10 +26,8 @@ USER_FIELDS = [
 # the switches the desk JS gates on — leaving them NULL disables the switcher,
 # command palette and focus mode outright.
 SETTINGS_DEFAULTS = {
-    "color_mode": "Preset Themes",
+    "color_mode": "Theme Preset",
     "active_preset": "Swift Blue",
-    "default_accent": "indigo",
-    "default_theme": "",
     "default_density": "Comfortable",
     "default_radius": "Rounded",
     "default_font_scale": "M",

@@ -1,0 +1,51 @@
+/* Swift Theme — Sapphire Elite
+   Generated from PREMIUM_THEMES["Sapphire Elite"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="sapphire-elite"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #3b82f6;
+  --swift-secondary:    #2563eb;
+  --swift-primary-soft: rgba(59, 130, 246, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #3b82f6;
+  --swift-accent-hover: #5895f7;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(59, 130, 246, 0.14);
+  --swift-accent-tint:  #60a5fa;
+
+  /* Frappe surface variables */
+  --bg-color:            #172554;
+  --fg-color:            #1e3a8a;
+  --card-bg:             #1e3a8a;
+  --subtle-fg:           #203e90;
+  --subtle-accent:       #1f3c8d;
+  --control-bg:          #1f3c8d;
+  --control-bg-on-gray:  #203e90;
+  --border-color:        rgba(219, 234, 254, 0.16);
+  --text-color:          #dbeafe;
+  --text-muted:          #93c5fd;
+  --text-light:          #93c5fd;
+  --heading-color:       #dbeafe;
+  --sidebar-bg:          #1b3172;
+  --navbar-bg:           rgba(30, 58, 138, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(59, 130, 246, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(37, 99, 235, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="sapphire-elite"] .btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="sapphire-elite"] .btn-primary:hover {
+  background: linear-gradient(135deg, #5895f7, #3b82f6);
+}

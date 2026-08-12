@@ -1,0 +1,51 @@
+/* Swift Theme — Royal Purple
+   Generated from PREMIUM_THEMES["Royal Purple"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="royal-purple"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #a855f7;
+  --swift-secondary:    #9333ea;
+  --swift-primary-soft: rgba(168, 85, 247, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #a855f7;
+  --swift-accent-hover: #b56ef8;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(168, 85, 247, 0.14);
+  --swift-accent-tint:  #c084fc;
+
+  /* Frappe surface variables */
+  --bg-color:            #2e1065;
+  --fg-color:            #4c1d95;
+  --card-bg:             #4c1d95;
+  --subtle-fg:           #52209b;
+  --subtle-accent:       #4f1f98;
+  --control-bg:          #4f1f98;
+  --control-bg-on-gray:  #52209b;
+  --border-color:        rgba(245, 243, 255, 0.16);
+  --text-color:          #f5f3ff;
+  --text-muted:          #d8b4fe;
+  --text-light:          #d8b4fe;
+  --heading-color:       #f5f3ff;
+  --sidebar-bg:          #3e177f;
+  --navbar-bg:           rgba(76, 29, 149, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(168, 85, 247, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(147, 51, 234, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="royal-purple"] .btn-primary {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="royal-purple"] .btn-primary:hover {
+  background: linear-gradient(135deg, #b56ef8, #a855f7);
+}

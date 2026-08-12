@@ -164,17 +164,31 @@ PREMIUM_THEMES = {
 }
 
 
+PRESET_SLUGS = {name: data["value"] for name, data in PREMIUM_THEMES.items()}
+DEFAULT_PRESET = "Swift Blue"
+
+
+def preset_stylesheet(slug):
+    """URL of the stylesheet for one preset, or None if it isn't shipped."""
+    if not slug:
+        return None
+    if not os.path.exists(frappe.get_app_path("swift_theme", "public", "css", "themes", f"{slug}.css")):
+        return None
+    return f"/assets/swift_theme/css/themes/{slug}.css"
+
+
 class SwiftThemeSettings(Document):
     def validate(self):
-        # Validate Custom Gradient mode requires both colors
-        if self.color_mode == "Custom Gradient":
-            if not self.gradient_start or not self.gradient_end:
+        if self.color_mode == "Custom Colors":
+            if not self.primary_color or not self.secondary_color:
                 frappe.throw(
                     frappe._(
-                        "Both Gradient Start and Gradient End colors are required "
-                        "when using Custom Gradient mode."
+                        "Both Primary Color and Secondary Color are required "
+                        "when using Custom Colors."
                     )
                 )
+        elif not self.active_preset:
+            self.active_preset = DEFAULT_PRESET
 
         self._validate_volume()
         self._validate_sound_events()
@@ -254,30 +268,40 @@ def get_active_theme_config():
         "custom_login_text": settings.login_tagline or "",
     }
 
-    if settings.color_mode == "Custom Gradient":
+    if settings.color_mode == "Custom Colors":
+        primary = settings.primary_color or "#0b84f3"
+        secondary = settings.secondary_color or "#0056b3"
+        # Custom colours describe the brand, not the page surface, so pair them
+        # with a neutral canvas rather than tinting the whole background.
         colors = {
-            "primary": settings.gradient_start or "#0b84f3",
-            "secondary": settings.gradient_end or "#0056b3",
-            "bg1": settings.gradient_start or "#0f172a",
-            "bg2": settings.gradient_end or "#1e293b",
+            "primary": primary,
+            "secondary": secondary,
+            "accent": secondary,
+            "bg_body": "#0f172a",
+            "bg_card": "#1e293b",
+            "text_main": "#f1f5f9",
+            "text_muted": "#94a3b8",
+            "bg1": "#0f172a",
+            "bg2": "#1e293b",
         }
-        config["gradient_start"] = settings.gradient_start
-        config["gradient_end"] = settings.gradient_end
-        config["mode"] = "custom"
+        config["preset"] = None
+        config["preset_name"] = None
+        config["theme_css"] = None
+        config["mode"] = "dark"
         config["colors"] = colors
-        # A custom gradient has no inherent brightness; keep the page's default.
-        config["is_dark_mode"] = None
+        config["is_dark_mode"] = True
     else:
-        preset_name = settings.active_preset or "Swift Blue"
-        theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES["Swift Blue"])
+        preset_name = settings.active_preset or DEFAULT_PRESET
+        theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES[DEFAULT_PRESET])
         colors = dict(theme_data["colors"])
         colors.setdefault("bg1", colors.get("bg_body"))
         colors.setdefault("bg2", colors.get("bg_card"))
+        config["preset"] = theme_data["value"]
+        config["preset_name"] = preset_name
+        config["theme_css"] = preset_stylesheet(theme_data["value"])
         config["theme"] = theme_data
         config["mode"] = theme_data["mode"]
         config["colors"] = colors
-        config["gradient_start"] = None
-        config["gradient_end"] = None
         config["is_dark_mode"] = theme_data["mode"] == "dark"
 
     # Flattened aliases so clients can read colours without digging into

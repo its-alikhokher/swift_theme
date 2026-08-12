@@ -1,0 +1,51 @@
+/* Swift Theme — Carbon Fiber
+   Generated from PREMIUM_THEMES["Carbon Fiber"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="carbon-fiber"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #9ca3af;
+  --swift-secondary:    #6b7280;
+  --swift-primary-soft: rgba(156, 163, 175, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #9ca3af;
+  --swift-accent-hover: #abb1bb;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(156, 163, 175, 0.14);
+  --swift-accent-tint:  #d1d5db;
+
+  /* Frappe surface variables */
+  --bg-color:            #111827;
+  --fg-color:            #1f2937;
+  --card-bg:             #1f2937;
+  --subtle-fg:           #27303e;
+  --subtle-accent:       #232d3b;
+  --control-bg:          #232d3b;
+  --control-bg-on-gray:  #27303e;
+  --border-color:        rgba(249, 250, 251, 0.16);
+  --text-color:          #f9fafb;
+  --text-muted:          #9ca3af;
+  --text-light:          #9ca3af;
+  --heading-color:       #f9fafb;
+  --sidebar-bg:          #192130;
+  --navbar-bg:           rgba(31, 41, 55, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(156, 163, 175, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(107, 114, 128, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="carbon-fiber"] .btn-primary {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="carbon-fiber"] .btn-primary:hover {
+  background: linear-gradient(135deg, #abb1bb, #9ca3af);
+}

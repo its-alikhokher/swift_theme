@@ -1,34 +1,29 @@
 import frappe
 
+from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
+    DEFAULT_PRESET,
+    PREMIUM_THEMES,
+    preset_stylesheet,
+)
 
-ACCENTS = [
-    {"key": "indigo",  "label": "Indigo"},
-    {"key": "violet",  "label": "Violet"},
-    {"key": "blue",    "label": "Blue"},
-    {"key": "sky",     "label": "Sky"},
-    {"key": "teal",    "label": "Teal"},
-    {"key": "emerald", "label": "Emerald"},
-    {"key": "amber",   "label": "Amber"},
-    {"key": "rose",    "label": "Rose"},
-    {"key": "pink",    "label": "Pink"},
-    {"key": "slate",   "label": "Slate"},
-]
 
-FULL_THEMES = [
-    {"key": "",           "label": "None (use accent + Frappe mode)"},
-    {"key": "emerald",    "label": "Emerald",    "tag": "Dark · SaaS premium green"},
-    {"key": "sapphire",   "label": "Sapphire",   "tag": "Dark · Enterprise banking blue"},
-    {"key": "obsidian",   "label": "Obsidian",   "tag": "Dark · Developer luxury"},
-    {"key": "midnight",   "label": "Midnight",   "tag": "Dark · Yacht-club navy"},
-    {"key": "aurora",     "label": "Aurora",     "tag": "Dark · Glassy magic"},
-    {"key": "graphite",   "label": "Graphite",   "tag": "Dark · Editorial charcoal"},
-    {"key": "carbon",     "label": "Carbon",     "tag": "Dark · Terminal neon"},
-    {"key": "ivory",      "label": "Ivory",      "tag": "Light · Museum-quality luxury"},
-    {"key": "porcelain",  "label": "Porcelain",  "tag": "Light · Warm editorial"},
-    {"key": "rose-gold",  "label": "Rose Gold",  "tag": "Light · Fashion pearl"},
-    {"key": "monochrome", "label": "Monochrome", "tag": "Light · Zero color noise"},
-    {"key": "sandstone",  "label": "Sandstone",  "tag": "Light · Muji calm"},
-]
+def preset_catalog():
+    """The presets offered in the navbar switcher.
+
+    Built from PREMIUM_THEMES so the switcher, the Settings dropdown and the
+    shipped stylesheets can never drift apart.
+    """
+    return [
+        {
+            "key": data["value"],
+            "label": name,
+            "mode": data["mode"],
+            "primary": data["colors"]["primary"],
+            "secondary": data["colors"]["secondary"],
+            "css": preset_stylesheet(data["value"]),
+        }
+        for name, data in PREMIUM_THEMES.items()
+    ]
 
 
 def boot_session(bootinfo):
@@ -42,12 +37,12 @@ def extend_bootinfo(bootinfo):
 # Keys a signed-out visitor may see. The login page needs branding and layout;
 # it has no business receiving custom CSS/JS or anything else site-internal.
 GUEST_KEYS = {
-    "accent", "theme", "hex_override",
+    "color_mode", "preset", "preset_name", "theme_css", "primary", "secondary", "is_dark",
     "density", "radius", "font_scale", "font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
     "login_layout", "login_bg_image", "login_tagline", "login_show_signup",
-    "accents", "themes",
+    "presets",
 }
 
 
@@ -63,14 +58,19 @@ def get_effective_prefs():
 
     follow = 1 if u.get("swift_follow_frappe") is None else int(u["swift_follow_frappe"])
     mode = u.get("swift_mode") or "Follow Frappe"
+    colors = _colors(s, u)
 
     prefs = {
-        # theming
+        # colour — either a named preset with its own stylesheet, or a custom pair
         "follow_frappe": follow,
         "mode": mode,
-        "accent":       u.get("swift_accent")     or s.get("default_accent")   or "indigo",
-        "theme":        u.get("swift_theme")      or s.get("default_theme")    or "",
-        "hex_override": s.get("brand_hex_override") or "",
+        "color_mode":  colors["color_mode"],
+        "preset":      colors["preset"],
+        "preset_name": colors["preset_name"],
+        "theme_css":   colors["theme_css"],
+        "primary":     colors["primary"],
+        "secondary":   colors["secondary"],
+        "is_dark":     colors["is_dark"],
 
         # layout
         "density":     u.get("swift_density")     or s.get("default_density")   or "Comfortable",
@@ -118,8 +118,7 @@ def get_effective_prefs():
         "sounds": _sound_config(s),
 
         # catalog
-        "accents": ACCENTS,
-        "themes":  FULL_THEMES,
+        "presets": preset_catalog(),
     }
 
     if frappe.session.user == "Guest":
@@ -132,7 +131,7 @@ def get_effective_prefs():
 def set_user_pref(field, value):
     """Save a single user preference. Whitelisted subset only."""
     ALLOWED = {
-        "swift_follow_frappe", "swift_mode", "swift_accent", "swift_theme",
+        "swift_follow_frappe", "swift_mode", "swift_preset",
         "swift_density", "swift_radius", "swift_font_scale", "swift_font_family",
     }
     if field not in ALLOWED:
@@ -144,6 +143,38 @@ def set_user_pref(field, value):
 
     frappe.db.set_value("User", user, field, value)
     return {"ok": True, "field": field, "value": value}
+
+
+def _colors(s, u):
+    """Resolve the active colour scheme.
+
+    A user's own preset choice wins over the site preset, but only in preset
+    mode — if the site is on Custom Colors, that brand pair applies to everyone.
+    """
+    color_mode = s.get("color_mode") or "Theme Preset"
+
+    if color_mode == "Custom Colors":
+        return {
+            "color_mode": "Custom Colors",
+            "preset": None,
+            "preset_name": None,
+            "theme_css": None,
+            "primary": s.get("primary_color") or "#0b84f3",
+            "secondary": s.get("secondary_color") or "#0056b3",
+            "is_dark": 1,
+        }
+
+    name = u.get("swift_preset") or s.get("active_preset") or DEFAULT_PRESET
+    data = PREMIUM_THEMES.get(name) or PREMIUM_THEMES[DEFAULT_PRESET]
+    return {
+        "color_mode": "Theme Preset",
+        "preset": data["value"],
+        "preset_name": name,
+        "theme_css": preset_stylesheet(data["value"]),
+        "primary": data["colors"]["primary"],
+        "secondary": data["colors"]["secondary"],
+        "is_dark": 1 if data["mode"] == "dark" else 0,
+    }
 
 
 def _sound_config(s):
@@ -175,7 +206,7 @@ def _user_prefs():
     if not user or user == "Guest":
         return {}
     fields = [
-        "swift_follow_frappe", "swift_mode", "swift_accent", "swift_theme",
+        "swift_follow_frappe", "swift_mode", "swift_preset",
         "swift_density", "swift_radius", "swift_font_scale", "swift_font_family",
     ]
     try:
