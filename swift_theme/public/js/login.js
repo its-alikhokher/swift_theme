@@ -8,7 +8,10 @@
     var REDIRECT_TO = body.getAttribute("data-redirect-to") || "";
     var SOUNDS_ENABLED = body.getAttribute("data-sounds-enabled") === "1";
 
-    document.addEventListener("DOMContentLoaded", setupLoginForm);
+    document.addEventListener("DOMContentLoaded", function () {
+        setupLoginForm();
+        setupPasswordReveal();
+    });
 
     function setupLoginForm() {
         var form = document.getElementById("login-form");
@@ -17,6 +20,27 @@
         form.addEventListener("submit", function (e) {
             e.preventDefault();
             submitLogin(form);
+        });
+    }
+
+    function setupPasswordReveal() {
+        var toggle = document.getElementById("toggle-pwd");
+        var input = document.getElementById("pwd");
+        if (!toggle || !input) return;
+
+        toggle.addEventListener("click", function () {
+            var reveal = input.type === "password";
+            input.type = reveal ? "text" : "password";
+            toggle.setAttribute("aria-pressed", String(reveal));
+            toggle.setAttribute("aria-label", reveal ? "Hide password" : "Show password");
+
+            var open = toggle.querySelector(".eye-open");
+            var shut = toggle.querySelector(".eye-shut");
+            if (open) open.hidden = reveal;
+            if (shut) shut.hidden = !reveal;
+
+            // Keep the caret where the user left it.
+            input.focus({ preventScroll: true });
         });
     }
 
@@ -30,8 +54,7 @@
             return;
         }
 
-        var btn = form.querySelector(".login-btn");
-        var originalHTML = btn.innerHTML;
+        var btn = form.querySelector(".btn-signin");
         setBusy(btn, true, "Signing In…");
         clearError();
 
@@ -61,10 +84,10 @@
                 return;
             }
 
-            setBusy(btn, false, null, originalHTML);
+            setBusy(btn, false);
             showError(extractMessage(data, response.status));
         } catch (error) {
-            setBusy(btn, false, null, originalHTML);
+            setBusy(btn, false);
             showError("Could not reach the server. Check your connection and try again.");
             console.error("Login request failed:", error);
         }
@@ -94,12 +117,18 @@
         return (tmp.textContent || "").trim();
     }
 
-    function setBusy(btn, busy, label, originalHTML) {
+    // Toggles a class rather than rewriting innerHTML, so the button keeps its
+    // spinner element and doesn't reflow mid-submit.
+    function setBusy(btn, busy, label) {
         btn.disabled = busy;
+        btn.classList.toggle("is-busy", busy);
+        var text = btn.querySelector(".btn-label");
+        if (!text) return;
         if (busy) {
-            btn.innerHTML = "<span>" + label + "</span>";
-        } else if (originalHTML) {
-            btn.innerHTML = originalHTML;
+            btn.dataset.idleLabel = text.textContent;
+            text.textContent = label;
+        } else if (btn.dataset.idleLabel) {
+            text.textContent = btn.dataset.idleLabel;
         }
     }
 

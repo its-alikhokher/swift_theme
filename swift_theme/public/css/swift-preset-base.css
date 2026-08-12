@@ -1,0 +1,337 @@
+/* Swift Theme — Preset scaffolding
+
+   Shared desk styling for any active colour scheme. Applies whenever
+   <html> carries data-swift-themed, which boot.js sets for both
+   "Theme Preset" and "Custom Colors" modes.
+
+   The colour values themselves come from either css/themes/<slug>.css
+   (preset mode) or inline custom properties (custom-colour mode). */
+
+html[data-swift-themed] {
+  background: var(--bg-color) !important;
+}
+html[data-swift-themed] body,
+html[data-swift-themed] .desk-body,
+html[data-swift-themed] .layout-main,
+html[data-swift-themed] .layout-main-section-wrapper {
+  background: transparent !important;
+}
+html[data-swift-themed] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--swift-ambient, none), var(--bg-color);
+  background-attachment: fixed;
+  animation: swift-ambient-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes swift-ambient-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-2%, -1%, 0) scale(1.04); }
+}
+
+html[data-swift-themed] .navbar,
+html[data-swift-themed] .layout-side-section,
+html[data-swift-themed] .layout-main,
+html[data-swift-themed] .desk-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar hairline glow line at accent color — high-end SaaS touch */
+html[data-swift-themed] .layout-side-section {
+  box-shadow: inset -1px 0 0 0 var(--border-color),
+              1px 0 24px -8px color-mix(in oklab, var(--swift-accent) 25%, transparent);
+}
+
+/* Page title gets a subtle accent gradient — premium magazine feel */
+html[data-swift-themed] .page-title h1,
+html[data-swift-themed] .page-head .title-text {
+  background: linear-gradient(135deg,
+    var(--heading-color) 40%,
+    color-mix(in oklab, var(--swift-accent) 65%, var(--heading-color)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+
+/* Active sidebar item — soft gradient pill */
+html[data-swift-themed] .sidebar-item.selected,
+html[data-swift-themed] .desk-sidebar-item.selected {
+  background: linear-gradient(135deg,
+    var(--swift-accent-soft),
+    color-mix(in oklab, var(--swift-accent) 6%, transparent)) !important;
+  color: var(--swift-accent) !important;
+  box-shadow: inset 2px 0 0 0 var(--swift-accent);
+}
+
+/* Glassy navbar for premium themes */
+html[data-swift-themed] .navbar {
+  background: var(--navbar-bg) !important;
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar tint */
+html[data-swift-themed] .layout-side-section {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+}
+
+/* Cards / form sections — refined surfaces with hairline border */
+html[data-swift-themed] .frappe-card,
+html[data-swift-themed] .form-section,
+html[data-swift-themed] .layout-main-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* Force our accent onto Frappe primary tokens */
+html[data-swift-themed] {
+  --primary:            var(--swift-accent);
+  --primary-color:      var(--swift-accent);
+  --btn-primary:        var(--swift-accent);
+  --btn-primary-hover:  var(--swift-accent-hover);
+  --focus-default:      var(--swift-accent);
+}
+
+/* Premium buttons — real gradient fill + shine sweep on hover */
+html[data-swift-themed] .btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--swift-accent) 90%, white),
+    var(--swift-accent) 60%,
+    var(--swift-accent-hover)) !important;
+  border-color: var(--swift-accent) !important;
+  color: var(--swift-accent-fg) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.20),
+    0 4px 14px -4px color-mix(in oklab, var(--swift-accent) 45%, transparent);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+html[data-swift-themed] .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    transparent 30%,
+    rgba(255,255,255,0.22) 45%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.22) 55%,
+    transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+html[data-swift-themed] .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 8px 22px -6px color-mix(in oklab, var(--swift-accent) 55%, transparent);
+}
+html[data-swift-themed] .btn-primary:hover::after {
+  transform: translateX(120%);
+}
+
+/* Theme cross-fade — smooth transition when user switches theme */
+html[data-swift-theme] * {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+html[data-swift-themed] .btn {
+  transition: all 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Refined form controls */
+html[data-swift-themed] .form-control {
+  background: var(--control-bg);
+  border-color: var(--border-color);
+  color: var(--text-color);
+  transition: all 160ms ease;
+}
+html[data-swift-themed] .form-control:focus {
+  border-color: var(--swift-accent);
+  box-shadow: 0 0 0 3px var(--swift-accent-soft);
+}
+
+/* Typography — tighter tracking on headings for premium feel */
+html[data-swift-themed] .page-title h1,
+html[data-swift-themed] .page-head .title-text,
+html[data-swift-themed] h1,
+html[data-swift-themed] h2,
+html[data-swift-themed] h3 {
+  letter-spacing: -0.02em;
+  color: var(--heading-color);
+  font-weight: 600;
+}
+
+/* ========================================================================
+   Full-theme scoped: Navbar force-paint (fixes cases where Frappe's own
+   navbar rules paint over the theme). Glassy + accent underline on hover.
+   ======================================================================== */
+html[data-swift-themed] .navbar {
+  background: color-mix(in oklab, var(--fg-color) 78%, transparent) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px -12px rgba(0,0,0,0.35);
+}
+html[data-swift-themed] .navbar .navbar-brand,
+html[data-swift-themed] .navbar .app-logo,
+html[data-swift-themed] .navbar .nav-link {
+  color: var(--text-color) !important;
+}
+html[data-swift-themed] .navbar .nav-link:hover,
+html[data-swift-themed] .navbar .navbar-nav > .nav-item.active > a {
+  color: var(--swift-accent) !important;
+}
+html[data-swift-themed] .navbar .navbar-brand::after {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px; margin-left: 8px;
+  border-radius: 50%;
+  background: var(--swift-accent);
+  box-shadow: 0 0 12px var(--swift-accent);
+  animation: swift-brand-pulse 2.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+@keyframes swift-brand-pulse {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%     { opacity: 1;   transform: scale(1.25); }
+}
+
+/* ========================================================================
+   Full-theme scoped: Dashboard widgets — premium multi-color cards
+   (Override the neutral accent-mode gradient with theme-specific saturation)
+   ======================================================================== */
+html[data-swift-themed] .widget,
+html[data-swift-themed] .number-card,
+html[data-swift-themed] .dashboard-graph {
+  background: color-mix(in oklab, var(--card-bg) 92%, var(--swift-accent) 8%);
+  border: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
+  box-shadow: 0 8px 24px -18px color-mix(in oklab, var(--swift-accent) 60%, transparent);
+}
+html[data-swift-themed] .widget:hover,
+html[data-swift-themed] .number-card:hover {
+  box-shadow: 0 20px 40px -20px color-mix(in oklab, var(--swift-accent) 70%, transparent);
+  border-color: var(--swift-accent);
+}
+html[data-swift-themed] .number-card .widget-body .number {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Multi-color number card cycle (theme mode) — richer, glowing */
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+1) .widget-body .number { background: linear-gradient(135deg,#a78bfa,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+2) .widget-body .number { background: linear-gradient(135deg,#34d399,#059669); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+3) .widget-body .number { background: linear-gradient(135deg,#fbbf24,#d97706); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+4) .widget-body .number { background: linear-gradient(135deg,#f472b6,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+5) .widget-body .number { background: linear-gradient(135deg,#38bdf8,#0284c7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+6) .widget-body .number { background: linear-gradient(135deg,#f87171,#dc2626); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+/* ========================================================================
+   Full-theme scoped: List / Report / Kanban premium look
+   ======================================================================== */
+html[data-swift-themed] .list-row-container:hover {
+  background: color-mix(in oklab, var(--swift-accent) 12%, transparent) !important;
+}
+html[data-swift-themed] .dt-header {
+  background: color-mix(in oklab, var(--card-bg) 80%, var(--swift-accent) 20%) !important;
+  border-bottom: 2px solid var(--swift-accent) !important;
+}
+html[data-swift-themed] .kanban-column {
+  background: color-mix(in oklab, var(--card-bg) 96%, var(--swift-accent) 4%);
+}
+html[data-swift-themed] .kanban-card {
+  background: var(--card-bg);
+  border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%);
+}
+
+/* ========================================================================
+   Full-theme scoped: Body Sidebar premium (v16 verified classes)
+   ======================================================================== */
+html[data-swift-themed] .body-sidebar-container,
+html[data-swift-themed] .body-sidebar {
+  background: color-mix(in oklab, var(--fg-color) 82%, transparent) !important;
+  border-right: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.02),
+              4px 0 24px -14px color-mix(in oklab, var(--swift-accent) 60%, transparent);
+}
+
+/* Active item — theme-strength gradient pill */
+html[data-swift-themed] .active-sidebar,
+html[data-swift-themed] .standard-sidebar-item.active-sidebar,
+html[data-swift-themed] .item-anchor.active {
+  background: linear-gradient(90deg,
+    color-mix(in oklab, var(--swift-accent) 26%, transparent),
+    color-mix(in oklab, var(--swift-accent) 6%, transparent) 70%,
+    transparent
+  ) !important;
+  box-shadow:
+    inset 3px 0 0 var(--swift-accent),
+    0 0 24px -8px color-mix(in oklab, var(--swift-accent) 60%, transparent) !important;
+  color: var(--swift-accent) !important;
+}
+
+/* Section headings (like "Modules", "Domains") — subtle accent tint */
+html[data-swift-themed] .body-sidebar .section-item > .item-anchor {
+  color: color-mix(in oklab, var(--text-muted) 60%, var(--swift-accent) 40%);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Suffix badges */
+html[data-swift-themed] .sidebar-item-suffix {
+  background: color-mix(in oklab, var(--swift-accent) 22%, transparent);
+  color: var(--swift-accent);
+  border: 1px solid color-mix(in oklab, var(--swift-accent) 45%, transparent);
+}
+
+/* Promotional banner — glassy accent card */
+html[data-swift-themed] .promotional-banner {
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--swift-accent) 22%, transparent),
+    transparent 70%),
+    color-mix(in oklab, var(--card-bg) 80%, transparent);
+  border: 1px solid color-mix(in oklab, var(--swift-accent) 40%, var(--border-color));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 12px 30px -18px color-mix(in oklab, var(--swift-accent) 70%, transparent);
+}
+
+/* User dropdown / notifications — accent glow border */
+html[data-swift-themed] .dropdown-navbar-user.expanded,
+html[data-swift-themed] .user-menu-active .dropdown-navbar-user,
+html[data-swift-themed] .dropdown-notifications,
+html[data-swift-themed] .dropdown-background-tasks {
+  border-color: color-mix(in oklab, var(--swift-accent) 40%, var(--border-color)) !important;
+  box-shadow: 0 20px 40px -18px color-mix(in oklab, var(--swift-accent) 60%, transparent),
+              var(--swift-shadow-lg) !important;
+}
+
+/* Awesomebar (global search) — theme-strength focus */
+html[data-swift-themed] .search-bar,
+html[data-swift-themed] .awesomebar-input-row {
+  background: color-mix(in oklab, var(--card-bg) 85%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%) !important;
+}
+html[data-swift-themed] .search-bar:focus-within,
+html[data-swift-themed] .awesomebar-input-row:focus-within {
+  border-color: var(--swift-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--swift-accent) 25%, transparent) !important;
+}

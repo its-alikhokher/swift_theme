@@ -3,13 +3,8 @@
 (function () {
     var html = document.documentElement;
 
-    // Apply accent from localStorage
-    try {
-        var accent = localStorage.getItem("swift_accent") || "indigo";
-        if (!html.getAttribute("data-swift-accent")) html.setAttribute("data-swift-accent", accent);
-        var theme = localStorage.getItem("swift_theme_full") || "";
-        if (theme && !html.getAttribute("data-swift-theme")) html.setAttribute("data-swift-theme", theme);
-    } catch (e) {}
+    // swift-boot.js already restores the colour scheme from localStorage on
+    // every page including this one, so there is nothing to re-apply here.
 
     // Detect login page and set layout + brand
     document.addEventListener("DOMContentLoaded", function () {

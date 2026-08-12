@@ -5,8 +5,10 @@
 
 (function () {
     var KEYS = {
-        accent:       "swift_accent",
-        theme:        "swift_theme_full",
+        preset:       "swift_preset",
+        primary:      "swift_primary",
+        secondary:    "swift_secondary",
+        themeCss:     "swift_theme_css",
         density:      "swift_density",
         radius:       "swift_radius",
         font_family:  "swift_font_family",
@@ -19,7 +21,6 @@
         toast:        "swift_toast",
         focus:        "swift_focus",
         reading:      "swift_reading",
-        hex:          "swift_hex_override",
     };
 
     var html = document.documentElement;
@@ -38,9 +39,13 @@
         else html.setAttribute("data-swift-" + name, val);
     }
 
-    // ---- Apply from localStorage immediately ----
-    applyAttr("accent",           get("accent")      || "indigo");
-    applyAttr("theme",            get("theme")       || "");
+    // ---- Apply from localStorage immediately (no flash of unstyled theme) ----
+    applyColors({
+        preset: get("preset") || "",
+        primary: get("primary") || "",
+        secondary: get("secondary") || "",
+        theme_css: get("themeCss") || "",
+    });
     applyAttr("density",          get("density")     || "");
     applyAttr("radius",           get("radius")      || "");
     applyAttr("font",             get("font_family") || "");
@@ -54,15 +59,84 @@
     if (get("focus")     === "on")  applyAttr("focus", "on");
     if (get("reading")   === "on")  applyAttr("reading", "on");
 
-    var hex = get("hex");
-    if (hex) html.style.setProperty("--swift-accent", hex);
+    // ---- Colour scheme ----
+    // Two modes, mirroring Swift Theme Settings:
+    //   Theme Preset  -> load that preset's own stylesheet, nothing else
+    //   Custom Colors -> no stylesheet, just the brand pair as variables
+    function applyColors(c) {
+        if (!c) return;
+
+        var preset = c.preset || "";
+        var primary = c.primary || "";
+        var secondary = c.secondary || "";
+
+        applyAttr("preset", preset);
+        // Marks "a Swift colour scheme is active" for the shared desk styling,
+        // whichever of the two modes produced it.
+        if (preset || primary) html.setAttribute("data-swift-themed", "");
+        else html.removeAttribute("data-swift-themed");
+
+        swapThemeStylesheet(preset ? c.theme_css : null);
+
+        // In preset mode the stylesheet owns the palette, so inline values are
+        // cleared rather than left shadowing it.
+        if (preset) {
+            html.style.removeProperty("--swift-primary");
+            html.style.removeProperty("--swift-secondary");
+            html.style.removeProperty("--swift-accent");
+            html.style.removeProperty("--swift-accent-hover");
+            html.style.removeProperty("--swift-accent-soft");
+        } else if (primary) {
+            html.style.setProperty("--swift-primary", primary);
+            html.style.setProperty("--swift-secondary", secondary || primary);
+            html.style.setProperty("--swift-accent", primary);
+            html.style.setProperty("--swift-accent-hover", secondary || primary);
+            html.style.setProperty("--swift-accent-soft", softColor(primary));
+        }
+
+        set("preset", preset);
+        set("primary", primary);
+        set("secondary", secondary);
+        set("themeCss", (preset && c.theme_css) || "");
+    }
+
+    // One <link> that is retargeted, so switching presets never stacks
+    // stylesheets and the old palette can't linger.
+    function swapThemeStylesheet(href) {
+        var link = document.getElementById("swift-theme-css");
+        if (!href) {
+            if (link) link.remove();
+            return;
+        }
+        if (!link) {
+            link = document.createElement("link");
+            link.id = "swift-theme-css";
+            link.rel = "stylesheet";
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+    }
+
+    function softColor(hex) {
+        var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(String(hex).trim());
+        if (!m) return "rgba(79, 70, 229, 0.14)";
+        return "rgba(" + parseInt(m[1], 16) + ", " + parseInt(m[2], 16) + ", " +
+               parseInt(m[3], 16) + ", 0.14)";
+    }
 
     // ---- Public API ----
     var API = {
+        applyColors: applyColors,
         applyPrefs: function (p) {
             if (!p) return;
-            if ("accent" in p)          { applyAttr("accent", p.accent); set("accent", p.accent); }
-            if ("theme" in p)           { applyAttr("theme", p.theme); set("theme", p.theme); }
+            if ("preset" in p || "primary" in p) {
+                applyColors({
+                    preset: p.preset,
+                    primary: p.primary,
+                    secondary: p.secondary,
+                    theme_css: p.theme_css,
+                });
+            }
             if ("density" in p)         { applyAttr("density", p.density); set("density", p.density); }
             if ("radius" in p)          { applyAttr("radius", p.radius); set("radius", p.radius); }
             if ("font_family" in p)     { applyAttr("font", p.font_family); set("font_family", p.font_family); }
@@ -70,10 +144,6 @@
             if ("navbar_variant" in p)  { applyAttr("navbar", p.navbar_variant); set("navbar", p.navbar_variant); }
             if ("sidebar_variant" in p) { applyAttr("sidebar-variant", p.sidebar_variant); set("sidebar", p.sidebar_variant); }
             if ("pin_behavior" in p)    { applyAttr("pin", pinKey(p.pin_behavior)); }
-            if (p.hex_override) {
-                html.style.setProperty("--swift-accent", p.hex_override);
-                set("hex", p.hex_override);
-            }
             if (p.enable_perf_mode === 0) { applyAttr("perf", null); set("perf", "off"); }
             if (p.enable_perf_mode === 1) { applyAttr("perf", "on"); set("perf", "on"); }
             if (p.enable_styled_scrollbar === 0) { applyAttr("scrollbar", null); set("scrollbar", "off"); }
@@ -81,18 +151,31 @@
             if (p.enable_toast_theming === 0) { applyAttr("toast", null); set("toast", "off"); }
             if (p.enable_toast_theming === 1) { applyAttr("toast", "on"); set("toast", "on"); }
         },
-        setAccent: function (v)         { applyAttr("accent", v); set("accent", v); persist("swift_accent", v); },
-        setFullTheme: function (v)      {
-            applyAttr("theme", v);  set("theme", v);  persist("swift_theme", v);
-            // Auto-switch Frappe's own Light/Dark mode based on theme family
+        // Switch to a preset from the catalog in frappe.boot.swift_theme.presets.
+        setPreset: function (key) {
+            var catalog = (window.frappe && frappe.boot && frappe.boot.swift_theme
+                && frappe.boot.swift_theme.presets) || [];
+            var chosen = null;
+            for (var i = 0; i < catalog.length; i++) {
+                if (catalog[i].key === key) { chosen = catalog[i]; break; }
+            }
+            if (!chosen) return;
+
+            applyColors({
+                preset: chosen.key,
+                primary: chosen.primary,
+                secondary: chosen.secondary,
+                theme_css: chosen.css,
+            });
+
+            // Keep Frappe's own Light/Dark in step with the preset's brightness.
             try {
-                var DARK  = ["emerald","sapphire","obsidian","midnight","aurora","graphite","carbon"];
-                var LIGHT = ["ivory","porcelain","rose-gold","monochrome","sandstone"];
-                var mode  = DARK.indexOf(v) > -1 ? "dark" : (LIGHT.indexOf(v) > -1 ? "light" : null);
-                if (mode && window.frappe && frappe.ui && frappe.ui.set_theme) {
-                    frappe.ui.set_theme(mode);
+                if (window.frappe && frappe.ui && frappe.ui.set_theme) {
+                    frappe.ui.set_theme(chosen.mode === "dark" ? "dark" : "light");
                 }
             } catch (e) {}
+
+            persist("swift_preset", chosen.label);
         },
         setDensity: function (v)        { applyAttr("density", v); set("density", v); persist("swift_density", v); },
         setRadius: function (v)         { applyAttr("radius", v);  set("radius", v);  persist("swift_radius", v); },
@@ -140,8 +223,10 @@
     function applyAll(boot) {
         try {
             API.applyPrefs({
-                accent: boot.accent,
-                theme: boot.theme,
+                preset: boot.preset,
+                primary: boot.primary,
+                secondary: boot.secondary,
+                theme_css: boot.theme_css,
                 density: boot.density,
                 radius: boot.radius,
                 font_family: boot.font_family,
@@ -149,7 +234,6 @@
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
                 pin_behavior: boot.pin_behavior,
-                hex_override: boot.hex_override,
                 enable_perf_mode: boot.enable_perf_mode,
                 enable_styled_scrollbar: boot.enable_styled_scrollbar,
                 enable_toast_theming: boot.enable_toast_theming,

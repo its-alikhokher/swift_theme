@@ -29,7 +29,7 @@
         var box = document.createElement("div");
         box.className = "swift-cmdk";
         box.innerHTML =
-            '<input type="text" placeholder="Type a command… (accent, theme, density, focus…)" autofocus />' +
+            '<input type="text" placeholder="Type a command… (theme, density, shape, focus…)" autofocus />' +
             '<div class="swift-cmdk-list"></div>';
 
         backdrop.appendChild(box);
@@ -76,12 +76,16 @@
 
     function buildCommands(boot) {
         var cmds = [];
-        (boot.accents || []).forEach(function (a) {
-            cmds.push({ label: "Accent → " + a.label, run: function () { window.SwiftTheme.setAccent(a.key); } });
-        });
-        (boot.themes || []).forEach(function (t) {
-            cmds.push({ label: "Full theme → " + t.label, run: function () { window.SwiftTheme.setFullTheme(t.key); } });
-        });
+        // Presets are only switchable when the site is in Theme Preset mode;
+        // in Custom Colors the brand pair is fixed in Swift Theme Settings.
+        if (boot.color_mode !== "Custom Colors") {
+            (boot.presets || []).forEach(function (p) {
+                cmds.push({
+                    label: "Theme → " + p.label,
+                    run: function () { window.SwiftTheme.setPreset(p.key); },
+                });
+            });
+        }
         ["Compact","Comfortable","Cozy"].forEach(function (d) {
             cmds.push({ label: "Density → " + d, run: function () { window.SwiftTheme.setDensity(d); } });
         });

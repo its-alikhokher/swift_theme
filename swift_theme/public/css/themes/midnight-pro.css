@@ -1,0 +1,51 @@
+/* Swift Theme — Midnight Pro
+   Generated from PREMIUM_THEMES["Midnight Pro"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="midnight-pro"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #6366f1;
+  --swift-secondary:    #4f46e5;
+  --swift-primary-soft: rgba(99, 102, 241, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #6366f1;
+  --swift-accent-hover: #7a7df3;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(99, 102, 241, 0.14);
+  --swift-accent-tint:  #818cf8;
+
+  /* Frappe surface variables */
+  --bg-color:            #0f172a;
+  --fg-color:            #1e293b;
+  --card-bg:             #1e293b;
+  --subtle-fg:           #222d46;
+  --subtle-accent:       #202b40;
+  --control-bg:          #202b40;
+  --control-bg-on-gray:  #222d46;
+  --border-color:        rgba(241, 245, 249, 0.16);
+  --text-color:          #f1f5f9;
+  --text-muted:          #94a3b8;
+  --text-light:          #94a3b8;
+  --heading-color:       #f1f5f9;
+  --sidebar-bg:          #172133;
+  --navbar-bg:           rgba(30, 41, 59, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(79, 70, 229, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="midnight-pro"] .btn-primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="midnight-pro"] .btn-primary:hover {
+  background: linear-gradient(135deg, #7a7df3, #6366f1);
+}

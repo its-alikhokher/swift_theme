@@ -1,29 +1,44 @@
 /* Swift Theme — Enterprise Login
-   Three layouts, driven by Swift Theme Settings -> Login Layout:
-     Split     — brand panel beside the form (default, enterprise look)
-     Centered  — single glass card on the gradient
-     Minimal   — flat, no blobs, no brand panel
-   Colours arrive as --primary/--secondary/--bg1/--bg2, rendered server-side. */
+
+   Split layout: a clean white form panel on the left, a deep brand panel on
+   the right with a sculpted curve between them. Layout follows Swift Theme
+   Settings -> Login Layout:
+     Split     — form + brand panel (default)
+     Centered  — form card centred over the brand colour
+     Minimal   — form only, flat, no ornament
+
+   Colours arrive as --primary / --secondary / --panel-1 / --panel-2,
+   rendered server-side so the page paints correctly on first load. */
 
 :root {
-    --primary: #3b82f6;
-    --secondary: #8b5cf6;
-    --bg1: #0f172a;
-    --bg2: #1e293b;
+    --primary: #0b84f3;
+    --secondary: #0056b3;
+    --panel-1: #0f172a;
+    --panel-2: #1e293b;
 
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.16);
-    --field-bg: rgba(255, 255, 255, 0.06);
-    --shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
-    --radius: 18px;
+    --ink: #10243a;
+    --ink-soft: #5b7185;
+    --ink-faint: #8fa3b4;
+    --surface: #ffffff;
+    --field: #f4f8fb;
+    --field-focus: #ffffff;
+    --line: #dfe8ef;
+    --danger: #c8322b;
+
+    --radius-field: 12px;
+    --radius-panel: 40px;
+    --ease: cubic-bezier(0.32, 0.72, 0.28, 1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    /* Never let a wide brand headline push the page sideways */
+    overflow-x: hidden;
 }
 
 html,
@@ -33,488 +48,645 @@ body {
 
 body {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow-x: hidden;
+    background: var(--surface);
+    color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* ---------- Ambient background ---------- */
-.blob {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.5;
-    animation: float 22s infinite ease-in-out;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.blob-1 {
-    width: 420px;
-    height: 420px;
-    background: var(--primary);
-    top: -120px;
-    left: -120px;
-}
-
-.blob-2 {
-    width: 320px;
-    height: 320px;
-    background: var(--secondary);
-    bottom: -80px;
-    right: -60px;
-    animation-delay: -7s;
-}
-
-.blob-3 {
-    width: 360px;
-    height: 360px;
-    background: linear-gradient(45deg, var(--primary), var(--secondary));
-    top: 45%;
-    left: 55%;
-    animation-delay: -14s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25%      { transform: translate(50px, -50px) scale(1.1); }
-    50%      { transform: translate(-30px, 30px) scale(0.9); }
-    75%      { transform: translate(40px, 20px) scale(1.05); }
-}
-
-/* ---------- Shell ---------- */
-.login-container {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 420px;
-    padding: 24px;
-}
-
-/* Split layout: brand panel + form side by side */
-html[data-swift-login-layout="Split"] .login-container {
-    max-width: 980px;
+/* ---------------- Shell ---------------- */
+.login-shell {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    align-items: stretch;
-    gap: 0;
-    background: var(--glass-bg);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    padding: 0;
+    grid-template-columns: minmax(400px, 0.82fr) 1.18fr;
+    /* dvh keeps the layout honest under mobile browser chrome */
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
-html[data-swift-login-layout="Split"] .login-card {
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 48px 44px;
+/* ---------------- Form side ---------------- */
+.login-form-side {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    padding: clamp(32px, 5vw, 56px) clamp(22px, 4vw, 48px);
+    background: var(--surface);
 }
 
-/* Brand panel — only rendered in Split */
-.login-brand-panel {
-    display: none;
-    position: relative;
-    padding: 48px 44px;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(150deg,
-        color-mix(in oklab, var(--primary) 88%, transparent),
-        color-mix(in oklab, var(--secondary) 88%, transparent));
-    color: #fff;
-    overflow: hidden;
+.login-form-inner {
+    width: 100%;
+    max-width: 400px;
+    animation: rise 0.5s var(--ease) both;
 }
 
-html[data-swift-login-layout="Split"] .login-brand-panel {
-    display: flex;
+@keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
 }
 
-.login-brand-panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.22), transparent 55%);
-    pointer-events: none;
-}
-
-.login-brand-panel > * {
-    position: relative;
-    z-index: 1;
-}
-
-.brand-mark {
+.login-brandmark {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 17px;
-    font-weight: 650;
+    gap: 10px;
+    margin-bottom: 44px;
+    font-size: 15px;
+    font-weight: 600;
     letter-spacing: -0.01em;
+    color: var(--ink);
 }
 
-.brand-mark img {
-    max-height: 40px;
-    max-width: 150px;
+.login-brandmark img {
+    max-height: 34px;
+    max-width: 140px;
     object-fit: contain;
 }
 
-.brand-pitch h2 {
+.login-brandmark-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    background: linear-gradient(140deg, var(--primary), var(--secondary));
+    box-shadow: 0 6px 16px -6px var(--primary);
+}
+
+.login-form-inner h1 {
     font-size: 30px;
-    line-height: 1.2;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 12px;
+    font-weight: 680;
+    letter-spacing: -0.028em;
+    line-height: 1.15;
 }
 
-.brand-pitch p {
+.login-sub {
+    margin-top: 8px;
+    margin-bottom: 32px;
     font-size: 14.5px;
-    line-height: 1.6;
-    opacity: 0.9;
-    max-width: 38ch;
+    line-height: 1.5;
+    color: var(--ink-soft);
 }
 
-.brand-points {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 13.5px;
-    opacity: 0.95;
-}
-
-.brand-points li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.brand-points svg {
-    flex: 0 0 auto;
-    opacity: 0.9;
-}
-
-/* ---------- Card ---------- */
-.login-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 40px;
-    box-shadow: var(--shadow);
-    animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-.login-header {
-    margin-bottom: 28px;
-}
-
-html[data-swift-login-layout="Centered"] .login-header,
-html[data-swift-login-layout="Minimal"] .login-header {
-    text-align: center;
-}
-
-.login-logo {
-    max-height: 46px;
-    max-width: 170px;
-    object-fit: contain;
-    margin-bottom: 18px;
-}
-
-html[data-swift-login-layout="Centered"] .login-logo,
-html[data-swift-login-layout="Minimal"] .login-logo {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-
-/* The brand panel already carries the logo in Split */
-html[data-swift-login-layout="Split"] .login-logo {
-    display: none;
-}
-
-.login-header h1 {
-    color: var(--text-primary);
-    font-size: 27px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
-}
-
-.subtitle {
-    color: var(--text-secondary);
-    font-size: 14px;
-}
-
-/* ---------- Form ---------- */
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
 }
 
-.form-group {
+.field {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
 }
 
-.form-group label {
-    color: var(--text-primary);
-    font-size: 13px;
+.field label {
+    font-size: 13.5px;
     font-weight: 550;
+    color: var(--ink);
 }
 
-.form-group input {
+.req {
+    margin-left: 2px;
+    color: var(--danger);
+}
+
+.field-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field input[type="text"],
+.field input[type="password"] {
     width: 100%;
-    background: var(--field-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 11px;
-    padding: 13px 15px;
-    color: var(--text-primary);
+    height: 50px;
+    padding: 0 16px;
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-field);
+    background: var(--field);
+    color: var(--ink);
     font-size: 15px;
     font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     outline: none;
+    transition: border-color 0.18s var(--ease), background 0.18s var(--ease),
+                box-shadow 0.18s var(--ease);
 }
 
-.form-group input:focus {
+.field-control input {
+    padding-right: 46px;
+}
+
+.field input::placeholder {
+    color: var(--ink-faint);
+}
+
+.field input:hover {
+    border-color: var(--line);
+}
+
+.field input:focus {
+    background: var(--field-focus);
     border-color: var(--primary);
-    background: color-mix(in oklab, var(--field-bg) 60%, var(--primary) 8%);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 28%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
-.form-group input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.75;
+/* Password reveal */
+.reveal {
+    position: absolute;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+    transition: color 0.15s var(--ease), background 0.15s var(--ease);
 }
 
-.form-options {
+.reveal:hover {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.field-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    font-size: 13px;
+    gap: 14px;
+    margin-top: -4px;
+    font-size: 13.5px;
 }
 
-.remember-me {
-    display: flex;
+.remember {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary);
+    color: var(--ink-soft);
     cursor: pointer;
     user-select: none;
 }
 
-.remember-me input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
+.remember input {
+    width: 16px;
+    height: 16px;
     accent-color: var(--primary);
     cursor: pointer;
 }
 
-.forgot-password {
+.link-quiet {
     color: var(--primary);
+    font-weight: 550;
     text-decoration: none;
-    font-weight: 500;
 }
 
-.forgot-password:hover {
+.link-quiet:hover {
     text-decoration: underline;
 }
 
-.login-btn {
+/* Primary action */
+.btn-signin {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
+    gap: 10px;
     width: 100%;
-    margin-top: 2px;
-    padding: 14px 20px;
+    height: 52px;
+    margin-top: 6px;
     border: none;
-    border-radius: 11px;
+    border-radius: 999px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: #fff;
     font-size: 15px;
     font-weight: 600;
     font-family: inherit;
+    letter-spacing: 0.01em;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-    box-shadow: 0 8px 22px color-mix(in oklab, var(--primary) 38%, transparent);
+    overflow: hidden;
+    box-shadow: 0 12px 26px -12px var(--primary);
+    transition: transform 0.16s var(--ease), box-shadow 0.2s var(--ease),
+                filter 0.2s var(--ease);
 }
 
-.login-btn:hover:not(:disabled) {
+.btn-signin::after {
+    /* Sheen sweep on hover */
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -60%;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-18deg);
+    transition: left 0.55s var(--ease);
+}
+
+.btn-signin:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px color-mix(in oklab, var(--primary) 48%, transparent);
+    box-shadow: 0 18px 34px -14px var(--primary);
+    filter: saturate(1.06);
 }
 
-.login-btn:active:not(:disabled) {
+.btn-signin:hover:not(:disabled)::after {
+    left: 115%;
+}
+
+.btn-signin:active:not(:disabled) {
     transform: translateY(0);
 }
 
-.login-btn:disabled {
-    opacity: 0.65;
+.btn-signin:disabled {
     cursor: not-allowed;
-    transform: none;
+    filter: saturate(0.7) brightness(0.98);
+    box-shadow: none;
 }
 
-/* ---------- Feedback ---------- */
+.btn-spinner {
+    display: none;
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.btn-signin.is-busy .btn-spinner {
+    display: block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Feedback */
 .alert-error {
     display: flex;
     align-items: flex-start;
-    gap: 9px;
-    background: rgba(239, 68, 68, 0.14);
-    border: 1px solid rgba(239, 68, 68, 0.42);
-    border-radius: 11px;
+    gap: 8px;
     padding: 12px 14px;
-    color: #fecaca;
-    font-size: 13px;
+    border: 1px solid color-mix(in srgb, var(--danger) 34%, transparent);
+    border-radius: var(--radius-field);
+    background: color-mix(in srgb, var(--danger) 8%, transparent);
+    color: var(--danger);
+    font-size: 13.2px;
     line-height: 1.45;
+    animation: shake 0.3s var(--ease);
 }
 
 .alert-error[hidden] {
     display: none;
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-4px); }
+    75%      { transform: translateX(4px); }
+}
+
 .signup-link {
     text-align: center;
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 13.5px;
+    color: var(--ink-soft);
 }
 
 .signup-link a {
     color: var(--primary);
+    font-weight: 550;
     text-decoration: none;
-    font-weight: 500;
 }
 
 .signup-link a:hover {
     text-decoration: underline;
 }
 
-.custom-text {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 12px;
-    padding-top: 16px;
-    border-top: 1px solid var(--glass-border);
+.login-foot {
+    margin-top: 40px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
 }
 
-.login-footer {
-    text-align: center;
-    margin-top: 22px;
-    padding-top: 20px;
-    border-top: 1px solid var(--glass-border);
+/* ---------------- Brand side ---------------- */
+.login-brand {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 72px 8% 72px 7%;
+    overflow: hidden;
+    background:
+        var(--brand-image, none) center / cover no-repeat,
+        linear-gradient(150deg,
+            color-mix(in srgb, var(--panel-1) 88%, var(--primary)) 0%,
+            var(--panel-1) 45%,
+            color-mix(in srgb, var(--panel-2) 82%, var(--secondary)) 100%);
+    color: #fff;
+    /* The sculpted curve that separates the two halves */
+    border-top-left-radius: var(--radius-panel);
+    border-bottom-left-radius: var(--radius-panel);
 }
 
-.login-footer p {
-    color: var(--text-secondary);
-    font-size: 12px;
+/* Soft light source, top-left */
+.brand-glow {
+    position: absolute;
+    top: -22%;
+    left: -12%;
+    width: 62%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--primary) 52%, transparent) 0%,
+        transparent 68%);
+    filter: blur(24px);
+    animation: drift 18s ease-in-out infinite alternate;
 }
 
-html[data-swift-login-layout="Split"] .login-footer {
-    border-top: none;
-    margin-top: 16px;
-    padding-top: 8px;
+/* Faint geometric facets, echoing the reference */
+.brand-mesh {
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background-image:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0 34%, transparent 34.4%),
+        linear-gradient(202deg, rgba(255, 255, 255, 0.04) 0 46%, transparent 46.4%),
+        linear-gradient(324deg, rgba(255, 255, 255, 0.035) 0 40%, transparent 40.4%);
 }
 
-/* ---------- Minimal ---------- */
-html[data-swift-login-layout="Minimal"] .blob {
+@keyframes drift {
+    from { transform: translate3d(0, 0, 0) scale(1); }
+    to   { transform: translate3d(6%, 5%, 0) scale(1.12); }
+}
+
+.brand-body {
+    position: relative;
+    z-index: 1;
+    max-width: 34rem;
+}
+
+.login-brand h2 {
+    font-size: clamp(2.2rem, 3.6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+}
+
+.login-brand > .brand-body > p {
+    margin-top: 20px;
+    max-width: 46ch;
+    font-size: clamp(0.95rem, 1.15vw, 1.08rem);
+    line-height: 1.62;
+    color: rgba(255, 255, 255, 0.76);
+}
+
+.brand-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 34px;
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.brand-points li {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.brand-points svg {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    padding: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.brand-proof {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 44px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.brand-proof strong {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.brand-proof span {
+    font-size: 13.8px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---------------- Split layout (default) ---------------- */
+html[data-swift-login-layout="Split"] .login-shell {
+    grid-template-columns: minmax(420px, 0.85fr) 1.15fr;
+}
+
+html[data-swift-login-layout="Split"] .login-brand {
+    display: flex;
+}
+
+/* ---------------- Centered layout ---------------- */
+html[data-swift-login-layout="Centered"] .login-shell {
+    grid-template-columns: 1fr;
+    place-items: center;
+    background: linear-gradient(150deg, var(--panel-1), var(--panel-2));
+}
+
+html[data-swift-login-layout="Centered"] .login-brand {
     display: none;
 }
 
-html[data-swift-login-layout="Minimal"] .login-card {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: var(--glass-bg);
+html[data-swift-login-layout="Centered"] .login-form-side {
+    width: min(456px, calc(100% - 40px));
+    padding: 44px 40px;
+    border-radius: 22px;
+    box-shadow: 0 34px 80px -30px rgba(2, 12, 27, 0.6);
+}
+
+/* ---------------- Minimal layout ---------------- */
+html[data-swift-login-layout="Minimal"] .login-shell {
+    grid-template-columns: 1fr;
+    place-items: center;
+}
+
+html[data-swift-login-layout="Minimal"] .login-brand {
+    display: none;
+}
+
+html[data-swift-login-layout="Minimal"] .login-brandmark-dot {
     box-shadow: none;
-    animation: none;
 }
 
-/* ---------- Light presets ---------- */
-body.light-mode {
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --glass-bg: rgba(255, 255, 255, 0.62);
-    --glass-border: rgba(15, 23, 42, 0.1);
-    --field-bg: rgba(255, 255, 255, 0.75);
-    --shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+html[data-swift-login-layout="Minimal"] .btn-signin {
+    box-shadow: none;
 }
 
-body.light-mode .blob {
-    opacity: 0.34;
+html[data-swift-login-layout="Minimal"] .btn-signin::after {
+    display: none;
 }
 
-body.light-mode .alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #991b1b;
-}
+/* ---------------- Responsive ----------------
+   Four stages: wide desktop, narrow desktop/tablet-landscape, stacked
+   (tablet-portrait and below), and phone. Plus a short-viewport rule so
+   landscape phones don't need to scroll to reach the button. */
 
-/* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-    html[data-swift-login-layout="Split"] .login-container {
-        max-width: 460px;
-        grid-template-columns: 1fr;
+/* Laptops — tighten the brand panel before anything has to wrap */
+@media (max-width: 1280px) {
+    .login-brand {
+        padding: 56px 6% 56px 5.5%;
     }
 
-    html[data-swift-login-layout="Split"] .login-brand-panel {
+    .brand-proof {
+        margin-top: 32px;
+        padding-top: 20px;
+    }
+}
+
+/* Tablet landscape — brand panel becomes a slim accent column */
+@media (max-width: 1100px) and (min-width: 861px) {
+    .login-shell,
+    html[data-swift-login-layout="Split"] .login-shell {
+        grid-template-columns: minmax(360px, 1fr) 0.85fr;
+    }
+
+    .brand-points {
+        margin-top: 24px;
+        gap: 9px;
+        font-size: 13.5px;
+    }
+}
+
+/* Stack: brand panel on top as a compact banner */
+@media (max-width: 860px) {
+    .login-shell,
+    html[data-swift-login-layout="Split"] .login-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+    }
+
+    .login-brand {
+        order: -1;
+        align-items: flex-end;
+        min-height: clamp(180px, 30vh, 280px);
+        padding: clamp(28px, 6vw, 44px) clamp(22px, 6vw, 40px);
+        border-radius: 0 0 28px 28px;
+    }
+
+    .login-brand h2 {
+        font-size: clamp(1.55rem, 6vw, 2.2rem);
+    }
+
+    .login-brand > .brand-body > p {
+        margin-top: 12px;
+        font-size: 0.94rem;
+        max-width: 52ch;
+    }
+
+    /* Detail that only earns its space on a large canvas */
+    .brand-points,
+    .brand-proof {
         display: none;
     }
 
-    html[data-swift-login-layout="Split"] .login-logo {
-        display: block;
+    .login-form-side {
+        align-items: flex-start;
+        padding-top: clamp(28px, 6vw, 40px);
     }
 
-    html[data-swift-login-layout="Split"] .login-card {
-        padding: 38px 30px;
+    .login-brandmark {
+        margin-bottom: 26px;
     }
 }
 
-@media (max-width: 480px) {
-    .login-container {
-        padding: 16px;
+/* Phone */
+@media (max-width: 560px) {
+    .login-brand {
+        min-height: clamp(150px, 24vh, 220px);
+        border-radius: 0 0 22px 22px;
     }
 
-    .login-card,
-    html[data-swift-login-layout="Split"] .login-card {
-        padding: 30px 22px;
+    .login-form-inner h1 {
+        font-size: 26px;
     }
 
-    .login-header h1 {
-        font-size: 23px;
+    .login-sub {
+        margin-bottom: 26px;
+        font-size: 14px;
     }
 
-    .form-options {
+    .login-form {
+        gap: 17px;
+    }
+
+    .field input[type="text"],
+    .field input[type="password"] {
+        /* 16px keeps iOS from zooming the viewport on focus */
+        font-size: 16px;
+        height: 48px;
+    }
+
+    .btn-signin {
+        height: 50px;
+    }
+
+    .field-row {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
+        gap: 11px;
+    }
+
+    .login-foot {
+        margin-top: 30px;
     }
 }
 
-/* ---------- Accessibility ---------- */
+/* Landscape phones and other short viewports */
+@media (max-height: 620px) and (max-width: 860px) {
+    .login-brand {
+        min-height: 0;
+        padding: 20px 22px;
+    }
+
+    .login-brand h2 {
+        font-size: 1.35rem;
+    }
+
+    .login-brand > .brand-body > p {
+        display: none;
+    }
+
+    .login-brandmark {
+        margin-bottom: 18px;
+    }
+
+    .login-foot {
+        margin-top: 22px;
+    }
+}
+
+/* Ultra-wide — stop the form drifting to the far edge */
+@media (min-width: 1800px) {
+    .login-shell,
+    html[data-swift-login-layout="Split"] .login-shell {
+        grid-template-columns: minmax(480px, 0.7fr) 1.3fr;
+    }
+
+    .brand-body {
+        max-width: 40rem;
+    }
+}
+
+/* ---------------- Accessibility ---------------- */
 @media (prefers-reduced-motion: reduce) {
-    .blob,
-    .login-card {
+    .login-form-inner,
+    .brand-glow,
+    .alert-error,
+    .btn-spinner {
         animation: none;
     }
 
@@ -526,4 +698,20 @@ body.light-mode .alert-error {
 :focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* Dark-preset presets keep the form panel readable */
+body.dark-mode {
+    --surface: #0f1720;
+    --ink: #eaf1f7;
+    --ink-soft: #9fb2c2;
+    --ink-faint: #6d8395;
+    --field: #172230;
+    --field-focus: #1b2836;
+    --line: #26374a;
+}
+
+body.dark-mode .login-brandmark {
+    color: var(--ink);
 }

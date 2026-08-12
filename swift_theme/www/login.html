@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ _("Login") }}{% if brand_name %} · {{ brand_name }}{% endif %}</title>
+    <title>{{ _("Sign In") }}{% if brand_name %} · {{ brand_name }}{% endif %}</title>
     <link rel="stylesheet" href="/assets/swift_theme/css/login.css">
     <style>
         :root {
-            --primary: {{ colors.get("primary") or "#3b82f6" }};
-            --secondary: {{ colors.get("secondary") or "#8b5cf6" }};
-            --bg1: {{ colors.get("bg1") or "#0f172a" }};
-            --bg2: {{ colors.get("bg2") or "#1e293b" }};
+            --primary: {{ colors.get("primary") or "#0b84f3" }};
+            --secondary: {{ colors.get("secondary") or "#0056b3" }};
+            --panel-1: {{ colors.get("bg_body") or "#0f172a" }};
+            --panel-2: {{ colors.get("bg_card") or "#1e293b" }};
         }
         {% if login_bg_image %}
-        .login-container { --swift-login-bg: url('{{ login_bg_image }}'); }
+        .login-brand { --brand-image: url('{{ login_bg_image }}'); }
         {% endif %}
     </style>
 </head>
@@ -21,114 +21,113 @@
       data-csrf-token="{{ csrf_token }}"
       data-redirect-to="{{ redirect_to }}"
       data-sounds-enabled="{{ 1 if theme.get('enable_sounds') else 0 }}">
-    <!-- Animated Background Blobs -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
 
-    <div class="login-container">
-        <!-- Brand panel (Split layout only) -->
-        <aside class="login-brand-panel">
-            <div class="brand-mark">
-                {% if brand_logo %}<img src="{{ brand_logo }}" alt="{{ brand_name }}">{% endif %}
-                <span>{{ brand_name or "Swift Theme" }}</span>
+    <main class="login-shell">
+
+        <!-- ---------- Form side ---------- -->
+        <section class="login-form-side">
+            <div class="login-form-inner">
+
+                <div class="login-brandmark">
+                    {% if brand_logo %}
+                    <img src="{{ brand_logo }}" alt="{{ brand_name }}">
+                    {% else %}
+                    <span class="login-brandmark-dot"></span>
+                    {% endif %}
+                    <span>{{ brand_name or "Swift Theme" }}</span>
+                </div>
+
+                <h1>{{ _("Sign In") }}</h1>
+                <p class="login-sub">{{ login_tagline or _("Welcome back. Please enter your details.") }}</p>
+
+                <form id="login-form" class="login-form" method="POST" action="/api/method/login" novalidate>
+                    <div class="alert-error" id="login-error" role="alert" aria-live="polite" hidden></div>
+
+                    <div class="field">
+                        <label for="usr">{{ _("User Name") }}<span class="req">*</span></label>
+                        <input type="text" id="usr" name="usr"
+                               placeholder="{{ _('Enter your username or email') }}"
+                               autocomplete="username" autocapitalize="off"
+                               spellcheck="false" autofocus required>
+                    </div>
+
+                    <div class="field">
+                        <label for="pwd">{{ _("Password") }}<span class="req">*</span></label>
+                        <div class="field-control">
+                            <input type="password" id="pwd" name="pwd"
+                                   placeholder="{{ _('Enter your password') }}"
+                                   autocomplete="current-password" required>
+                            <button type="button" class="reveal" id="toggle-pwd"
+                                    aria-label="{{ _('Show password') }}" aria-pressed="false">
+                                <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                                    <path d="M1.5 12S5 5.5 12 5.5 22.5 12 22.5 12 19 18.5 12 18.5 1.5 12 1.5 12Z"/>
+                                    <circle cx="12" cy="12" r="3.2"/>
+                                </svg>
+                                <svg class="eye-shut" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" hidden>
+                                    <path d="M3 3l18 18"/>
+                                    <path d="M10.6 6.1A9.9 9.9 0 0 1 12 6c7 0 10.5 6 10.5 6a17 17 0 0 1-3.4 4"/>
+                                    <path d="M6.6 7.6A16.6 16.6 0 0 0 1.5 12S5 18 12 18a10 10 0 0 0 4-.8"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <label class="remember">
+                            <input type="checkbox" id="remember_me" name="remember_me" value="1">
+                            <span>{{ _("Remember me") }}</span>
+                        </label>
+                        <a class="link-quiet" href="/update-password?new=1">{{ _("Forgot Password?") }}</a>
+                    </div>
+
+                    <button type="submit" class="btn-signin">
+                        <span class="btn-label">{{ _("Sign In") }}</span>
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                    </button>
+
+                    {% if show_signup %}
+                    <p class="signup-link">{{ _("Don't have an account?") }} <a href="/signup">{{ _("Sign up") }}</a></p>
+                    {% endif %}
+                </form>
+
+                <p class="login-foot">&copy; {{ current_year }} {{ brand_name or "Swift Theme" }}</p>
             </div>
+        </section>
 
-            <div class="brand-pitch">
-                <h2>{{ login_tagline or _("Your workspace, exactly the way your team works.") }}</h2>
-                <p>{{ _("Sign in to access dashboards, approvals and reports from one secure place.") }}</p>
+        <!-- ---------- Brand side ---------- -->
+        <aside class="login-brand">
+            <div class="brand-glow" aria-hidden="true"></div>
+            <div class="brand-mesh" aria-hidden="true"></div>
+
+            <div class="brand-body">
+                <h2>{{ _("Streamline Your") }}<br>{{ _("Business Operations") }}</h2>
+                <p>{{ _("Unlock your ERP potential — build feature-rich dashboards, automate approvals and see every number in one place.") }}</p>
+
+                <ul class="brand-points">
+                    <li>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        <span>{{ _("Role-based access control") }}</span>
+                    </li>
+                    <li>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        <span>{{ _("Encrypted sessions and audit trails") }}</span>
+                    </li>
+                    <li>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        <span>{{ _("Single sign-on ready") }}</span>
+                    </li>
+                </ul>
+
+                <div class="brand-proof">
+                    <strong>300+</strong>
+                    <span>{{ _("implementations delivered. Be our next success story.") }}</span>
+                </div>
             </div>
-
-            <ul class="brand-points">
-                <li>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
-                    <span>{{ _("Role-based access control") }}</span>
-                </li>
-                <li>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
-                    <span>{{ _("Encrypted sessions and audit trails") }}</span>
-                </li>
-                <li>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
-                    <span>{{ _("Single sign-on ready") }}</span>
-                </li>
-            </ul>
         </aside>
 
-        <!-- Glassmorphism Login Card -->
-        <div class="login-card">
-            <div class="login-header">
-                {% if brand_logo %}
-                <img class="login-logo" src="{{ brand_logo }}" alt="{{ brand_name }}">
-                {% endif %}
-                <h1>{{ _("Welcome Back") }}</h1>
-                {# In Split the tagline headlines the brand panel, so don't repeat it here. #}
-                <p class="subtitle">
-                    {%- if login_layout == "Split" -%}
-                        {{ _("Sign in to continue") }}
-                    {%- else -%}
-                        {{ login_tagline or _("Enterprise Access Portal") }}
-                    {%- endif -%}
-                </p>
-            </div>
-
-            <form id="login-form" class="login-form" method="POST" action="/api/method/login" novalidate>
-                <div class="alert-error" id="login-error" role="alert" aria-live="polite" hidden></div>
-
-                <div class="form-group">
-                    <label for="usr">{{ _("Username or Email") }}</label>
-                    <input
-                        type="text"
-                        id="usr"
-                        name="usr"
-                        placeholder="{{ _('Enter your username or email') }}"
-                        autocomplete="username"
-                        autocapitalize="off"
-                        spellcheck="false"
-                        autofocus
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="pwd">{{ _("Password") }}</label>
-                    <input
-                        type="password"
-                        id="pwd"
-                        name="pwd"
-                        placeholder="{{ _('Enter your password') }}"
-                        autocomplete="current-password"
-                        required
-                    >
-                </div>
-
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember_me" name="remember_me" value="1">
-                        <span>{{ _("Remember me") }}</span>
-                    </label>
-                    <a href="/update-password?new=1" class="forgot-password">{{ _("Forgot Password?") }}</a>
-                </div>
-
-                <button type="submit" class="login-btn">
-                    <span>{{ _("Sign In") }}</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                </button>
-
-                {% if show_signup %}
-                <p class="signup-link"><a href="/signup">{{ _("Don't have an account? Sign up") }}</a></p>
-                {% endif %}
-
-                <p class="custom-text" id="custom-message">{{ custom_login_text }}</p>
-            </form>
-
-            <div class="login-footer">
-                <p>&copy; {{ current_year }} {{ brand_name or "Swift Theme" }}. {{ _("All rights reserved.") }}</p>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <script src="/assets/swift_theme/js/login.js"></script>
 </body>

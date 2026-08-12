@@ -1,0 +1,51 @@
+/* Swift Theme — Rose Gold
+   Generated from PREMIUM_THEMES["Rose Gold"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="rose-gold"] {
+  color-scheme: light;
+
+  /* Brand */
+  --swift-primary:      #fb7185;
+  --swift-secondary:    #e11d48;
+  --swift-primary-soft: rgba(251, 113, 133, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #fb7185;
+  --swift-accent-hover: #d56071;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(251, 113, 133, 0.14);
+  --swift-accent-tint:  #fda4af;
+
+  /* Frappe surface variables */
+  --bg-color:            #fff1f2;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #fff6f8;
+  --subtle-accent:       #fffbfb;
+  --control-bg:          #fffbfb;
+  --control-bg-on-gray:  #fff6f8;
+  --border-color:        rgba(136, 19, 55, 0.12);
+  --text-color:          #881337;
+  --text-muted:          #be123c;
+  --text-light:          #be123c;
+  --heading-color:       #881337;
+  --sidebar-bg:          #fff9f9;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(251, 113, 133, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(225, 29, 72, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="rose-gold"] .btn-primary {
+  background: linear-gradient(135deg, #fb7185, #e11d48);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="rose-gold"] .btn-primary:hover {
+  background: linear-gradient(135deg, #d56071, #fb7185);
+}

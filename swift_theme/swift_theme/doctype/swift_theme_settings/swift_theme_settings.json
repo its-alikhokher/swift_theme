@@ -5,16 +5,13 @@
   "color_mode_section",
   "color_mode",
   "active_preset",
-  "gradient_colors_section",
-  "gradient_start",
-  "gradient_end",
+  "custom_colors_section",
+  "primary_color",
+  "secondary_color",
   "defaults_section",
-  "default_accent",
-  "default_theme",
-  "brand_hex_override",
-  "defaults_col_break",
   "default_density",
   "default_radius",
+  "defaults_col_break",
   "default_font_scale",
   "default_font_family",
   "features_section",
@@ -62,72 +59,53 @@
    "label": "Color Mode"
   },
   {
-   "default": "Preset Themes",
+   "default": "Theme Preset",
    "fieldname": "color_mode",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Color Mode",
-   "options": "Preset Themes\nCustom Gradient",
-   "reqd": 1
+   "options": "Theme Preset\nCustom Colors",
+   "reqd": 1,
+   "description": "Pick a ready-made preset, or set your own primary and secondary colours."
   },
   {
-   "depends_on": "eval:doc.color_mode=='Preset Themes'",
+   "depends_on": "eval:doc.color_mode=='Theme Preset'",
    "fieldname": "active_preset",
    "fieldtype": "Select",
    "label": "Active Preset",
-   "options": "Swift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red"
+   "options": "Swift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red",
+   "mandatory_depends_on": "eval:doc.color_mode=='Theme Preset'",
+   "default": "Swift Blue",
+   "description": "Each preset ships its own stylesheet; only the selected one is loaded."
   },
   {
    "collapsible": 1,
-   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
-   "fieldname": "gradient_colors_section",
+   "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "fieldname": "custom_colors_section",
    "fieldtype": "Section Break",
-   "label": "Gradient Colors"
+   "label": "Custom Colors"
   },
   {
-   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
-   "fieldname": "gradient_start",
+   "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "fieldname": "primary_color",
    "fieldtype": "Color",
-   "label": "Gradient Start",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Gradient'"
+   "label": "Primary Color",
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Buttons, links and highlights."
   },
   {
-   "depends_on": "eval:doc.color_mode=='Custom Gradient'",
-   "fieldname": "gradient_end",
+   "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "fieldname": "secondary_color",
    "fieldtype": "Color",
-   "label": "Gradient End",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Gradient'"
+   "label": "Secondary Color",
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Gradients and hover states."
   },
   {
    "collapsible": 1,
    "fieldname": "defaults_section",
    "fieldtype": "Section Break",
    "label": "Desk Defaults"
-  },
-  {
-   "default": "indigo",
-   "description": "Default accent for users who have not picked their own.",
-   "fieldname": "default_accent",
-   "fieldtype": "Select",
-   "label": "Default Accent",
-   "options": "\nindigo\nviolet\nblue\nsky\nteal\nemerald\namber\nrose\npink\nslate"
-  },
-  {
-   "description": "A full theme overrides the accent. Leave blank to use accent + Frappe's Light/Dark mode.",
-   "fieldname": "default_theme",
-   "fieldtype": "Select",
-   "label": "Default Full Theme",
-   "options": "\nemerald\nsapphire\nobsidian\nmidnight\naurora\ngraphite\ncarbon\nivory\nporcelain\nrose-gold\nmonochrome\nsandstone"
-  },
-  {
-   "description": "Force a specific accent colour site-wide. Leave blank to use the named accent above.",
-   "fieldname": "brand_hex_override",
-   "fieldtype": "Color",
-   "label": "Brand Accent Override"
-  },
-  {
-   "fieldname": "defaults_col_break",
-   "fieldtype": "Column Break"
   },
   {
    "default": "Comfortable",
@@ -142,6 +120,10 @@
    "fieldtype": "Select",
    "label": "Default Shape",
    "options": "\nSharp\nRounded\nPill"
+  },
+  {
+   "fieldname": "defaults_col_break",
+   "fieldtype": "Column Break"
   },
   {
    "default": "M",
@@ -393,7 +375,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-12 01:30:00.000000",
+ "modified": "2026-08-12 03:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",

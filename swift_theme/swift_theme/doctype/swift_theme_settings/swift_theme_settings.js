@@ -24,6 +24,18 @@ frappe.ui.form.on("Swift Theme Settings", {
         toggleFieldVisibility(frm);
     },
 
+    active_preset(frm) {
+        previewColors(frm);
+    },
+
+    primary_color(frm) {
+        previewColors(frm);
+    },
+
+    secondary_color(frm) {
+        previewColors(frm);
+    },
+
     enable_sounds(frm) {
         toggleFieldVisibility(frm);
         showSoundHint(frm);
@@ -48,6 +60,32 @@ function showSoundHint(frm) {
     );
 }
 
+// Live preview before saving, so picking a preset or a colour shows straight
+// away instead of only after the save round-trips.
+function previewColors(frm) {
+    if (!(window.SwiftTheme && window.SwiftTheme.applyColors)) return;
+
+    if (frm.doc.color_mode === "Custom Colors") {
+        window.SwiftTheme.applyColors({
+            preset: "",
+            primary: frm.doc.primary_color,
+            secondary: frm.doc.secondary_color,
+        });
+        return;
+    }
+
+    const catalog = (frappe.boot.swift_theme && frappe.boot.swift_theme.presets) || [];
+    const chosen = catalog.find((p) => p.label === frm.doc.active_preset);
+    if (!chosen) return;
+
+    window.SwiftTheme.applyColors({
+        preset: chosen.key,
+        primary: chosen.primary,
+        secondary: chosen.secondary,
+        theme_css: chosen.css,
+    });
+}
+
 function reloadTheme() {
     if (window.SwiftTheme && window.SwiftTheme.reload) {
         return Promise.resolve(window.SwiftTheme.reload());
@@ -64,12 +102,12 @@ function reloadTheme() {
 }
 
 function toggleFieldVisibility(frm) {
-    const isPreset = frm.doc.color_mode === "Preset Themes";
-    const isCustomGradient = frm.doc.color_mode === "Custom Gradient";
+    const isPreset = frm.doc.color_mode === "Theme Preset";
+    const isCustom = frm.doc.color_mode === "Custom Colors";
 
     frm.toggle_display("active_preset", isPreset);
-    frm.toggle_display("gradient_start", isCustomGradient);
-    frm.toggle_display("gradient_end", isCustomGradient);
+    frm.toggle_display("primary_color", isCustom);
+    frm.toggle_display("secondary_color", isCustom);
 
     const soundsOn = frm.doc.enable_sounds == 1;
     frm.toggle_display("volume_level", soundsOn);

@@ -11,8 +11,7 @@ app_license = "MIT"
 app_include_css = [
     "/assets/swift_theme/css/swift-fonts.css",
     "/assets/swift_theme/css/swift-base.css",
-    "/assets/swift_theme/css/swift-accents.css",
-    "/assets/swift_theme/css/swift-themes.css",
+    "/assets/swift_theme/css/swift-preset-base.css",
     "/assets/swift_theme/css/swift-layout.css",
     "/assets/swift_theme/css/swift-density.css",
     "/assets/swift_theme/css/swift-desk.css",
@@ -35,8 +34,7 @@ app_include_js = [
 web_include_css = [
     "/assets/swift_theme/css/swift-fonts.css",
     "/assets/swift_theme/css/swift-base.css",
-    "/assets/swift_theme/css/swift-accents.css",
-    "/assets/swift_theme/css/swift-themes.css",
+    "/assets/swift_theme/css/swift-preset-base.css",
     "/assets/swift_theme/css/swift-website.css",
     "/assets/swift_theme/css/swift-login.css",
     "/assets/swift_theme/css/swift-scrollbar.css",

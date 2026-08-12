@@ -1,0 +1,51 @@
+/* Swift Theme — Crimson Red
+   Generated from PREMIUM_THEMES["Crimson Red"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="crimson-red"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #ef4444;
+  --swift-secondary:    #dc2626;
+  --swift-primary-soft: rgba(239, 68, 68, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #ef4444;
+  --swift-accent-hover: #f16060;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(239, 68, 68, 0.14);
+  --swift-accent-tint:  #f87171;
+
+  /* Frappe surface variables */
+  --bg-color:            #450a0a;
+  --fg-color:            #7f1d1d;
+  --card-bg:             #7f1d1d;
+  --subtle-fg:           #861f1f;
+  --subtle-accent:       #821e1e;
+  --control-bg:          #821e1e;
+  --control-bg-on-gray:  #861f1f;
+  --border-color:        rgba(254, 242, 242, 0.16);
+  --text-color:          #fef2f2;
+  --text-muted:          #fca5a5;
+  --text-light:          #fca5a5;
+  --heading-color:       #fef2f2;
+  --sidebar-bg:          #651414;
+  --navbar-bg:           rgba(127, 29, 29, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(239, 68, 68, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(220, 38, 38, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="crimson-red"] .btn-primary {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="crimson-red"] .btn-primary:hover {
+  background: linear-gradient(135deg, #f16060, #ef4444);
+}

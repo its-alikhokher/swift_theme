@@ -1,0 +1,51 @@
+/* Swift Theme — Emerald Luxury
+   Generated from PREMIUM_THEMES["Emerald Luxury"]. Loaded on its own; only the
+   selected preset's stylesheet is ever added to the page. */
+
+html[data-swift-preset="emerald-luxury"] {
+  color-scheme: dark;
+
+  /* Brand */
+  --swift-primary:      #10b981;
+  --swift-secondary:    #059669;
+  --swift-primary-soft: rgba(16, 185, 129, 0.14);
+
+  /* Accent aliases — everything else in the app reads these */
+  --swift-accent:       #10b981;
+  --swift-accent-hover: #34c494;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(16, 185, 129, 0.14);
+  --swift-accent-tint:  #34d399;
+
+  /* Frappe surface variables */
+  --bg-color:            #022c22;
+  --fg-color:            #064e3b;
+  --card-bg:             #064e3b;
+  --subtle-fg:           #07543f;
+  --subtle-accent:       #06513d;
+  --control-bg:          #06513d;
+  --control-bg-on-gray:  #07543f;
+  --border-color:        rgba(236, 253, 245, 0.16);
+  --text-color:          #ecfdf5;
+  --text-muted:          #6ee7b7;
+  --text-light:          #6ee7b7;
+  --heading-color:       #ecfdf5;
+  --sidebar-bg:          #043f30;
+  --navbar-bg:           rgba(6, 78, 59, 0.82);
+
+  /* Ambient wash behind the desk */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(16, 185, 129, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(5, 150, 105, 0.12), transparent 60%);
+}
+
+/* Buttons and links pick up the brand pair */
+html[data-swift-preset="emerald-luxury"] .btn-primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-swift-preset="emerald-luxury"] .btn-primary:hover {
+  background: linear-gradient(135deg, #34c494, #10b981);
+}

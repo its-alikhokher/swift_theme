@@ -52,24 +52,20 @@
     function openPalette(anchor) {
         closePalette();
         var boot = frappe.boot.swift_theme || {};
-        var accents = boot.accents || [];
-        var themes  = boot.themes  || [];
+        var presets = boot.presets || [];
 
         var pop = document.createElement("div");
         pop.className = "swift-palette";
 
-        // Full themes ALWAYS on top so users see the premium options first
-        pop.appendChild(section("Premium theme", themesList(themes)));
-
-        // Accents — only show when NO full theme is active
-        var currentTheme = document.documentElement.getAttribute("data-swift-theme") || "";
-        if (!currentTheme) {
-            pop.appendChild(section("Accent", accentsGrid(accents)));
-        } else {
+        if (boot.color_mode === "Custom Colors") {
+            // The site is on a fixed brand pair; offering presets here would
+            // silently contradict Swift Theme Settings.
             var note = document.createElement("div");
             note.className = "swift-palette-note";
-            note.textContent = "Accent picker is hidden — the active theme provides its own accent. Pick “None” above to choose your own.";
-            pop.appendChild(section("Accent", note));
+            note.textContent = "This site uses custom brand colours. Switch Color Mode to “Theme Preset” in Swift Theme Settings to choose a theme.";
+            pop.appendChild(section("Theme", note));
+        } else {
+            pop.appendChild(section("Theme", presetList(presets)));
         }
 
         // Layout
@@ -113,39 +109,41 @@
         return wrap;
     }
 
-    function accentsGrid(accents) {
-        var grid = document.createElement("div");
-        grid.className = "swift-accent-grid";
-        accents.forEach(function (a) {
-            var sw = document.createElement("button");
-            sw.className = "swift-accent-swatch";
-            sw.title = a.label;
-            sw.style.background = accentColor(a.key);
-            if (document.documentElement.getAttribute("data-swift-accent") === a.key) sw.classList.add("active");
-            sw.addEventListener("click", function () {
-                window.SwiftTheme.setAccent(a.key);
-                grid.querySelectorAll(".swift-accent-swatch").forEach(function (n) { n.classList.remove("active"); });
-                sw.classList.add("active");
-            });
-            grid.appendChild(sw);
-        });
-        return grid;
-    }
-
-    function themesList(themes) {
+    // Each row previews the preset's own primary/secondary pair, so the choice
+    // is visible before it's applied.
+    function presetList(presets) {
         var list = document.createElement("div");
-        themes.forEach(function (t) {
+        list.className = "swift-preset-list";
+
+        presets.forEach(function (p) {
             var row = document.createElement("div");
-            row.className = "swift-menu-item";
-            row.textContent = t.label;
-            if ((document.documentElement.getAttribute("data-swift-theme") || "") === t.key) {
+            row.className = "swift-menu-item swift-preset-item";
+
+            var chip = document.createElement("span");
+            chip.className = "swift-preset-swatch";
+            chip.style.background = "linear-gradient(135deg, " + p.primary + ", " + p.secondary + ")";
+            row.appendChild(chip);
+
+            var label = document.createElement("span");
+            label.className = "swift-preset-label";
+            label.textContent = p.label;
+            row.appendChild(label);
+
+            var mode = document.createElement("span");
+            mode.className = "swift-preset-mode";
+            mode.textContent = p.mode === "dark" ? "Dark" : "Light";
+            row.appendChild(mode);
+
+            if ((document.documentElement.getAttribute("data-swift-preset") || "") === p.key) {
+                row.classList.add("active");
                 var tag = document.createElement("span");
                 tag.className = "swift-tag";
                 tag.textContent = "active";
                 row.appendChild(tag);
             }
+
             row.addEventListener("click", function () {
-                window.SwiftTheme.setFullTheme(t.key);
+                window.SwiftTheme.setPreset(p.key);
                 closePalette();
             });
             list.appendChild(row);
@@ -220,12 +218,4 @@
         return wrap;
     }
 
-    function accentColor(key) {
-        var map = {
-            indigo:"#4f46e5", violet:"#7c3aed", blue:"#2563eb", sky:"#0284c7",
-            teal:"#0d9488", emerald:"#059669", amber:"#d97706",
-            rose:"#e11d48", pink:"#db2777", slate:"#475569",
-        };
-        return map[key] || "#999";
-    }
 })();
