@@ -533,3 +533,156 @@ html[data-swift-performance="1"] * {
     font-size: 12px;
     line-height: 1.45;
 }
+
+/* ============================================
+   SWIFT PRESETS INSIDE FRAPPE'S "SWITCH THEME" DIALOG
+   Rendered by swift-theme-dialog.js beneath Frappe's own Light/Dark grid.
+   ============================================ */
+
+.swift-switch-sep {
+    height: 1px;
+    margin: 20px 0 16px;
+    background: var(--border-color, #e2e8f0);
+}
+
+.swift-switch-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted, #94a3b8);
+}
+
+.swift-switch-reset {
+    border: none;
+    background: transparent;
+    padding: 2px 4px;
+    color: var(--swift-accent, #4f46e5);
+    font: inherit;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.swift-switch-reset:hover {
+    text-decoration: underline;
+}
+
+.swift-switch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+    gap: 8px;
+}
+
+.swift-swatch {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    background: var(--card-bg, var(--fg-color, #fff));
+    color: var(--text-color, #1e293b);
+    font: inherit;
+    font-size: 12.5px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.12s ease;
+}
+
+.swift-swatch:hover {
+    border-color: var(--swift-accent, #4f46e5);
+    transform: translateY(-1px);
+}
+
+.swift-swatch.selected {
+    border-color: var(--swift-accent, #4f46e5);
+    box-shadow: 0 0 0 3px var(--swift-accent-soft, rgba(79, 70, 229, 0.14));
+}
+
+.swift-swatch-chip {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.swift-swatch-name {
+    flex: 1 1 auto;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.swift-swatch-mode {
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* ---- Custom colour pair ---- */
+.swift-custom {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1.5px dashed var(--border-color, #e2e8f0);
+    border-radius: 10px;
+}
+
+.swift-custom.selected {
+    border-style: solid;
+    border-color: var(--swift-accent, #4f46e5);
+    box-shadow: 0 0 0 3px var(--swift-accent-soft, rgba(79, 70, 229, 0.14));
+}
+
+.swift-custom-head {
+    margin-bottom: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted, #94a3b8);
+}
+
+.swift-custom-row {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.swift-custom-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--text-muted, #94a3b8);
+}
+
+.swift-custom-row input[type="color"] {
+    width: 54px;
+    height: 32px;
+    padding: 2px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    background: var(--control-bg, #fff);
+    cursor: pointer;
+}
+
+.swift-custom-apply {
+    margin-left: auto;
+}
+
+.swift-custom-preview {
+    height: 8px;
+    margin-top: 12px;
+    border-radius: 999px;
+}

@@ -23,6 +23,7 @@ app_include_js = [
     "/assets/swift_theme/js/swift-boot.js",
     "/assets/swift_theme/js/swift-mode-observer.js",
     "/assets/swift_theme/js/swift-switcher.js",
+    "/assets/swift_theme/js/swift-theme-dialog.js",
     "/assets/swift_theme/js/swift-palette.js",
     "/assets/swift_theme/js/swift-sidebar.js",
     "/assets/swift_theme/js/swift-focus.js",

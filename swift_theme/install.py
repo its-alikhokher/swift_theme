@@ -16,6 +16,10 @@ USER_FIELDS = [
     ("swift_follow_frappe", "Check",  "Follow Frappe's Theme Mode", None, "1"),
     ("swift_mode",          "Select", "Swift Mode Override",         "\n".join(MODES), "Follow Frappe"),
     ("swift_preset",        "Select", "Swift Theme Preset",          "\n".join([""] + PRESETS), ""),
+    # A user may pick their own pair instead of a preset, straight from the
+    # navbar theme switcher.
+    ("swift_primary",       "Color",  "Swift Primary Color",         None, None),
+    ("swift_secondary",     "Color",  "Swift Secondary Color",       None, None),
     ("swift_density",       "Select", "Swift Density",               "\n".join([""] + DENSITIES), ""),
     ("swift_radius",        "Select", "Swift Shape",                 "\n".join([""] + RADII), ""),
     ("swift_font_scale",    "Select", "Swift Font Scale",            "\n".join([""] + FONT_SCALES), ""),

@@ -16,6 +16,8 @@ target/
 .gradle/
 
 # Compiled files
+# (a trailing slash matches directories only, so "*.pyc/" never matched a
+# .pyc file — the bare "*.pyc" below is what does the work)
 *.pyc
 *.class
 *.o

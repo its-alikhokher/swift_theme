@@ -238,7 +238,11 @@ class SwiftThemeSettings(Document):
                     frappe.PermissionError,
                 )
 
+    COLOR_FIELDS = ("color_mode", "active_preset", "primary_color", "secondary_color")
+
     def on_update(self):
+        self._release_user_overrides()
+
         # Document.save() already invalidates this doc's own cached copy. What
         # still needs clearing is every user's cached bootinfo, since these
         # preferences are embedded in it — but only that. The previous
@@ -247,6 +251,46 @@ class SwiftThemeSettings(Document):
         frappe.clear_cache(doctype=self.doctype)
         frappe.cache.delete_key("bootinfo")
         frappe.publish_realtime("swift_theme_updated", {}, after_commit=True)
+
+    def _release_user_overrides(self):
+        """Make a changed site colour actually take effect for everyone.
+
+        Picking a theme from the navbar switcher stores swift_preset on the
+        User. That override outranks this doctype, so once someone had used the
+        switcher, changing the colour here did nothing for them and there was
+        nothing on screen explaining why. When the site colour actually changes,
+        stand those overrides down so the new choice applies; users are free to
+        pick their own again afterwards.
+        """
+        if self.is_new():
+            return
+        if not any(self.has_value_changed(f) for f in self.COLOR_FIELDS):
+            return
+
+        overridden = set()
+        for field in ("swift_preset", "swift_primary", "swift_secondary"):
+            overridden.update(
+                frappe.get_all("User", filters={field: ["is", "set"]}, pluck="name")
+            )
+        if not overridden:
+            return
+
+        for user in overridden:
+            frappe.db.set_value(
+                "User",
+                user,
+                {"swift_preset": None, "swift_primary": None, "swift_secondary": None},
+                update_modified=False,
+            )
+            frappe.clear_cache(user=user)
+
+        frappe.msgprint(
+            frappe._("Applied to {0} user(s) who had picked their own theme.").format(
+                len(overridden)
+            ),
+            alert=True,
+            indicator="green",
+        )
 
 
 @frappe.whitelist(allow_guest=True)

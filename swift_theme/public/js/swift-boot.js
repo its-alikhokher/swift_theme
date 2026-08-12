@@ -176,6 +176,26 @@
             } catch (e) {}
 
             persist("swift_preset", chosen.label);
+            // A preset and a custom pair are mutually exclusive.
+            persist("swift_primary", "");
+            persist("swift_secondary", "");
+        },
+
+        // Pick your own two colours instead of a preset.
+        setCustomColors: function (primary, secondary) {
+            if (!primary) return;
+            applyColors({ preset: "", primary: primary, secondary: secondary || primary });
+            persist("swift_primary", primary);
+            persist("swift_secondary", secondary || primary);
+            persist("swift_preset", "");
+        },
+
+        // Drop personal choices and fall back to whatever the site is set to.
+        clearPersonalTheme: function () {
+            persist("swift_preset", "");
+            persist("swift_primary", "");
+            persist("swift_secondary", "");
+            return API.reload();
         },
         setDensity: function (v)        { applyAttr("density", v); set("density", v); persist("swift_density", v); },
         setRadius: function (v)         { applyAttr("radius", v);  set("radius", v);  persist("swift_radius", v); },
