@@ -20,10 +20,27 @@ def preset_catalog():
             "mode": data["mode"],
             "primary": data["colors"]["primary"],
             "secondary": data["colors"]["secondary"],
+            # Surface colours so the switcher can draw a true preview card
+            # rather than a flat swatch.
+            "bg": data["colors"]["bg_body"],
+            "card": data["colors"]["bg_card"],
+            "muted": data["colors"]["text_muted"],
             "css": preset_stylesheet(data["value"]),
         }
         for name, data in PREMIUM_THEMES.items()
     ]
+
+
+# Changing the site's look is an administrative act, so the navbar switcher is
+# limited to the roles that would already be allowed into Swift Theme Settings.
+THEME_SWITCH_ROLES = ("System Manager",)
+
+
+def can_switch_theme():
+    if frappe.session.user == "Administrator":
+        return 1
+    roles = set(frappe.get_roles())
+    return 1 if roles.intersection(THEME_SWITCH_ROLES) else 0
 
 
 def boot_session(bootinfo):
@@ -119,6 +136,9 @@ def get_effective_prefs():
         # sounds — sent whole so the desk can play without a round trip per event
         "sounds": _sound_config(s),
 
+        # who may use the navbar switcher
+        "can_switch_theme": can_switch_theme(),
+
         # catalog
         "presets": preset_catalog(),
     }
@@ -137,12 +157,21 @@ def set_user_pref(field, value):
         "swift_primary", "swift_secondary",
         "swift_density", "swift_radius", "swift_font_scale", "swift_font_family",
     }
+    COLOR_FIELDS = {"swift_preset", "swift_primary", "swift_secondary"}
+
     if field not in ALLOWED:
-        frappe.throw(f"Field not allowed: {field}")
+        frappe.throw(frappe._("Field not allowed: {0}").format(field))
 
     user = frappe.session.user
     if not user or user == "Guest":
-        frappe.throw("Login required")
+        frappe.throw(frappe._("Login required"))
+
+    # Hiding the switcher is not enough on its own — the endpoint is reachable
+    # directly, so the same restriction is enforced here.
+    if field in COLOR_FIELDS and not can_switch_theme():
+        frappe.throw(
+            frappe._("You are not permitted to change the theme."), frappe.PermissionError
+        )
 
     frappe.db.set_value("User", user, field, value)
     return {"ok": True, "field": field, "value": value}

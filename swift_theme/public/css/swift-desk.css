@@ -536,13 +536,14 @@ html[data-swift-performance="1"] * {
 
 /* ============================================
    SWIFT PRESETS INSIDE FRAPPE'S "SWITCH THEME" DIALOG
-   Rendered by swift-theme-dialog.js beneath Frappe's own Light/Dark grid.
+   Cards are rendered into a .theme-grid, so Frappe's own card styling applies
+   and only the surrounding chrome needs styles here.
    ============================================ */
 
-.swift-switch-sep {
-    height: 1px;
-    margin: 20px 0 16px;
-    background: var(--border-color, #e2e8f0);
+.swift-switch {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
 .swift-switch-head {
@@ -550,7 +551,7 @@ html[data-swift-performance="1"] * {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -562,7 +563,7 @@ html[data-swift-performance="1"] * {
     border: none;
     background: transparent;
     padding: 2px 4px;
-    color: var(--swift-accent, #4f46e5);
+    color: var(--primary-color, var(--swift-accent, #4f46e5));
     font: inherit;
     font-size: 10.5px;
     letter-spacing: 0.04em;
@@ -573,77 +574,65 @@ html[data-swift-performance="1"] * {
     text-decoration: underline;
 }
 
-.swift-switch-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-    gap: 8px;
+/* Frappe's grid is fixed at 3 columns; twelve presets need to wrap and stay
+   compact, and the dialog needs to scroll rather than run off the screen. */
+.modal-body .theme-grid.swift-theme-grid {
+    grid-template-columns: repeat(auto-fill, minmax(116px, 1fr));
+    grid-gap: 14px;
+    max-height: 46vh;
+    overflow-y: auto;
+    padding: 2px;
 }
 
-.swift-swatch {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 8px 10px;
-    border: 1.5px solid var(--border-color, #e2e8f0);
-    border-radius: 10px;
-    background: var(--card-bg, var(--fg-color, #fff));
-    color: var(--text-color, #1e293b);
-    font: inherit;
-    font-size: 12.5px;
-    text-align: left;
-    cursor: pointer;
-    transition: border-color 0.15s ease, transform 0.12s ease;
+.modal-body .theme-grid.swift-theme-grid .background {
+    height: 84px;
 }
 
-.swift-swatch:hover {
-    border-color: var(--swift-accent, #4f46e5);
-    transform: translateY(-1px);
+.modal-body .theme-grid.swift-theme-grid .foreground {
+    height: 28px;
 }
 
-.swift-swatch.selected {
-    border-color: var(--swift-accent, #4f46e5);
-    box-shadow: 0 0 0 3px var(--swift-accent-soft, rgba(79, 70, 229, 0.14));
+.modal-body .theme-grid.swift-theme-grid .foreground:first-child {
+    height: 18px;
 }
 
-.swift-swatch-chip {
-    flex: 0 0 auto;
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.swift-swatch-name {
-    flex: 1 1 auto;
-    font-weight: 500;
+.modal-body .theme-grid.swift-theme-grid .theme-title {
+    font-size: 12px;
+    margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.swift-swatch-mode {
-    font-size: 9.5px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--text-muted, #94a3b8);
+.modal-body .theme-grid.swift-theme-grid .mt-3 {
+    margin-top: 8px !important;
 }
 
-/* ---- Custom colour pair ---- */
+.modal-body .theme-grid.swift-theme-grid [data-swift-card] {
+    cursor: pointer;
+}
+
+/* ---- Step two: the custom colour pair ---- */
 .swift-custom {
-    margin-top: 14px;
-    padding: 12px;
-    border: 1.5px dashed var(--border-color, #e2e8f0);
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 10px;
+    background: var(--subtle-fg, rgba(148, 163, 184, 0.08));
+    animation: swift-custom-in 0.18s ease-out;
 }
 
-.swift-custom.selected {
-    border-style: solid;
-    border-color: var(--swift-accent, #4f46e5);
-    box-shadow: 0 0 0 3px var(--swift-accent-soft, rgba(79, 70, 229, 0.14));
+.swift-custom[hidden] {
+    display: none;
+}
+
+@keyframes swift-custom-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
 }
 
 .swift-custom-head {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -655,7 +644,7 @@ html[data-swift-performance="1"] * {
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
 }
 
 .swift-custom-row label {
@@ -668,8 +657,8 @@ html[data-swift-performance="1"] * {
 }
 
 .swift-custom-row input[type="color"] {
-    width: 54px;
-    height: 32px;
+    width: 58px;
+    height: 34px;
     padding: 2px;
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 8px;
@@ -683,6 +672,6 @@ html[data-swift-performance="1"] * {
 
 .swift-custom-preview {
     height: 8px;
-    margin-top: 12px;
+    margin-top: 14px;
     border-radius: 999px;
 }

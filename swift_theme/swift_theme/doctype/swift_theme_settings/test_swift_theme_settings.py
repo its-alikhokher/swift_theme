@@ -25,7 +25,7 @@ from contextlib import contextmanager
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from swift_theme.api.boot import get_effective_prefs, set_user_pref
+from swift_theme.api.boot import can_switch_theme, get_effective_prefs, set_user_pref
 from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
     PREMIUM_THEMES,
     apply_theme,
@@ -131,6 +131,22 @@ def no_user_preset():
         frappe.db.set_value("User", user, "swift_preset", previous)
 
 
+def make_user(roles):
+    """A throwaway user for permission checks."""
+    slug = "-".join(roles).lower().replace(" ", "-") or "plain"
+    email = f"swift-perm-{slug}@example.com"
+    if not frappe.db.exists("User", email):
+        doc = frappe.get_doc({
+            "doctype": "User",
+            "email": email,
+            "first_name": "Swift Perm Test",
+            "send_welcome_email": 0,
+            "roles": [{"role": r} for r in roles],
+        })
+        doc.insert(ignore_permissions=True)
+    return email
+
+
 @contextmanager
 def as_guest():
     original = frappe.session.user
@@ -227,6 +243,57 @@ class TestSwiftThemeAccessControl(IntegrationTestCase):
             settings.custom_js = previous
             settings.save(ignore_permissions=True)
             frappe.clear_cache()
+
+
+class TestSwiftThemeSwitchPermission(IntegrationTestCase):
+    """Only Administrator / System Manager may change the theme."""
+
+    def test_administrator_may_switch(self):
+        self.assertTrue(can_switch_theme())
+        self.assertTrue(get_effective_prefs()["can_switch_theme"])
+
+    def test_plain_user_may_not_switch(self):
+        user = make_user([])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            self.assertFalse(can_switch_theme())
+            self.assertFalse(get_effective_prefs()["can_switch_theme"])
+        finally:
+            frappe.set_user(original)
+
+    def test_system_manager_may_switch(self):
+        user = make_user(["System Manager"])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            self.assertTrue(can_switch_theme())
+        finally:
+            frappe.set_user(original)
+
+    def test_endpoint_refuses_a_plain_user(self):
+        """Hiding the UI is not a control — the endpoint is reachable directly."""
+        user = make_user([])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            with self.assertRaises(frappe.PermissionError):
+                set_user_pref("swift_preset", "Crimson Red")
+            with self.assertRaises(frappe.PermissionError):
+                set_user_pref("swift_primary", "#123456")
+        finally:
+            frappe.set_user(original)
+
+    def test_layout_prefs_stay_open_to_everyone(self):
+        """Only colour is restricted; density and font are personal comfort."""
+        user = make_user([])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            set_user_pref("swift_density", "Compact")
+            self.assertEqual(frappe.db.get_value("User", user, "swift_density"), "Compact")
+        finally:
+            frappe.set_user(original)
 
 
 class TestSwiftThemePreferences(IntegrationTestCase):
@@ -659,13 +726,54 @@ class TestSwiftThemeClientContract(IntegrationTestCase):
 
     def test_theme_dialog_elements_are_styled(self):
         css = read_css("swift-desk.css")
-        for selector in (".swift-swatch", ".swift-custom", ".swift-switch-grid"):
+        for selector in (".swift-switch", ".swift-custom", ".swift-theme-grid"):
             self.assertIn(selector, css, f"{selector} is built by JS but never styled")
+
+    def test_presets_reuse_frappes_own_card_markup(self):
+        """Cards must look like Frappe's Light/Dark ones, not a separate widget."""
+        js = read_js("swift-theme-dialog.js")
+        self.assertIn("theme-grid", js, "cards belong in Frappe's own grid class")
+        for part in ("background", "preview-check", "theme-title", "foreground"):
+            self.assertIn(part, js, f"card markup is missing .{part}")
+
+    def test_custom_colours_are_a_second_step(self):
+        """The pickers stay hidden until the Custom Colors card is chosen."""
+        js = read_js("swift-theme-dialog.js")
+        self.assertIn('hidden', js)
+        self.assertIn("removeAttr", js)
+
+    def test_switcher_ui_is_gated_on_the_role_flag(self):
+        for filename in ("swift-theme-dialog.js", "swift-switcher.js", "swift-palette.js"):
+            self.assertIn(
+                "can_switch_theme", read_js(filename), f"{filename} does not check the role"
+            )
 
     def test_boot_exposes_a_custom_colour_api(self):
         js = read_js("swift-boot.js")
         self.assertIn("setCustomColors", js)
         self.assertIn("swift_primary", js)
+
+    def test_boot_js_actually_applies_the_theme(self):
+        """Runs swift-boot.js for real, rather than grepping its source.
+
+        The string assertions elsewhere in this class prove code is present;
+        this proves it works — the attributes and the stylesheet link that the
+        CSS keys off are genuinely produced.
+        """
+        import shutil
+        import subprocess
+
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node is not installed")
+
+        harness = frappe.get_app_path(APP, "tests", "boot_js_contract.js")
+        result = subprocess.run(
+            [node, harness], capture_output=True, text=True, timeout=60
+        )
+        self.assertEqual(
+            result.returncode, 0, f"swift-boot.js contract failed:\n{result.stdout}\n{result.stderr}"
+        )
 
     def test_boot_swaps_a_single_theme_stylesheet(self):
         """Presets must retarget one <link>, not stack stylesheets."""
