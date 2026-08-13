@@ -16,11 +16,19 @@ html[data-swift-themed] .layout-main,
 html[data-swift-themed] .layout-main-section-wrapper {
   background: transparent !important;
 }
+/* The ambient wash sits behind everything on its own negative layer.
+   It used to be z-index:0 with the desk lifted above it via
+   `.layout-main, .desk-body > * { position: relative; z-index: 1 }`.
+   That lift created a stacking context, and anything Frappe positions
+   fixed *inside* the desk — most visibly an open child-table row, which is
+   `position: fixed` behind a z-index 1040 backdrop — was trapped under it and
+   rendered behind the freeze overlay. Painting behind instead of lifting in
+   front keeps the effect without capping any descendant. */
 html[data-swift-themed] body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
   background: var(--swift-ambient, none), var(--bg-color);
   background-attachment: fixed;
@@ -30,14 +38,6 @@ html[data-swift-themed] body::before {
 @keyframes swift-ambient-drift {
   0%   { transform: translate3d(0, 0, 0) scale(1); }
   100% { transform: translate3d(-2%, -1%, 0) scale(1.04); }
-}
-
-html[data-swift-themed] .navbar,
-html[data-swift-themed] .layout-side-section,
-html[data-swift-themed] .layout-main,
-html[data-swift-themed] .desk-body > * {
-  position: relative;
-  z-index: 1;
 }
 
 /* Sidebar hairline glow line at accent color — high-end SaaS touch */
