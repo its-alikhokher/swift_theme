@@ -1,12 +1,58 @@
-/* Swift Theme — Performance (opt-in) */
+/* Swift Theme — Performance mode
 
-html[data-swift-perf="on"] .list-row,
-html[data-swift-perf="on"] .frappe-card,
-html[data-swift-perf="on"] .layout-main-section {
-  content-visibility: auto;
-  contain-intrinsic-size: 400px;
+   This file used to apply:
+
+       html[data-swift-perf="on"] .list-row,
+       html[data-swift-perf="on"] .frappe-card,
+       html[data-swift-perf="on"] .layout-main-section {
+         content-visibility: auto;
+         contain-intrinsic-size: 400px;
+       }
+
+   `content-visibility: auto` gives an element layout, style and *paint*
+   containment. Paint containment makes that element:
+     * a stacking context, and
+     * the containing block for position:fixed descendants, and
+     * a clip boundary for anything overflowing it.
+
+   Frappe opens a child-table row as
+   `.grid-row-open .form-in-grid { position: fixed; top: 5%; left: 50% }`
+   at z-index 1021, above a z-index 1020 backdrop — and that panel lives
+   inside .layout-main-section. Under containment it was positioned against
+   the section instead of the viewport, capped below the backdrop, and clipped
+   at the section's edges. The row appeared to open but could not be typed in.
+
+   Perf mode is ON by default, so this affected every install. The containment
+   is gone; what remains cuts motion and expensive effects, which is safe
+   because none of it changes layout or hit-testing. */
+
+/* Cut animation and transitions */
+html[data-swift-perf="on"] *,
+html[data-swift-perf="on"] *::before,
+html[data-swift-perf="on"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
 }
 
+/* Drop the expensive compositing effects, keeping colours intact */
+html[data-swift-perf="on"] .navbar,
+html[data-swift-perf="on"] .body-sidebar,
+html[data-swift-perf="on"] .promotional-banner {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html[data-swift-perf="on"] body::before {
+  animation: none !important;
+  background: var(--bg-color) !important;
+}
+
+html[data-swift-perf="on"] .btn-primary::after {
+  display: none !important;
+}
+
+/* Explicit "no animation" switch, independent of perf mode */
 html[data-swift-anim="off"] *,
 html[data-swift-anim="off"] *::before,
 html[data-swift-anim="off"] *::after {

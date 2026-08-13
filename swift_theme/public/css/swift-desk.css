@@ -1044,3 +1044,47 @@ html[data-swift-themed] .grid-row .form-control:focus {
     border-color: var(--swift-accent);
     box-shadow: 0 0 0 2px var(--swift-accent-soft);
 }
+
+/* ---- Child-table editor: colour only ----
+   Default Frappe already makes this work:
+       #freeze.grid-form            z-index 1020, opacity .8 of --bg-color
+       .grid-row-open .form-in-grid position fixed, z-index 1021, opacity 1
+   The editor is usable purely because 1021 sits above 1020 in the ROOT
+   stacking context. Re-declaring any of that here risks fighting Frappe on a
+   future release, and creating a stacking context around the desk breaks it
+   outright (see body::before in swift-preset-base.css). So this section sets
+   surfaces and nothing else — no z-index, opacity, position or pointer-events.
+
+   The backdrop is left exactly as Frappe ships it. It only looked like the
+   page had been bleached because the editor was rendering *underneath* it. */
+
+html[data-swift-themed] {
+    /* Frappe paints the editor and modals with --modal-bg, which it leaves as
+       plain white (or gray-900 in dark), so the panel ignored the theme. */
+    --modal-bg: var(--card-bg);
+}
+
+html[data-swift-themed] .grid-row-open .form-in-grid {
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 12px);
+    box-shadow: 0 26px 60px -20px rgba(0, 0, 0, 0.5);
+}
+
+html[data-swift-themed] .grid-form-heading,
+html[data-swift-themed] .grid-form-heading .grid-form-control {
+    color: var(--text-color);
+}
+
+/* The item-search suggestions inside the editor */
+html[data-swift-themed] .form-in-grid .awesomplete > ul,
+html[data-swift-themed] .form-in-grid .awesomplete > ul li {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+html[data-swift-themed] .form-in-grid .awesomplete > ul li:hover,
+html[data-swift-themed] .form-in-grid .awesomplete > ul li[aria-selected="true"] {
+    background: var(--swift-accent-soft);
+    color: var(--swift-accent);
+}

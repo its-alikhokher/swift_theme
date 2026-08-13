@@ -750,6 +750,67 @@ class TestSwiftThemeStyling(IntegrationTestCase):
                     "position:fixed child-table editor under the backdrop",
                 )
 
+    def test_nothing_contains_the_desk(self):
+        """Second cause of the broken child table, and the subtler one.
+
+        `content-visibility: auto` (and `contain: paint/strict/content`) gives
+        an element paint containment, which makes it a stacking context, the
+        containing block for position:fixed descendants, and a clip boundary.
+        Frappe opens a grid row as position:fixed at z-index 1021 inside
+        .layout-main-section — under containment it was mispositioned, capped
+        below the backdrop and clipped, so the row could not be typed into.
+        Perf mode ships enabled, so every install had this.
+        """
+        containment = re.compile(
+            r"(content-visibility\s*:\s*auto|contain\s*:\s*(paint|strict|content|layout))")
+        for name in sorted(os.listdir(CSS_DIR)):
+            if not name.endswith(".css"):
+                continue
+            src = COMMENT_RE.sub("", open(os.path.join(CSS_DIR, name)).read())
+            for block in re.finditer(r"([^{}]+)\{([^{}]*)\}", src):
+                selector, body = block.group(1), block.group(2)
+                if not containment.search(body):
+                    continue
+                self.assertNotRegex(
+                    selector,
+                    r"layout-main|frappe-card|form-section|desk-body|list-row|page-container",
+                    f"{name}: containment on {selector.strip()[:60]!r} traps the "
+                    "position:fixed child-table editor",
+                )
+
+    def test_theme_does_not_redeclare_frappes_editor_mechanics(self):
+        """Colour it, don't re-engineer it.
+
+        The editor works because Frappe puts .form-in-grid at z-index 1021 over
+        a 1020 backdrop. Re-declaring position/z-index/opacity here would mean
+        fighting Frappe on every upgrade, so the theme only sets surfaces.
+        """
+        css = read_css("swift-desk.css")
+        for block in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+            selector, body = block.group(1), block.group(2)
+            if "form-in-grid" not in selector and "#freeze" not in selector:
+                continue
+            for prop in ("z-index", "opacity", "position", "pointer-events", "overflow"):
+                self.assertNotRegex(
+                    body, rf"(^|;)\s*{prop}\s*:",
+                    f"the theme overrides {prop} on {selector.strip()[:50]!r}; "
+                    "leave Frappe's own value alone",
+                )
+
+    def test_child_table_editor_surface_follows_the_theme(self):
+        """Frappe paints the editor with --modal-bg, which it leaves white."""
+        css = read_css("swift-desk.css")
+        # The panel surface must follow the theme; Frappe leaves --modal-bg white.
+        self.assertRegex(css, r"--modal-bg:\s*var\(--card-bg\)")
+        self.assertIn(".grid-row-open .form-in-grid", css)
+
+    def test_theme_crossfade_uses_the_attribute_that_exists(self):
+        """It was written as [data-swift-theme]; we set data-swift-themed."""
+        base = read_css("swift-preset-base.css")
+        self.assertNotRegex(base, r"\[data-swift-theme\]")
+        # ...and must not fade the child-table editor in and out.
+        self.assertRegex(base, r"data-swift-themed\]\s*\*:not\(#freeze\)")
+
     def test_child_table_grid_is_themed(self):
         css = read_css("swift-desk.css")
         for selector in (".form-grid", ".grid-heading-row", ".grid-row",
