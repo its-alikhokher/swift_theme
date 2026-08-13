@@ -78,7 +78,7 @@
         var cmds = [];
         // Presets are only switchable when the site is in Theme Preset mode;
         // in Custom Colors the brand pair is fixed in Swift Theme Settings.
-        if (boot.color_mode !== "Custom Colors") {
+        if (boot.can_switch_theme && boot.color_mode !== "Custom Colors") {
             (boot.presets || []).forEach(function (p) {
                 cmds.push({
                     label: "Theme → " + p.label,

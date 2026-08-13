@@ -9,11 +9,17 @@
     // Switcher" shows or hides the chip without a reload.
     document.addEventListener("swift:prefs:applied", syncSwitcher);
 
+    function allowed(boot) {
+        // Changing the theme is restricted to Administrator / System Manager,
+        // decided server-side and passed through bootinfo.
+        return !!(boot && boot.enable_switcher && boot.can_switch_theme);
+    }
+
     function syncSwitcher() {
         var boot = frappe.boot && frappe.boot.swift_theme;
         var existing = document.querySelector(".swift-nav-item");
 
-        if (!boot || !boot.enable_switcher) {
+        if (!allowed(boot)) {
             if (existing) existing.remove();
             closePalette();
             return;
@@ -24,7 +30,7 @@
     function injectSwitcher() {
         try {
             var boot = frappe.boot && frappe.boot.swift_theme;
-            if (!boot || !boot.enable_switcher) return;
+            if (!allowed(boot)) return;
             if (document.querySelector(".swift-chip")) return;
 
             var navbar = document.querySelector("header .navbar-nav, .navbar .nav.navbar-nav, .navbar .navbar-collapse .navbar-nav");
