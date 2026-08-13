@@ -81,17 +81,25 @@
         // In preset mode the stylesheet owns the palette, so inline values are
         // cleared rather than left shadowing it.
         if (preset) {
-            html.style.removeProperty("--swift-primary");
-            html.style.removeProperty("--swift-secondary");
-            html.style.removeProperty("--swift-accent");
-            html.style.removeProperty("--swift-accent-hover");
-            html.style.removeProperty("--swift-accent-soft");
+            [
+                "--swift-primary", "--swift-secondary", "--swift-accent",
+                "--swift-accent-hover", "--swift-accent-soft",
+                "--swift-accent-fg", "--swift-ambient",
+            ].forEach(function (name) { html.style.removeProperty(name); });
         } else if (primary) {
+            var second = secondary || primary;
             html.style.setProperty("--swift-primary", primary);
-            html.style.setProperty("--swift-secondary", secondary || primary);
+            html.style.setProperty("--swift-secondary", second);
             html.style.setProperty("--swift-accent", primary);
-            html.style.setProperty("--swift-accent-hover", secondary || primary);
-            html.style.setProperty("--swift-accent-soft", softColor(primary));
+            html.style.setProperty("--swift-accent-hover", second);
+            html.style.setProperty("--swift-accent-soft", rgba(primary, 0.14));
+            // Preset files ship these two; in custom mode nothing else would
+            // define them, leaving text on accent unreadable and the animated
+            // background wash missing entirely.
+            html.style.setProperty("--swift-accent-fg", readableOn(primary));
+            html.style.setProperty("--swift-ambient",
+                "radial-gradient(1200px 600px at 8% -10%, " + rgba(primary, 0.16) + ", transparent 60%)," +
+                "radial-gradient(900px 500px at 100% 110%, " + rgba(second, 0.12) + ", transparent 60%)");
         }
 
         set("preset", preset);
@@ -117,11 +125,29 @@
         if (link.getAttribute("href") !== href) link.setAttribute("href", href);
     }
 
-    function softColor(hex) {
+    function channels(hex) {
         var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(String(hex).trim());
-        if (!m) return "rgba(79, 70, 229, 0.14)";
-        return "rgba(" + parseInt(m[1], 16) + ", " + parseInt(m[2], 16) + ", " +
-               parseInt(m[3], 16) + ", 0.14)";
+        if (!m) return null;
+        return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+    }
+
+    function rgba(hex, alpha) {
+        var c = channels(hex);
+        if (!c) return "rgba(79, 70, 229, " + alpha + ")";
+        return "rgba(" + c[0] + ", " + c[1] + ", " + c[2] + ", " + alpha + ")";
+    }
+
+    // Black or white, whichever stays legible on the given colour. Mirrors the
+    // same decision the preset stylesheets bake in at build time.
+    function readableOn(hex) {
+        var c = channels(hex);
+        if (!c) return "#ffffff";
+        var lin = c.map(function (v) {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        var luminance = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+        return luminance > 0.45 ? "#0b0d12" : "#ffffff";
     }
 
     // ---- Public API ----

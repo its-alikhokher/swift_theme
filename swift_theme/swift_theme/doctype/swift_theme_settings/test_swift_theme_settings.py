@@ -649,6 +649,73 @@ class TestSwiftThemeStyling(IntegrationTestCase):
                 f"preset {option!r} is selectable but ships no stylesheet",
             )
 
+    def test_desk_views_use_no_undefined_colour_variables(self):
+        """The bug: list, report, kanban and dashboards ignored the theme.
+
+        They read --accent-color / --accent-light / --accent-dark / --bg-light,
+        which neither a preset nor Frappe ever defines, so every theme rendered
+        the same hardcoded blue and dark themes got light-grey report rows.
+        """
+        ours = set()
+        for name in os.listdir(CSS_DIR):
+            if name.endswith(".css"):
+                ours |= set(re.findall(
+                    r"^\s*(--[a-z0-9-]+)\s*:", open(os.path.join(CSS_DIR, name)).read(), re.M))
+        theme_dir = os.path.join(CSS_DIR, "themes")
+        for name in os.listdir(theme_dir):
+            ours |= set(re.findall(
+                r"^\s*(--[a-z0-9-]+)\s*:", open(os.path.join(theme_dir, name)).read(), re.M))
+
+        frappe_css = ""
+        scss_root = frappe.get_app_path("frappe", "public", "scss")
+        for root, _dirs, files in os.walk(scss_root):
+            for name in files:
+                if name.endswith(".scss"):
+                    frappe_css += open(os.path.join(root, name), errors="ignore").read()
+        frappe_defined = set(re.findall(r"^\s*(--[a-z0-9-]+)\s*:", frappe_css, re.M))
+
+        css = read_css("swift-desk.css")
+        # Only flag var() with no fallback — those render as nothing at all.
+        undefined = sorted(
+            v for v in set(re.findall(r"var\(\s*(--[a-z0-9-]+)\s*\)", css))
+            if v not in ours and v not in frappe_defined
+        )
+        self.assertEqual(undefined, [], f"swift-desk.css relies on undefined variables: {undefined}")
+
+    def test_themed_views_do_not_hardcode_the_old_blue(self):
+        css = read_css("swift-desk.css")
+        for dead in ("--accent-color,", "--accent-light", "--accent-dark", "--bg-light"):
+            self.assertNotIn(dead, css, f"{dead} is not defined by any theme")
+        self.assertNotIn("#0b84f3", css, "hardcoded blue ignores the active theme")
+
+    def test_report_and_dashboard_follow_the_theme(self):
+        css = read_css("swift-desk.css")
+        for selector in (".dt-header", ".dt-cell", ".number-card", ".widget", ".kanban-column"):
+            self.assertIn(selector, css, f"{selector} has no themed rule")
+        # Text sitting on the accent must use the computed on-accent colour.
+        self.assertIn("--swift-accent-fg", css)
+
+    def test_navbar_follows_the_theme(self):
+        css = read_css("swift-desk.css")
+        self.assertIn("html[data-swift-themed] .navbar", css)
+
+    def test_animated_background_is_wired_up(self):
+        """The wash needs the rule, the keyframes and a per-theme gradient."""
+        base = read_css("swift-preset-base.css")
+        self.assertIn("body::before", base)
+        self.assertIn("swift-ambient-drift", base)
+        self.assertIn("--swift-ambient", base)
+        for data in PREMIUM_THEMES.values():
+            path = os.path.join(CSS_DIR, "themes", f"{data['value']}.css")
+            self.assertIn("--swift-ambient", open(path).read(),
+                          f"{data['value']} defines no ambient background")
+
+    def test_performance_mode_uses_the_attribute_boot_actually_sets(self):
+        """The old rule keyed off data-swift-performance, which nothing set."""
+        css = read_css("swift-desk.css")
+        self.assertNotIn("data-swift-performance", css)
+        self.assertIn("data-swift-perf", css)
+
     def test_hidden_sidebar_has_a_css_rule(self):
         """Alt+B set data-swift-sidebar="off" but nothing styled it."""
         self.assertIn('data-swift-sidebar="off"', read_css("swift-desk.css"))

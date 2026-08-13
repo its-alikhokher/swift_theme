@@ -162,214 +162,383 @@ html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:not(:hover) .s
     display: none;
 }
 
-/* Sidebar items - smooth hover, no jump */
+/* Sidebar items — smooth hover, no jump.
+   These used --accent-color, which nothing defines, so every theme got the
+   same hardcoded blue here. */
 .standard-sidebar-item, .desk-sidebar-item {
-    transition: all 0.15s ease !important;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
     border-radius: 8px;
     margin: 2px 8px;
 }
 
-.standard-sidebar-item:hover, .desk-sidebar-item:hover {
-    background: var(--accent-color, #0b84f3) !important;
-    color: #fff !important;
-    transform: translateX(4px);
+html[data-swift-themed] .standard-sidebar-item:hover,
+html[data-swift-themed] .desk-sidebar-item:hover {
+    background: var(--swift-accent-soft) !important;
+    color: var(--swift-accent) !important;
+    transform: translateX(3px);
 }
 
-.standard-sidebar-item.selected, .desk-sidebar-item.selected {
-    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
-    color: #fff;
+html[data-swift-themed] .standard-sidebar-item.selected,
+html[data-swift-themed] .desk-sidebar-item.selected {
+    background: linear-gradient(90deg, var(--swift-accent-soft), transparent) !important;
+    color: var(--swift-accent) !important;
     font-weight: 600;
+    box-shadow: inset 2px 0 0 0 var(--swift-accent);
+}
+
+html[data-swift-themed] .standard-sidebar-item.selected a,
+html[data-swift-themed] .desk-sidebar-item.selected a,
+html[data-swift-themed] .standard-sidebar-item.selected .sidebar-item-label {
+    color: var(--swift-accent) !important;
 }
 
 /* ============================================
-   LIST VIEW - Premium Styling
+   THEMED DESK VIEWS
+
+   Everything below is scoped to [data-swift-themed], which boot.js sets for
+   both colour modes, and reads only variables the active theme actually
+   defines. The previous rules used --accent-color / --accent-light / --bg-light,
+   which no theme and no Frappe stylesheet ever set, so list rows, report
+   headers, kanban and dashboards stayed the same hardcoded blue whatever
+   preset was chosen — and the light greys made dark themes unreadable.
    ============================================ */
-.list-row-container {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
+
+/* ---------------- List view ---------------- */
+html[data-swift-themed] .list-row-container,
+html[data-swift-themed] .filter-section,
+html[data-swift-themed] .report-summary {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 12px);
+    box-shadow: var(--swift-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.list-row {
-    transition: background 0.15s ease;
-    border-bottom: 1px solid var(--border-color, #f1f5f9);
-}
-
-.list-row:hover {
-    background: var(--accent-light, rgba(11, 132, 243, 0.05)) !important;
-}
-
-.list-row-checkbox {
-    accent-color: var(--accent-color, #0b84f3);
-}
-
-.filter-section {
-    background: var(--card-bg, #fff);
+html[data-swift-themed] .filter-section,
+html[data-swift-themed] .report-summary {
     padding: 12px;
-    border-radius: 12px;
     margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-.list-count-badge {
-    background: var(--accent-color, #0b84f3);
-    color: #fff;
-    border-radius: 12px;
-    padding: 4px 12px;
+html[data-swift-themed] .list-row {
+    transition: background 0.15s ease;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .list-row:hover {
+    background: var(--swift-accent-soft) !important;
+}
+
+html[data-swift-themed] .list-row-checkbox,
+html[data-swift-themed] input[type="checkbox"] {
+    accent-color: var(--swift-accent);
+}
+
+html[data-swift-themed] .list-count-badge,
+html[data-swift-themed] .list-stats-label {
+    background: var(--swift-accent);
+    color: var(--swift-accent-fg);
+    border-radius: 999px;
+    padding: 3px 11px;
     font-weight: 600;
 }
 
-/* Status pills */
-.indicator-pill, .indicator-pill-right {
+html[data-swift-themed] .list-subject a,
+html[data-swift-themed] .list-row-col a {
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .list-row:hover .list-subject a {
+    color: var(--swift-accent);
+}
+
+html[data-swift-themed] .indicator-pill,
+html[data-swift-themed] .indicator-pill-right {
     border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 12px;
+    padding: 3px 9px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
-/* ============================================
-   REPORT VIEW - Premium Styling
-   ============================================ */
-.dt-scrollable {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+/* ---------------- Report view (datatable) ---------------- */
+html[data-swift-themed] .dt-scrollable,
+html[data-swift-themed] .datatable {
+    background: var(--card-bg);
+    border-radius: var(--swift-radius, 12px);
     overflow: hidden;
 }
 
-.dt-header {
-    background: linear-gradient(90deg, var(--accent-color, #0b84f3), var(--accent-dark, #096fc9));
-    color: #fff !important;
+html[data-swift-themed] .dt-header,
+html[data-swift-themed] .dt-row-header {
+    background: linear-gradient(90deg, var(--swift-accent), var(--swift-accent-hover)) !important;
+    color: var(--swift-accent-fg) !important;
+    border: none;
 }
 
-.dt-cell {
-    border: 1px solid var(--border-color, #e2e8f0);
+html[data-swift-themed] .dt-header .dt-cell,
+html[data-swift-themed] .dt-row-header .dt-cell,
+html[data-swift-themed] .dt-cell--header .dt-cell__content {
+    background: transparent !important;
+    color: var(--swift-accent-fg) !important;
+    font-weight: 600;
+}
+
+html[data-swift-themed] .dt-dropdown__toggle,
+html[data-swift-themed] .dt-cell--header .dt-dropdown svg {
+    color: var(--swift-accent-fg) !important;
+    fill: currentColor;
+}
+
+/* Body cells follow the theme surface, not a fixed light grey */
+html[data-swift-themed] .dt-cell {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
     transition: background 0.15s ease;
 }
 
-.dt-cell--header {
-    font-weight: 700;
-    background: var(--bg-light, #f8fafc);
+html[data-swift-themed] .dt-row:nth-child(even) .dt-cell {
+    background: var(--subtle-fg);
 }
 
-.dt-row:nth-child(even) {
-    background: var(--bg-light, #f9fafb);
+html[data-swift-themed] .dt-row:hover .dt-cell,
+html[data-swift-themed] .dt-cell--highlight {
+    background: var(--swift-accent-soft) !important;
+    color: var(--text-color) !important;
 }
 
-.dt-row:hover {
-    background: var(--accent-light, rgba(11, 132, 243, 0.05));
+html[data-swift-themed] .dt-cell--focus {
+    box-shadow: inset 0 0 0 2px var(--swift-accent);
 }
 
-.report-summary {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
+html[data-swift-themed] .dt-toast,
+html[data-swift-themed] .dt-paste-target {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+html[data-swift-themed] .dt-scrollable::-webkit-scrollbar-thumb {
+    background: var(--swift-accent-soft);
+}
+
+/* ---------------- Kanban ---------------- */
+html[data-swift-themed] .kanban-board {
+    background: var(--bg-color);
     padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-radius: var(--swift-radius, 12px);
 }
 
-/* ============================================
-   KANBAN VIEW - Premium Styling
-   ============================================ */
-.kanban-board {
-    background: var(--bg-body, #f8fafc);
-    padding: 16px;
-    border-radius: 12px;
-}
-
-.kanban-column {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+html[data-swift-themed] .kanban-column {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 12px);
+    box-shadow: var(--swift-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
     margin: 8px;
     overflow: hidden;
 }
 
-.kanban-column-title {
-    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
-    color: #fff;
-    padding: 12px 16px;
-    font-weight: 700;
-    border-radius: 12px 12px 0 0;
+html[data-swift-themed] .kanban-column-title {
+    background: linear-gradient(90deg, var(--swift-accent), transparent);
+    color: var(--swift-accent-fg);
+    padding: 11px 15px;
+    font-weight: 650;
 }
 
-.kanban-card {
-    background: #fff;
-    border-radius: 8px;
+html[data-swift-themed] .kanban-card {
+    background: var(--subtle-fg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
     padding: 12px;
     margin: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
-    border: 1px solid var(--border-color, #e2e8f0);
 }
 
-.kanban-card:hover {
+html[data-swift-themed] .kanban-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    box-shadow: var(--swift-shadow-md, 0 6px 16px rgba(0, 0, 0, 0.14));
+    border-color: var(--swift-accent);
 }
 
-.kanban-card-doc {
+html[data-swift-themed] .kanban-card-doc {
     font-weight: 600;
-    color: var(--text-color, #1e293b);
+    color: var(--text-color);
 }
 
-/* Drag preview */
-.kanban-card.dragging {
-    opacity: 0.5;
-    transform: rotate(3deg);
+html[data-swift-themed] .kanban-card.dragging {
+    opacity: 0.55;
+    transform: rotate(2deg);
 }
 
-/* ============================================
-   DASHBOARD VIEW - Premium Styling
-   ============================================ */
-.widget {
-    background: var(--card-bg, #fff);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    border: 1px solid var(--border-color, #e2e8f0);
+/* ---------------- Dashboards ---------------- */
+html[data-swift-themed] .widget,
+html[data-swift-themed] .dashboard-section .frappe-card {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 12px);
+    box-shadow: var(--swift-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
     overflow: hidden;
 }
 
-.widget-title {
-    background: linear-gradient(90deg, var(--accent-color, #0b84f3), transparent);
-    color: #fff;
-    padding: 12px 16px;
-    font-weight: 700;
-    border-radius: 12px 12px 0 0;
+html[data-swift-themed] .widget .widget-head,
+html[data-swift-themed] .widget-title {
+    color: var(--heading-color, var(--text-color));
+    font-weight: 650;
 }
 
-.number-card {
-    background: linear-gradient(135deg, var(--accent-color, #0b84f3), var(--accent-dark, #096fc9));
-    color: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 16px rgba(11, 132, 243, 0.3);
+/* The title bar used to be an accent gradient with white text, which vanished
+   on light presets. A hairline keeps it legible in every theme. */
+html[data-swift-themed] .widget .widget-head {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--subtle-fg);
 }
 
-.number-card .number {
-    font-size: 32px;
-    font-weight: 700;
+html[data-swift-themed] .widget .widget-subtitle,
+html[data-swift-themed] .widget .widget-footer,
+html[data-swift-themed] .dashboard-section .text-muted {
+    color: var(--text-muted) !important;
 }
 
-.chart-container {
-    background: #fff;
-    border-radius: 12px;
-    padding: 16px;
+html[data-swift-themed] .number-card,
+html[data-swift-themed] .number-widget-box {
+    background: linear-gradient(135deg, var(--swift-accent), var(--swift-accent-hover));
+    color: var(--swift-accent-fg);
+    border: none;
+    border-radius: var(--swift-radius, 12px);
+    padding: 18px;
+    box-shadow: 0 8px 22px -10px var(--swift-accent);
 }
 
-.dashboard-graph svg {
-    stroke: var(--accent-color, #0b84f3) !important;
-    stroke-width: 2;
+html[data-swift-themed] .number-card .number,
+html[data-swift-themed] .number-widget-box .widget-title,
+html[data-swift-themed] .number-widget-box .number {
+    color: var(--swift-accent-fg) !important;
 }
 
-/* ============================================
-   PERFORMANCE MODE - Disable Animations
-   ============================================ */
-html[data-swift-performance="1"] * {
-    transition: none !important;
+html[data-swift-themed] .number-card .card-label,
+html[data-swift-themed] .number-widget-box .card-label {
+    color: var(--swift-accent-fg) !important;
+    opacity: 0.82;
+}
+
+html[data-swift-themed] .chart-container,
+html[data-swift-themed] .chart-wrapper {
+    background: var(--card-bg);
+    border-radius: var(--swift-radius, 12px);
+    padding: 14px;
+}
+
+/* Frappe Charts render inline SVG with its own defaults */
+html[data-swift-themed] .frappe-chart .chart-label,
+html[data-swift-themed] .frappe-chart text,
+html[data-swift-themed] .graph-svg-tip ~ * text {
+    fill: var(--text-muted) !important;
+}
+
+html[data-swift-themed] .frappe-chart .axis line,
+html[data-swift-themed] .frappe-chart .chart-vertical-bar line,
+html[data-swift-themed] .frappe-chart .y-axis-guide {
+    stroke: var(--border-color) !important;
+}
+
+html[data-swift-themed] .graph-svg-tip {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color);
+}
+
+html[data-swift-themed] .graph-svg-tip .svg-pointer {
+    fill: var(--card-bg) !important;
+    stroke: var(--border-color);
+}
+
+/* ---------------- Navbar ---------------- */
+html[data-swift-themed] .navbar {
+    background: var(--navbar-bg, var(--card-bg)) !important;
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+}
+
+html[data-swift-themed] .navbar .navbar-brand,
+html[data-swift-themed] .navbar .nav-link,
+html[data-swift-themed] .navbar .dropdown-toggle {
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .navbar .nav-link:hover,
+html[data-swift-themed] .navbar .dropdown-toggle:hover {
+    color: var(--swift-accent);
+}
+
+html[data-swift-themed] .navbar .navbar-icon-container .navbar-badge,
+html[data-swift-themed] .navbar .badge {
+    background: var(--swift-accent);
+    color: var(--swift-accent-fg);
+}
+
+html[data-swift-themed] .navbar .dropdown-menu,
+html[data-swift-themed] .navbar .search-bar .awesomplete ul {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--swift-shadow-md, 0 12px 30px rgba(0, 0, 0, 0.2));
+}
+
+html[data-swift-themed] .navbar .dropdown-item {
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .navbar .dropdown-item:hover,
+html[data-swift-themed] .navbar .dropdown-item:focus {
+    background: var(--swift-accent-soft);
+    color: var(--swift-accent);
+}
+
+html[data-swift-themed] .navbar #navbar-search,
+html[data-swift-themed] .navbar .search-bar input {
+    background: var(--control-bg, var(--subtle-fg));
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+/* ---------------- Buttons and links ---------------- */
+html[data-swift-themed] .btn-primary {
+    background: linear-gradient(135deg, var(--swift-accent), var(--swift-accent-hover));
+    border-color: transparent;
+    color: var(--swift-accent-fg);
+}
+
+html[data-swift-themed] .btn-primary:hover,
+html[data-swift-themed] .btn-primary:focus {
+    filter: saturate(1.08) brightness(1.04);
+    color: var(--swift-accent-fg);
+}
+
+html[data-swift-themed] a:not(.btn):not(.nav-link) {
+    color: var(--swift-accent);
+}
+
+/* ---------------- Performance mode ----------------
+   boot.js writes data-swift-perf="on"; the rule here used to key off
+   data-swift-performance="1", which nothing ever set. */
+html[data-swift-perf="off"] *,
+html[data-swift-anim="off"] * {
     animation: none !important;
+    transition: none !important;
+}
+
+html[data-swift-anim="off"] body::before {
+    animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-swift-themed] body::before {
+        animation: none !important;
+    }
 }
 
 /* ============================================

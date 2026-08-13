@@ -126,6 +126,19 @@ check("--swift-accent aliased to primary",
 check("data-swift-themed still set for custom mode",
     html.getAttribute("data-swift-themed") !== null);
 
+console.log("\n== 3b. Custom mode must still supply on-accent text + background wash ==");
+check("--swift-accent-fg computed for contrast",
+    html.style.getPropertyValue("--swift-accent-fg") === "#ffffff",
+    html.style.getPropertyValue("--swift-accent-fg"));
+check("--swift-ambient set (animated background needs it)",
+    (html.style.getPropertyValue("--swift-ambient") || "").indexOf("radial-gradient") === 0,
+    html.style.getPropertyValue("--swift-ambient"));
+
+API.applyPrefs({ preset: null, primary: "#FFE066", secondary: "#FFD43B", theme_css: null });
+check("light custom colour gets dark on-accent text",
+    html.style.getPropertyValue("--swift-accent-fg") === "#0b0d12",
+    html.style.getPropertyValue("--swift-accent-fg"));
+
 console.log("\n== 4. Back to a preset: inline vars must not shadow the stylesheet ==");
 API.applyPrefs({
     preset: "swift-blue", primary: "#0b84f3", secondary: "#0056b3",
@@ -135,6 +148,10 @@ check("inline --swift-primary cleared",
     html.style.getPropertyValue("--swift-primary") === undefined);
 check("inline --swift-accent cleared",
     html.style.getPropertyValue("--swift-accent") === undefined);
+check("inline --swift-accent-fg cleared (preset file owns it)",
+    html.style.getPropertyValue("--swift-accent-fg") === undefined);
+check("inline --swift-ambient cleared",
+    html.style.getPropertyValue("--swift-ambient") === undefined);
 check("stylesheet back", themeLink() && themeLink().getAttribute("href").endsWith("swift-blue.css"));
 
 console.log("\n== 5. Persistence for the next page load (no flash) ==");
