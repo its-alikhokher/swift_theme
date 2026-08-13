@@ -695,6 +695,69 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         # Text sitting on the accent must use the computed on-accent colour.
         self.assertIn("--swift-accent-fg", css)
 
+    def test_gradients_use_both_of_the_users_colours(self):
+        """A user picks a pair; both should be visible, not just the first.
+
+        These surfaces previously faded primary into a shade of itself, so a
+        chosen secondary colour never appeared anywhere on the desk.
+        """
+        css = read_css("swift-desk.css")
+        for marker in (".widget .widget-head", ".number-card", ".dt-header",
+                       ".kanban-column-title", ".btn-primary"):
+            self.assertIn(marker, css, f"{marker} has no themed rule")
+        self.assertIn("--swift-secondary", css,
+                      "no surface uses the second colour of the pair")
+
+    def test_charts_are_repointed_at_the_theme(self):
+        """frappe-charts hardcodes a light palette on :root.
+
+        Without overriding its own variables the chart stays a white slab with
+        near-black labels on every dark theme.
+        """
+        css = read_css("swift-desk.css")
+        for var in ("--charts-tooltip-bg", "--charts-label-color",
+                    "--charts-axis-line-color", "--charts-legend-label"):
+            self.assertIn(var, css, f"{var} is left at the frappe-charts default")
+
+    def test_desk_containers_do_not_trap_fixed_positioned_children(self):
+        """Child tables broke on this.
+
+        Frappe opens a grid row as .form-in-grid { position: fixed } behind a
+        z-index 1040 backdrop. Lifting desk containers with
+        `position: relative; z-index: <n>` makes them a stacking context, which
+        caps that panel underneath the backdrop — the row opens but is hidden.
+        The ambient wash must therefore paint behind (negative z-index) rather
+        than push content in front.
+        """
+        base = read_css("swift-preset-base.css")
+
+        # The wash sits behind everything instead of lifting the desk.
+        self.assertRegex(base, r"body::before\s*\{[^}]*z-index:\s*-1")
+
+        containers = (".layout-main", ".desk-body >", ".layout-main-section-wrapper",
+                      ".page-container", ".main-section")
+        for block in re.findall(r"\{[^{}]*\}", base):
+            if "z-index" not in block or "position" not in block:
+                continue
+            if re.search(r"z-index:\s*-", block):
+                continue
+            start = base.rfind("}", 0, base.index(block))
+            selector = base[start + 1: base.index(block)]
+            for name in containers:
+                self.assertNotIn(
+                    name, selector,
+                    f"{name} is given a stacking context, which traps the "
+                    "position:fixed child-table editor under the backdrop",
+                )
+
+    def test_child_table_grid_is_themed(self):
+        css = read_css("swift-desk.css")
+        for selector in (".form-grid", ".grid-heading-row", ".grid-row",
+                         ".btn-open-row", ".grid-row-open", ".form-in-grid"):
+            self.assertIn(selector, css, f"{selector} has no themed rule")
+        # The open row has to look selected, not just be open.
+        self.assertRegex(css, r"grid-row-open[^{]*\{[^}]*box-shadow")
+
     def test_navbar_follows_the_theme(self):
         css = read_css("swift-desk.css")
         self.assertIn("html[data-swift-themed] .navbar", css)

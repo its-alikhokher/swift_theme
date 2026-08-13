@@ -179,11 +179,16 @@ html[data-swift-themed] .desk-sidebar-item:hover {
 }
 
 html[data-swift-themed] .standard-sidebar-item.selected,
-html[data-swift-themed] .desk-sidebar-item.selected {
-    background: linear-gradient(90deg, var(--swift-accent-soft), transparent) !important;
+html[data-swift-themed] .desk-sidebar-item.selected,
+html[data-swift-themed] .sidebar-item.selected {
+    background: linear-gradient(100deg,
+        color-mix(in oklab, var(--swift-primary, var(--swift-accent)) 22%, transparent),
+        color-mix(in oklab, var(--swift-secondary, var(--swift-accent-hover)) 14%, transparent) 70%,
+        transparent) !important;
     color: var(--swift-accent) !important;
     font-weight: 600;
-    box-shadow: inset 2px 0 0 0 var(--swift-accent);
+    /* The rail picks up both colours so the pair reads as one identity */
+    box-shadow: inset 3px 0 0 0 var(--swift-primary, var(--swift-accent));
 }
 
 html[data-swift-themed] .standard-sidebar-item.selected a,
@@ -271,7 +276,9 @@ html[data-swift-themed] .datatable {
 
 html[data-swift-themed] .dt-header,
 html[data-swift-themed] .dt-row-header {
-    background: linear-gradient(90deg, var(--swift-accent), var(--swift-accent-hover)) !important;
+    background: linear-gradient(100deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover))) !important;
     color: var(--swift-accent-fg) !important;
     border: none;
 }
@@ -340,7 +347,10 @@ html[data-swift-themed] .kanban-column {
 }
 
 html[data-swift-themed] .kanban-column-title {
-    background: linear-gradient(90deg, var(--swift-accent), transparent);
+    background: linear-gradient(100deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)) 65%,
+        transparent);
     color: var(--swift-accent-fg);
     padding: 11px 15px;
     font-weight: 650;
@@ -383,18 +393,34 @@ html[data-swift-themed] .dashboard-section .frappe-card {
     overflow: hidden;
 }
 
+/* The header pill keeps its gradient — it just uses BOTH of the theme's
+   colours now instead of a hardcoded blue that ignored the theme. */
 html[data-swift-themed] .widget .widget-head,
-html[data-swift-themed] .widget-title {
-    color: var(--heading-color, var(--text-color));
+html[data-swift-themed] .widget-title,
+html[data-swift-themed] .widget-group-head {
+    background: linear-gradient(100deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)) 62%,
+        transparent);
+    color: var(--swift-accent-fg) !important;
+    padding: 10px 16px;
     font-weight: 650;
+    border-radius: var(--swift-radius, 12px) var(--swift-radius, 12px) 0 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* The title bar used to be an accent gradient with white text, which vanished
-   on light presets. A hairline keeps it legible in every theme. */
-html[data-swift-themed] .widget .widget-head {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--subtle-fg);
+html[data-swift-themed] .widget .widget-head *,
+html[data-swift-themed] .widget .widget-head .widget-title,
+html[data-swift-themed] .widget .widget-head .drag-handle {
+    color: var(--swift-accent-fg) !important;
+}
+
+/* Only the label carries the gradient; the action icons stay on the card */
+html[data-swift-themed] .widget .widget-head .widget-control svg,
+html[data-swift-themed] .widget .widget-head .dropdown-btn {
+    color: var(--swift-accent-fg) !important;
+    fill: currentColor;
+    opacity: 0.85;
 }
 
 html[data-swift-themed] .widget .widget-subtitle,
@@ -405,12 +431,14 @@ html[data-swift-themed] .dashboard-section .text-muted {
 
 html[data-swift-themed] .number-card,
 html[data-swift-themed] .number-widget-box {
-    background: linear-gradient(135deg, var(--swift-accent), var(--swift-accent-hover));
+    background: linear-gradient(135deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)));
     color: var(--swift-accent-fg);
     border: none;
     border-radius: var(--swift-radius, 12px);
     padding: 18px;
-    box-shadow: 0 8px 22px -10px var(--swift-accent);
+    box-shadow: 0 10px 26px -12px var(--swift-primary, var(--swift-accent));
 }
 
 html[data-swift-themed] .number-card .number,
@@ -425,23 +453,44 @@ html[data-swift-themed] .number-widget-box .card-label {
     opacity: 0.82;
 }
 
-html[data-swift-themed] .chart-container,
-html[data-swift-themed] .chart-wrapper {
-    background: var(--card-bg);
-    border-radius: var(--swift-radius, 12px);
-    padding: 14px;
+/* ---- Charts ----
+   frappe-charts hardcodes a light palette on :root (white tooltip, near-black
+   labels, near-white axis lines), which is why the chart stayed a white slab
+   on dark themes. Re-point its own variables at the theme. */
+html[data-swift-themed] {
+    --charts-label-color: var(--text-muted);
+    --charts-axis-line-color: var(--border-color);
+    --charts-tooltip-title: var(--text-muted);
+    --charts-tooltip-label: var(--text-muted);
+    --charts-tooltip-value: var(--text-color);
+    --charts-tooltip-bg: var(--card-bg);
+    --charts-dataset-circle-stroke: var(--card-bg);
+    --charts-legend-label: var(--text-muted);
+    --charts-legend-value: var(--text-color);
 }
 
-/* Frappe Charts render inline SVG with its own defaults */
+html[data-swift-themed] .chart-container,
+html[data-swift-themed] .chart-wrapper,
+html[data-swift-themed] .widget.chart-widget .widget-body,
+html[data-swift-themed] .frappe-chart {
+    background: var(--card-bg) !important;
+    border-radius: 0 0 var(--swift-radius, 12px) var(--swift-radius, 12px);
+}
+
+html[data-swift-themed] .chart-container {
+    padding: 12px;
+}
+
 html[data-swift-themed] .frappe-chart .chart-label,
 html[data-swift-themed] .frappe-chart text,
-html[data-swift-themed] .graph-svg-tip ~ * text {
+html[data-swift-themed] .chart-container text {
     fill: var(--text-muted) !important;
 }
 
 html[data-swift-themed] .frappe-chart .axis line,
-html[data-swift-themed] .frappe-chart .chart-vertical-bar line,
-html[data-swift-themed] .frappe-chart .y-axis-guide {
+html[data-swift-themed] .chart-container .axis line,
+html[data-swift-themed] .frappe-chart .y-axis-guide,
+html[data-swift-themed] .chart-container .y-axis-guide {
     stroke: var(--border-color) !important;
 }
 
@@ -449,11 +498,39 @@ html[data-swift-themed] .graph-svg-tip {
     background: var(--card-bg) !important;
     color: var(--text-color) !important;
     border: 1px solid var(--border-color);
+    border-radius: 9px;
 }
 
 html[data-swift-themed] .graph-svg-tip .svg-pointer {
     fill: var(--card-bg) !important;
     stroke: var(--border-color);
+}
+
+html[data-swift-themed] .graph-svg-tip .title,
+html[data-swift-themed] .graph-svg-tip .data-point-list li {
+    color: var(--text-color) !important;
+}
+
+/* Shortcut / link cards on a workspace */
+html[data-swift-themed] .widget.shortcut-widget-box,
+html[data-swift-themed] .widget.links-widget-box {
+    background: var(--card-bg);
+}
+
+html[data-swift-themed] .widget.shortcut-widget-box:hover {
+    border-color: var(--swift-accent);
+    box-shadow: 0 6px 18px -8px var(--swift-primary, var(--swift-accent));
+}
+
+html[data-swift-themed] .link-item,
+html[data-swift-themed] .widget .link-item a {
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .link-item:hover,
+html[data-swift-themed] .widget .link-item a:hover {
+    color: var(--swift-accent);
+    background: var(--swift-accent-soft);
 }
 
 /* ---------------- Navbar ---------------- */
@@ -507,7 +584,9 @@ html[data-swift-themed] .navbar .search-bar input {
 
 /* ---------------- Buttons and links ---------------- */
 html[data-swift-themed] .btn-primary {
-    background: linear-gradient(135deg, var(--swift-accent), var(--swift-accent-hover));
+    background: linear-gradient(135deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)));
     border-color: transparent;
     color: var(--swift-accent-fg);
 }
@@ -843,4 +922,125 @@ html[data-swift-anim="off"] body::before {
     height: 8px;
     margin-top: 14px;
     border-radius: 999px;
+}
+
+/* ============================================
+   CHILD TABLES (GRID)
+
+   Opening a row renders .form-in-grid as position:fixed behind a z-index 1040
+   backdrop. Nothing here may create a stacking context around it — see the
+   note on body::before in swift-preset-base.css for the bug that caused.
+   ============================================ */
+
+html[data-swift-themed] .form-grid {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 10px);
+}
+
+html[data-swift-themed] .grid-heading-row {
+    background: var(--subtle-fg);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+html[data-swift-themed] .grid-row {
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .grid-row:hover {
+    background: var(--swift-accent-soft);
+}
+
+html[data-swift-themed] .grid-static-col,
+html[data-swift-themed] .grid-row .col {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+html[data-swift-themed] .grid-row-check,
+html[data-swift-themed] .grid-row input[type="checkbox"] {
+    accent-color: var(--swift-accent);
+}
+
+/* The pencil — visible enough to find, quiet enough not to shout */
+html[data-swift-themed] .btn-open-row {
+    color: var(--text-muted);
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+html[data-swift-themed] .btn-open-row:hover,
+html[data-swift-themed] .grid-row:hover .btn-open-row {
+    color: var(--swift-accent);
+    background: var(--swift-accent-soft);
+}
+
+html[data-swift-themed] .btn-open-row svg,
+html[data-swift-themed] .btn-open-row .icon {
+    stroke: currentColor;
+    fill: none;
+}
+
+/* The row currently being edited, so it reads as selected */
+html[data-swift-themed] .grid-row-open > .data-row,
+html[data-swift-themed] .grid-row.grid-row-open {
+    background: var(--swift-accent-soft);
+    box-shadow: inset 3px 0 0 0 var(--swift-primary, var(--swift-accent));
+}
+
+/* The floating editor panel itself */
+html[data-swift-themed] .grid-row-open .form-in-grid {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--swift-radius, 12px);
+    box-shadow: 0 26px 60px -20px rgba(0, 0, 0, 0.55);
+}
+
+html[data-swift-themed] .grid-row-open .form-in-grid .form-tabs-list {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+html[data-swift-themed] .grid-row-open .form-in-grid .nav-link {
+    color: var(--text-muted);
+}
+
+html[data-swift-themed] .grid-row-open .form-in-grid .nav-link.active {
+    color: var(--swift-accent);
+    border-bottom-color: var(--swift-accent);
+}
+
+html[data-swift-themed] .grid-form-body,
+html[data-swift-themed] .grid-form-body .form-section {
+    background: var(--card-bg);
+    border: none;
+}
+
+html[data-swift-themed] .grid-footer,
+html[data-swift-themed] .grid-buttons {
+    background: var(--subtle-fg);
+    border-top: 1px solid var(--border-color);
+}
+
+html[data-swift-themed] .grid-empty {
+    color: var(--text-muted);
+    background: transparent;
+}
+
+/* Inline-editable cell being typed into */
+html[data-swift-themed] .editable-row .field-area input,
+html[data-swift-themed] .grid-row .form-control {
+    background: var(--control-bg, var(--subtle-fg));
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+html[data-swift-themed] .editable-row .field-area input:focus,
+html[data-swift-themed] .grid-row .form-control:focus {
+    border-color: var(--swift-accent);
+    box-shadow: 0 0 0 2px var(--swift-accent-soft);
 }
