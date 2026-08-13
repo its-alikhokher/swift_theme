@@ -140,8 +140,12 @@ html[data-swift-themed] .btn-primary:hover::after {
   transform: translateX(120%);
 }
 
-/* Theme cross-fade — smooth transition when user switches theme */
-html[data-swift-theme] * {
+/* Theme cross-fade — smooth transition when the user switches theme.
+   The selector was [data-swift-theme]; the attribute we actually set is
+   data-swift-themed, so this never applied. Opening a child-table row is
+   excluded, otherwise the editor and its backdrop fade in slowly and the
+   whole screen looks like it is dissolving. */
+html[data-swift-themed] *:not(#freeze):not(.form-in-grid):not(.form-in-grid *) {
   transition:
     background-color 220ms ease,
     color 220ms ease,
