@@ -4,168 +4,246 @@ import frappe
 from frappe.model.document import Document
 
 
+# Each preset is a set of roles, not one colour with shades derived from it.
+# A single hue applied to every surface is what made every theme read as one
+# flat tint. Light and dark follow different rules — see REQUIREMENT.md §2.1:
+# in dark, `surface` must be lighter than `canvas`, because elevation there
+# comes from light rather than shadow.
+#
+# Regenerate the stylesheets after editing:
+#     python3 swift_theme/scripts/generate_theme_css.py
 PREMIUM_THEMES = {
     "Swift Blue": {
-        "value": "swift-blue",
+        "slug": "swift-blue",
         "mode": "light",
-        "colors": {
+        "roles": {
+            "canvas": "#f5f7fa",
+            "surface": "#ffffff",
+            "surface_alt": "#f0f8fe",
+            "on_canvas": "#1e293b",
+            "on_surface": "#1e293b",
+            "muted": "#64748b",
+            "border": "rgba(30, 41, 59, 0.12)",
             "primary": "#0b84f3",
             "secondary": "#0056b3",
-            "accent": "#3b82f6",
-            "bg_body": "#f5f7fa",
-            "bg_card": "#ffffff",
-            "text_main": "#1e293b",
-            "text_muted": "#64748b"
-        }
+            "tint": "#3b82f6",
+            "on_primary": "#0b0d12",
+        },
     },
     "Midnight Pro": {
-        "value": "midnight-pro",
+        "slug": "midnight-pro",
         "mode": "dark",
-        "colors": {
-            "primary": "#6366f1",
+        "roles": {
+            "canvas": "#0f172a",
+            "surface": "#1e293b",
+            "surface_alt": "#222d46",
+            "on_canvas": "#f1f5f9",
+            "on_surface": "#f1f5f9",
+            "muted": "#94a3b8",
+            "border": "rgba(241, 245, 249, 0.16)",
+            # Nudged from #6366f1, which put white button text at 4.47:1 —
+            # just under WCAG AA. This clears it at 4.79:1.
+            "primary": "#5f62e7",
             "secondary": "#4f46e5",
-            "accent": "#818cf8",
-            "bg_body": "#0f172a",
-            "bg_card": "#1e293b",
-            "text_main": "#f1f5f9",
-            "text_muted": "#94a3b8"
-        }
+            "tint": "#818cf8",
+            "on_primary": "#ffffff",
+        },
     },
     "Emerald Luxury": {
-        "value": "emerald-luxury",
+        "slug": "emerald-luxury",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#022c22",
+            "surface": "#064e3b",
+            "surface_alt": "#07543f",
+            "on_canvas": "#ecfdf5",
+            "on_surface": "#ecfdf5",
+            "muted": "#6ee7b7",
+            "border": "rgba(236, 253, 245, 0.16)",
             "primary": "#10b981",
             "secondary": "#059669",
-            "accent": "#34d399",
-            "bg_body": "#022c22",
-            "bg_card": "#064e3b",
-            "text_main": "#ecfdf5",
-            "text_muted": "#6ee7b7"
-        }
+            "tint": "#34d399",
+            "on_primary": "#0b0d12",
+        },
     },
     "Rose Gold": {
-        "value": "rose-gold",
+        "slug": "rose-gold",
         "mode": "light",
-        "colors": {
+        "roles": {
+            "canvas": "#fff1f2",
+            "surface": "#ffffff",
+            "surface_alt": "#fff6f8",
+            "on_canvas": "#881337",
+            "on_surface": "#881337",
+            "muted": "#be123c",
+            "border": "rgba(136, 19, 55, 0.12)",
             "primary": "#fb7185",
             "secondary": "#e11d48",
-            "accent": "#fda4af",
-            "bg_body": "#fff1f2",
-            "bg_card": "#ffffff",
-            "text_main": "#881337",
-            "text_muted": "#be123c"
-        }
+            "tint": "#fda4af",
+            "on_primary": "#0b0d12",
+        },
     },
     "Sapphire Elite": {
-        "value": "sapphire-elite",
+        "slug": "sapphire-elite",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#172554",
+            "surface": "#1e3a8a",
+            "surface_alt": "#203e90",
+            "on_canvas": "#dbeafe",
+            "on_surface": "#dbeafe",
+            "muted": "#93c5fd",
+            "border": "rgba(219, 234, 254, 0.16)",
             "primary": "#3b82f6",
             "secondary": "#2563eb",
-            "accent": "#60a5fa",
-            "bg_body": "#172554",
-            "bg_card": "#1e3a8a",
-            "text_main": "#dbeafe",
-            "text_muted": "#93c5fd"
-        }
+            "tint": "#60a5fa",
+            "on_primary": "#0b0d12",
+        },
     },
     "Golden Hour": {
-        "value": "golden-hour",
+        "slug": "golden-hour",
         "mode": "light",
-        "colors": {
+        "roles": {
+            "canvas": "#fffbeb",
+            "surface": "#ffffff",
+            "surface_alt": "#fef9f0",
+            "on_canvas": "#78350f",
+            "on_surface": "#78350f",
+            "muted": "#b45309",
+            "border": "rgba(120, 53, 15, 0.12)",
             "primary": "#f59e0b",
             "secondary": "#d97706",
-            "accent": "#fbbf24",
-            "bg_body": "#fffbeb",
-            "bg_card": "#ffffff",
-            "text_main": "#78350f",
-            "text_muted": "#b45309"
-        }
+            "tint": "#fbbf24",
+            "on_primary": "#0b0d12",
+        },
     },
     "Carbon Fiber": {
-        "value": "carbon-fiber",
+        "slug": "carbon-fiber",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#111827",
+            "surface": "#1f2937",
+            "surface_alt": "#26303e",
+            "on_canvas": "#f9fafb",
+            "on_surface": "#f9fafb",
+            "muted": "#9ca3af",
+            "border": "rgba(249, 250, 251, 0.16)",
             "primary": "#9ca3af",
             "secondary": "#6b7280",
-            "accent": "#d1d5db",
-            "bg_body": "#111827",
-            "bg_card": "#1f2937",
-            "text_main": "#f9fafb",
-            "text_muted": "#9ca3af"
-        }
+            "tint": "#d1d5db",
+            "on_primary": "#0b0d12",
+        },
     },
     "Pearl White": {
-        "value": "pearl-white",
+        "slug": "pearl-white",
         "mode": "light",
-        "colors": {
+        "roles": {
+            "canvas": "#f8fafc",
+            "surface": "#ffffff",
+            "surface_alt": "#f6f7f8",
+            "on_canvas": "#0f172a",
+            "on_surface": "#0f172a",
+            "muted": "#64748b",
+            "border": "rgba(15, 23, 42, 0.12)",
             "primary": "#64748b",
             "secondary": "#475569",
-            "accent": "#94a3b8",
-            "bg_body": "#f8fafc",
-            "bg_card": "#ffffff",
-            "text_main": "#0f172a",
-            "text_muted": "#64748b"
-        }
+            "tint": "#94a3b8",
+            "on_primary": "#ffffff",
+        },
     },
     "Royal Purple": {
-        "value": "royal-purple",
+        "slug": "royal-purple",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#2e1065",
+            "surface": "#4c1d95",
+            "surface_alt": "#52209b",
+            "on_canvas": "#f5f3ff",
+            "on_surface": "#f5f3ff",
+            "muted": "#d8b4fe",
+            "border": "rgba(245, 243, 255, 0.16)",
             "primary": "#a855f7",
             "secondary": "#9333ea",
-            "accent": "#c084fc",
-            "bg_body": "#2e1065",
-            "bg_card": "#4c1d95",
-            "text_main": "#f5f3ff",
-            "text_muted": "#d8b4fe"
-        }
+            "tint": "#c084fc",
+            "on_primary": "#0b0d12",
+        },
     },
     "Ocean Depth": {
-        "value": "ocean-depth",
+        "slug": "ocean-depth",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#164e63",
+            "surface": "#155e75",
+            "surface_alt": "#14637b",
+            "on_canvas": "#ecfeff",
+            "on_surface": "#ecfeff",
+            "muted": "#67e8f9",
+            "border": "rgba(236, 254, 255, 0.16)",
             "primary": "#06b6d4",
             "secondary": "#0891b2",
-            "accent": "#22d3ee",
-            "bg_body": "#164e63",
-            "bg_card": "#155e75",
-            "text_main": "#ecfeff",
-            "text_muted": "#67e8f9"
-        }
+            "tint": "#22d3ee",
+            "on_primary": "#0b0d12",
+        },
     },
     "Forest Mist": {
-        "value": "forest-mist",
+        "slug": "forest-mist",
         "mode": "light",
-        "colors": {
+        "roles": {
+            "canvas": "#f7fee7",
+            "surface": "#ffffff",
+            "surface_alt": "#f8fcf1",
+            "on_canvas": "#365314",
+            "on_surface": "#365314",
+            "muted": "#84cc16",
+            "border": "rgba(54, 83, 20, 0.12)",
             "primary": "#84cc16",
             "secondary": "#65a30d",
-            "accent": "#a3e635",
-            "bg_body": "#f7fee7",
-            "bg_card": "#ffffff",
-            "text_main": "#365314",
-            "text_muted": "#84cc16"
-        }
+            "tint": "#a3e635",
+            "on_primary": "#0b0d12",
+        },
     },
     "Crimson Red": {
-        "value": "crimson-red",
+        "slug": "crimson-red",
         "mode": "dark",
-        "colors": {
+        "roles": {
+            "canvas": "#450a0a",
+            "surface": "#7f1d1d",
+            "surface_alt": "#861f1f",
+            "on_canvas": "#fef2f2",
+            "on_surface": "#fef2f2",
+            "muted": "#fca5a5",
+            "border": "rgba(254, 242, 242, 0.16)",
             "primary": "#ef4444",
             "secondary": "#dc2626",
-            "accent": "#f87171",
-            "bg_body": "#450a0a",
-            "bg_card": "#7f1d1d",
-            "text_main": "#fef2f2",
-            "text_muted": "#fca5a5"
-        }
-    }
+            "tint": "#f87171",
+            "on_primary": "#0b0d12",
+        },
+    },
 }
 
-
-PRESET_SLUGS = {name: data["value"] for name, data in PREMIUM_THEMES.items()}
+PRESET_SLUGS = {name: data["slug"] for name, data in PREMIUM_THEMES.items()}
 DEFAULT_PRESET = "Swift Blue"
+
+
+def theme_colors(name):
+    """The flat colour shape the login page and its template consume.
+
+    Roles are the source of truth; this is only a view over them, so the two
+    can never disagree.
+    """
+    data = PREMIUM_THEMES.get(name) or PREMIUM_THEMES[DEFAULT_PRESET]
+    r = data["roles"]
+    return {
+        "primary": r["primary"],
+        "secondary": r["secondary"],
+        "accent": r["tint"],
+        "bg_body": r["canvas"],
+        "bg_card": r["surface"],
+        "text_main": r["on_surface"],
+        "text_muted": r["muted"],
+        "bg1": r["canvas"],
+        "bg2": r["surface"],
+    }
 
 
 def preset_stylesheet(slug):
@@ -337,12 +415,10 @@ def get_active_theme_config():
     else:
         preset_name = settings.active_preset or DEFAULT_PRESET
         theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES[DEFAULT_PRESET])
-        colors = dict(theme_data["colors"])
-        colors.setdefault("bg1", colors.get("bg_body"))
-        colors.setdefault("bg2", colors.get("bg_card"))
-        config["preset"] = theme_data["value"]
+        colors = theme_colors(preset_name)
+        config["preset"] = theme_data["slug"]
         config["preset_name"] = preset_name
-        config["theme_css"] = preset_stylesheet(theme_data["value"])
+        config["theme_css"] = preset_stylesheet(theme_data["slug"])
         config["theme"] = theme_data
         config["mode"] = theme_data["mode"]
         config["colors"] = colors
@@ -423,9 +499,9 @@ def get_premium_themes():
     for name, data in PREMIUM_THEMES.items():
         themes_list.append({
             "name": name,
-            "value": data["value"],
+            "value": data["slug"],
             "mode": data["mode"],
-            "colors": data["colors"]
+            "colors": theme_colors(name),
         })
     return {"themes": themes_list}
 

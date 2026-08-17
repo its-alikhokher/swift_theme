@@ -1,51 +1,49 @@
 /* Swift Theme — Swift Blue
-   Generated from PREMIUM_THEMES["Swift Blue"]. Loaded on its own; only the
-   selected preset's stylesheet is ever added to the page. */
+   Generated from PREMIUM_THEMES["Swift Blue"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
 
 html[data-swift-preset="swift-blue"] {
   color-scheme: light;
 
-  /* Brand */
+  /* Brand pair */
   --swift-primary:      #0b84f3;
   --swift-secondary:    #0056b3;
   --swift-primary-soft: rgba(11, 132, 243, 0.14);
 
-  /* Accent aliases — everything else in the app reads these */
+  /* Accent aliases — the rest of the app reads these */
   --swift-accent:       #0b84f3;
   --swift-accent-hover: #0970cf;
-  --swift-accent-fg:    #ffffff;
+  --swift-accent-fg:    #0b0d12;
   --swift-accent-soft:  rgba(11, 132, 243, 0.14);
   --swift-accent-tint:  #3b82f6;
 
-  /* Frappe surface variables */
+  /* Roles */
+  --swift-canvas:       #f5f7fa;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #f0f8fe;
+  --swift-on-canvas:    #1e293b;
+  --swift-on-surface:   #1e293b;
+
+  /* Mapped onto the variables Frappe itself paints with */
   --bg-color:            #f5f7fa;
   --fg-color:            #ffffff;
   --card-bg:             #ffffff;
   --subtle-fg:           #f0f8fe;
-  --subtle-accent:       #f8fbff;
-  --control-bg:          #f8fbff;
+  --subtle-accent:       #f5faff;
+  --control-bg:          #f5faff;
   --control-bg-on-gray:  #f0f8fe;
   --border-color:        rgba(30, 41, 59, 0.12);
   --text-color:          #1e293b;
   --text-muted:          #64748b;
   --text-light:          #64748b;
   --heading-color:       #1e293b;
-  --sidebar-bg:          #fafbfd;
+  --sidebar-bg:          #f0f8fe;
   --navbar-bg:           rgba(255, 255, 255, 0.82);
 
-  /* Ambient wash behind the desk */
+  /* Fallback wash for when no backdrop is selected */
   --swift-ambient:
     radial-gradient(1200px 600px at 8% -10%, rgba(11, 132, 243, 0.16), transparent 60%),
     radial-gradient(900px 500px at 100% 110%, rgba(0, 86, 179, 0.12), transparent 60%);
-}
-
-/* Buttons and links pick up the brand pair */
-html[data-swift-preset="swift-blue"] .btn-primary {
-  background: linear-gradient(135deg, #0b84f3, #0056b3);
-  border-color: transparent;
-  color: #ffffff;
-}
-
-html[data-swift-preset="swift-blue"] .btn-primary:hover {
-  background: linear-gradient(135deg, #0970cf, #0b84f3);
 }

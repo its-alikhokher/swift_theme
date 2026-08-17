@@ -139,6 +139,12 @@ check("light custom colour gets dark on-accent text",
     html.style.getPropertyValue("--swift-accent-fg") === "#0b0d12",
     html.style.getPropertyValue("--swift-accent-fg"));
 
+// Gold sits at luminance .43 — a .45 threshold picked white, at 2.2:1.
+API.applyPrefs({ preset: null, primary: "#e0a422", secondary: "#c2a878", theme_css: null });
+check("mid-tone gold gets dark text, not white",
+    html.style.getPropertyValue("--swift-accent-fg") === "#0b0d12",
+    html.style.getPropertyValue("--swift-accent-fg"));
+
 console.log("\n== 4. Back to a preset: inline vars must not shadow the stylesheet ==");
 API.applyPrefs({
     preset: "swift-blue", primary: "#0b84f3", secondary: "#0056b3",
