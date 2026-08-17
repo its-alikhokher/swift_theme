@@ -32,12 +32,9 @@ html[data-swift-themed] body::before {
   pointer-events: none;
   background: var(--swift-ambient, none), var(--bg-color);
   background-attachment: fixed;
-  animation: swift-ambient-drift 24s ease-in-out infinite alternate;
-}
-
-@keyframes swift-ambient-drift {
-  0%   { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(-2%, -1%, 0) scale(1.04); }
+  /* Still by default. Motion belongs to whichever backdrop asks for it in
+     swift-backdrops.css; animating here as well meant a static backdrop such
+     as Mesh or Grain inherited a drift it never asked for. */
 }
 
 /* Sidebar hairline glow line at accent color — high-end SaaS touch */
@@ -237,12 +234,11 @@ html[data-swift-themed] .number-card .widget-body .number {
 }
 
 /* Multi-color number card cycle (theme mode) — richer, glowing */
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+1) .widget-body .number { background: linear-gradient(135deg,#a78bfa,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+2) .widget-body .number { background: linear-gradient(135deg,#34d399,#059669); -webkit-background-clip:text; background-clip:text; color:transparent; }
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+3) .widget-body .number { background: linear-gradient(135deg,#fbbf24,#d97706); -webkit-background-clip:text; background-clip:text; color:transparent; }
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+4) .widget-body .number { background: linear-gradient(135deg,#f472b6,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; }
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+5) .widget-body .number { background: linear-gradient(135deg,#38bdf8,#0284c7); -webkit-background-clip:text; background-clip:text; color:transparent; }
-html[data-swift-themed] .widget-group .widget.number-card:nth-child(6n+6) .widget-body .number { background: linear-gradient(135deg,#f87171,#dc2626); -webkit-background-clip:text; background-clip:text; color:transparent; }
+/* Number-card figures used to cycle through six hardcoded gradients here —
+   violet, green, amber, pink, sky, red — regardless of the active theme. That
+   contradicts the whole point of a palette, and it now sits on top of a card
+   that swift-desk.css already fills with the theme's own pair, so the text
+   fought its own background. The card styling there covers this. */
 
 /* ========================================================================
    Full-theme scoped: List / Report / Kanban premium look

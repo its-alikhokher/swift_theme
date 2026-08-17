@@ -9,6 +9,7 @@
         primary:      "swift_primary",
         secondary:    "swift_secondary",
         themeCss:     "swift_theme_css",
+        backdrop:     "swift_backdrop",
         density:      "swift_density",
         radius:       "swift_radius",
         font_family:  "swift_font_family",
@@ -45,6 +46,7 @@
         primary: get("primary") || "",
         secondary: get("secondary") || "",
         theme_css: get("themeCss") || "",
+        backdrop: get("backdrop") || "",
     });
     applyAttr("density",          get("density")     || "");
     applyAttr("radius",           get("radius")      || "");
@@ -71,6 +73,8 @@
         var secondary = c.secondary || "";
 
         applyAttr("preset", preset);
+        // The colour field behind the desk. Blank leaves the fallback wash.
+        applyAttr("backdrop", c.backdrop || "");
         // Marks "a Swift colour scheme is active" for the shared desk styling,
         // whichever of the two modes produced it.
         if (preset || primary) html.setAttribute("data-swift-themed", "");
@@ -94,6 +98,7 @@
         set("primary", primary);
         set("secondary", secondary);
         set("themeCss", (preset && c.theme_css) || "");
+        set("backdrop", c.backdrop || "");
     }
 
     // One <link> that is retargeted, so switching presets never stacks
@@ -261,6 +266,7 @@
                     primary: p.primary,
                     secondary: p.secondary,
                     theme_css: p.theme_css,
+                    backdrop: p.backdrop,
                     roles: p.roles,
                     mode: p.custom_mode,
                     strength: p.custom_strength,
@@ -290,11 +296,13 @@
             }
             if (!chosen) return;
 
+            var boot = (window.frappe && frappe.boot && frappe.boot.swift_theme) || {};
             applyColors({
                 preset: chosen.key,
                 primary: chosen.primary,
                 secondary: chosen.secondary,
                 theme_css: chosen.css,
+                backdrop: boot.backdrop_pinned ? boot.backdrop : chosen.backdrop,
             });
 
             // Keep Frappe's own Light/Dark in step with the preset's brightness.
@@ -393,6 +401,7 @@
                 sidebar_variant: boot.sidebar_variant,
                 pin_behavior: boot.pin_behavior,
                 roles: boot.roles,
+                backdrop: boot.backdrop,
                 custom_mode: boot.custom_mode,
                 custom_strength: boot.custom_strength,
                 enable_perf_mode: boot.enable_perf_mode,
