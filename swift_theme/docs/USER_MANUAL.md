@@ -14,23 +14,29 @@ bench build --app swift_theme
 
 1. **Login** with your credentials
 2. Go to **Swift Theme Settings** from the search bar
-3. Select a **Preset Theme** or use **Gradient Mode**
+3. Pick a **Theme Preset**, or choose **Custom Colors**
 
 ### 3. Color Modes
 
-#### Preset Mode (Recommended)
-- Choose from 12 premium themes
-- Auto dark/light mode detection
-- Complete color palette included
+#### Theme Preset (Recommended)
+- 12 presets named after Marvel characters — six light, six dark
+- Each is a hand-tuned palette, not one colour tinting everything: the page,
+  the cards and the accents are set separately
+- Only the selected preset's stylesheet is loaded
 
-#### Gradient Mode
-- Select 2 colors (Start + End)
-- System auto-detects if gradient is dark or light
-- Applies to all views automatically
+#### Custom Colors
+- Pick a **Primary** and a **Secondary** colour
+- Choose **Custom Mode** — Light or Dark. Two hex codes cannot say which you
+  want, and it used to be locked to dark
+- Choose **Colour Strength** — *Subtle* keeps the cards neutral and puts the
+  colour in the accents; *Bold* gives the cards the brand tone
+- Everything else is worked out from your pair: canvas, cards, the text on each
+  surface, muted text, borders and the accent states. If your colour is one
+  where neither black nor white is quite legible on it, it is nudged a percent
+  or two until it is
 
-#### Manual Mode
-- Set Primary and Secondary colors individually
-- Full control over color scheme
+There is no third mode. A separate accent, a full-theme picker and a brand
+override used to exist alongside these two and overlapped with them.
 
 ### 4. Sidebar Behavior
 
@@ -70,7 +76,7 @@ All views are styled:
 - ✅ Report View (headers, zebra stripes, sticky columns)
 - ✅ Kanban (columns, cards, drag preview)
 - ✅ Dashboard (widgets, number cards, charts)
-- ✅ Login Page (gradient background, glassmorphism)
+- ✅ Login Page (themed from the active palette, three layouts)
 
 ### Troubleshooting
 
