@@ -1,0 +1,49 @@
+/* Swift Theme — Vision
+   Generated from PREMIUM_THEMES["Vision"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="vision"] {
+  color-scheme: light;
+
+  /* Brand pair */
+  --swift-primary:      #a16207;
+  --swift-secondary:    #be185d;
+  --swift-primary-soft: rgba(161, 98, 7, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #a16207;
+  --swift-accent-hover: #895306;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(161, 98, 7, 0.14);
+  --swift-accent-tint:  #facc15;
+
+  /* Roles */
+  --swift-canvas:       #fbf7ee;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #faf7f3;
+  --swift-on-canvas:    #231a09;
+  --swift-on-surface:   #231a09;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #fbf7ee;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #faf7f3;
+  --subtle-accent:       #fbf9f5;
+  --control-bg:          #fbf9f5;
+  --control-bg-on-gray:  #faf7f3;
+  --border-color:        rgba(35, 26, 9, 0.13);
+  --text-color:          #231a09;
+  --text-muted:          #847d70;
+  --text-light:          #847d70;
+  --heading-color:       #231a09;
+  --sidebar-bg:          #faf7f3;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(161, 98, 7, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(190, 24, 93, 0.12), transparent 60%);
+}

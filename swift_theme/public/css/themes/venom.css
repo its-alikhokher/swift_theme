@@ -1,0 +1,49 @@
+/* Swift Theme — Venom
+   Generated from PREMIUM_THEMES["Venom"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="venom"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #d1d5db;
+  --swift-secondary:    #6b7280;
+  --swift-primary-soft: rgba(209, 213, 219, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #d1d5db;
+  --swift-accent-hover: #d8dbe0;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(209, 213, 219, 0.14);
+  --swift-accent-tint:  #f3f4f6;
+
+  /* Roles */
+  --swift-canvas:       #08080a;
+  --swift-surface:      #19191b;
+  --swift-surface-alt:  #262627;
+  --swift-on-canvas:    #e8e9ec;
+  --swift-on-surface:   #e8e9ec;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #08080a;
+  --fg-color:            #19191b;
+  --card-bg:             #19191b;
+  --subtle-fg:           #262627;
+  --subtle-accent:       #202123;
+  --control-bg:          #202123;
+  --control-bg-on-gray:  #262627;
+  --border-color:        rgba(232, 233, 236, 0.14);
+  --text-color:          #e8e9ec;
+  --text-muted:          #8a8b8d;
+  --text-light:          #8a8b8d;
+  --heading-color:       #e8e9ec;
+  --sidebar-bg:          #262627;
+  --navbar-bg:           rgba(25, 25, 27, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(209, 213, 219, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(107, 114, 128, 0.12), transparent 60%);
+}

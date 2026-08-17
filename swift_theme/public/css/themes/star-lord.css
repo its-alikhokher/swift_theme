@@ -1,0 +1,49 @@
+/* Swift Theme — Star-Lord
+   Generated from PREMIUM_THEMES["Star-Lord"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="star-lord"] {
+  color-scheme: light;
+
+  /* Brand pair */
+  --swift-primary:      #c2410c;
+  --swift-secondary:    #0d9488;
+  --swift-primary-soft: rgba(194, 65, 12, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #c2410c;
+  --swift-accent-hover: #a5370a;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(194, 65, 12, 0.14);
+  --swift-accent-tint:  #fb923c;
+
+  /* Roles */
+  --swift-canvas:       #faf5ef;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #fcf6f3;
+  --swift-on-canvas:    #26160c;
+  --swift-on-surface:   #26160c;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #faf5ef;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #fcf6f3;
+  --subtle-accent:       #fdf7f5;
+  --control-bg:          #fdf7f5;
+  --control-bg-on-gray:  #fcf6f3;
+  --border-color:        rgba(38, 22, 12, 0.13);
+  --text-color:          #26160c;
+  --text-muted:          #857a72;
+  --text-light:          #857a72;
+  --heading-color:       #26160c;
+  --sidebar-bg:          #fcf6f3;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(194, 65, 12, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(13, 148, 136, 0.12), transparent 60%);
+}

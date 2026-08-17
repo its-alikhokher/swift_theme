@@ -1,0 +1,49 @@
+/* Swift Theme — Loki
+   Generated from PREMIUM_THEMES["Loki"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="loki"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #10b981;
+  --swift-secondary:    #d4af37;
+  --swift-primary-soft: rgba(16, 185, 129, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #10b981;
+  --swift-accent-hover: #34c494;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(16, 185, 129, 0.14);
+  --swift-accent-tint:  #34d399;
+
+  /* Roles */
+  --swift-canvas:       #07130f;
+  --swift-surface:      #182420;
+  --swift-surface-alt:  #252f2c;
+  --swift-on-canvas:    #e6f4ee;
+  --swift-on-surface:   #e6f4ee;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #07130f;
+  --fg-color:            #182420;
+  --card-bg:             #182420;
+  --subtle-fg:           #252f2c;
+  --subtle-accent:       #182a24;
+  --control-bg:          #182a24;
+  --control-bg-on-gray:  #252f2c;
+  --border-color:        rgba(230, 244, 238, 0.14);
+  --text-color:          #e6f4ee;
+  --text-muted:          #889690;
+  --text-light:          #889690;
+  --heading-color:       #e6f4ee;
+  --sidebar-bg:          #252f2c;
+  --navbar-bg:           rgba(24, 36, 32, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(16, 185, 129, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(212, 175, 55, 0.12), transparent 60%);
+}
