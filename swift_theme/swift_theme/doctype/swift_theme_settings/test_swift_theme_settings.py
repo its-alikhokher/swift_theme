@@ -842,6 +842,88 @@ class TestSwiftThemeSounds(IntegrationTestCase):
             frappe.clear_cache()
 
 
+class TestSwiftThemeBackdrops(IntegrationTestCase):
+    """The stylesheet existed for a while but was wired to nothing."""
+
+    SHIPPED = {"aurora", "mesh", "grain", "facets", "silk", "none"}
+
+    def test_stylesheet_is_actually_loaded(self):
+        for hook in ("app_include_css", "web_include_css"):
+            self.assertIn(
+                "/assets/swift_theme/css/swift-backdrops.css",
+                frappe.get_hooks(hook) or [],
+                f"backdrops.css is not in {hook}, so none of it ever applies")
+
+    def test_every_offered_backdrop_has_a_rule(self):
+        """A Settings option with no CSS behind it silently does nothing."""
+        css = read_css("swift-backdrops.css")
+        for option in settings_json_options("backdrop"):
+            key = option.lower()
+            self.assertIn(key, self.SHIPPED, f"{option} is not a shipped backdrop")
+            self.assertIn(f'data-swift-backdrop="{key}"', css,
+                          f"{option} is selectable but has no rule")
+
+    def test_every_preset_ships_a_backdrop(self):
+        from swift_theme.api.boot import BACKDROPS
+
+        for name, data in PREMIUM_THEMES.items():
+            self.assertIn(data.get("backdrop"), BACKDROPS,
+                          f"{name} has no valid default backdrop")
+
+    def test_settings_overrides_the_preset_default(self):
+        from swift_theme.api.boot import resolve_backdrop
+
+        self.assertEqual(resolve_backdrop("Silk", "aurora"), "silk", "Settings must win")
+        self.assertEqual(resolve_backdrop("", "aurora"), "aurora", "blank falls back")
+        self.assertEqual(resolve_backdrop(None, "grain"), "grain")
+        self.assertEqual(resolve_backdrop("nonsense", "mesh"), "mesh", "junk falls back")
+        self.assertEqual(resolve_backdrop("", None), "none")
+
+    def test_backdrop_reaches_the_client(self):
+        with no_user_preset():
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki",
+                                  backdrop=""):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["backdrop"], PREMIUM_THEMES["Loki"]["backdrop"])
+        self.assertEqual(prefs["backdrop_pinned"], 0)
+
+        with no_user_preset():
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki",
+                                  backdrop="Facets"):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["backdrop"], "facets")
+        self.assertEqual(prefs["backdrop_pinned"], 1)
+
+    def test_boot_js_applies_the_attribute(self):
+        js = read_js("swift-boot.js")
+        self.assertIn('applyAttr("backdrop"', js)
+
+    def test_motion_belongs_to_the_backdrop_only(self):
+        """preset-base animated the same layer, so a still backdrop such as
+        Mesh inherited a drift it never asked for."""
+        base = read_css("swift-preset-base.css")
+        self.assertNotIn("swift-ambient-drift", base)
+        css = read_css("swift-backdrops.css")
+        for still in ("mesh", "grain", "facets"):
+            block = css.split(f'data-swift-backdrop="{still}"] body::before {{', 1)[1].split("}", 1)[0]
+            self.assertIn("animation: none", block, f"{still} does not stop the motion")
+
+    def test_backdrops_use_only_theme_colours(self):
+        """A hardcoded hue would ignore the preset and the custom pair alike."""
+        css = read_css("swift-backdrops.css")
+        hues = re.findall(r"#[0-9a-fA-F]{6}", css)
+        self.assertEqual([h for h in hues if h.lower() != "#000000"], [],
+                         "backdrops must build from --swift-primary/--swift-secondary")
+
+    def test_backdrop_layers_cannot_trap_the_desk(self):
+        """Same rule as everywhere else: nothing behind the desk may become a
+        containing block for the position:fixed child-table editor."""
+        css = read_css("swift-backdrops.css")
+        block = css.split("body::before,", 1)[1].split("}", 1)[0]
+        self.assertIn("z-index: -1", block)
+        self.assertIn("pointer-events: none", block)
+
+
 class TestSwiftThemeStyling(IntegrationTestCase):
     """Options and injected elements must have styling that actually exists."""
 
@@ -918,6 +1000,34 @@ class TestSwiftThemeStyling(IntegrationTestCase):
             if v not in ours and v not in frappe_defined
         )
         self.assertEqual(undefined, [], f"swift-desk.css relies on undefined variables: {undefined}")
+
+    def test_no_themed_rule_hardcodes_a_hue(self):
+        """A literal colour inside a [data-swift-themed] rule ignores the theme.
+
+        This was scoped to swift-desk.css and so missed preset-base, where the
+        number-card figures cycled through six fixed gradients whatever preset
+        was active — on top of a card the theme had already coloured.
+
+        Neutrals are allowed: pure black and white are used for shadows and
+        highlight overlays, not as brand colour.
+        """
+        NEUTRAL = {"#000000", "#ffffff", "#fff", "#000"}
+        offenders = []
+        for name in sorted(os.listdir(CSS_DIR)):
+            if not name.endswith(".css") or name in ("login.css", "swift-base.css"):
+                continue
+            src = COMMENT_RE.sub("", open(os.path.join(CSS_DIR, name)).read())
+            for block in re.finditer(r"([^{}]*)\{([^{}]*)\}", src):
+                selector, body = block.group(1), block.group(2)
+                themed = ("data-swift-themed" in selector or "data-swift-preset" in selector)
+                # :not([data-swift-themed]) is the no-theme fallback — there is
+                # no palette to read from there, so a literal is correct.
+                if not themed or ":not([data-swift-themed]" in selector:
+                    continue
+                for hue in re.findall(r"#[0-9a-fA-F]{3,6}\b", body):
+                    if hue.lower() not in NEUTRAL:
+                        offenders.append(f"{name}: {selector.strip()[:48]!r} -> {hue}")
+        self.assertEqual(offenders[:8], [], f"{len(offenders)} hardcoded hues: {offenders[:8]}")
 
     def test_themed_views_do_not_hardcode_the_old_blue(self):
         css = read_css("swift-desk.css")
@@ -1061,11 +1171,15 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         self.assertIn("html[data-swift-themed] .navbar", css)
 
     def test_animated_background_is_wired_up(self):
-        """The wash needs the rule, the keyframes and a per-theme gradient."""
+        """The layer lives in preset-base; the motion belongs to whichever
+        backdrop asks for it, so the two files are checked separately."""
         base = read_css("swift-preset-base.css")
         self.assertIn("body::before", base)
-        self.assertIn("swift-ambient-drift", base)
         self.assertIn("--swift-ambient", base)
+
+        backdrops = read_css("swift-backdrops.css")
+        self.assertIn("@keyframes swift-aurora", backdrops)
+        self.assertIn("@keyframes swift-silk", backdrops)
         for data in PREMIUM_THEMES.values():
             path = os.path.join(CSS_DIR, "themes", f"{data['slug']}.css")
             self.assertIn("--swift-ambient", open(path).read(),
