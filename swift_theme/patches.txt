@@ -1,6 +1,8 @@
 [pre_model_sync]
 
 [post_model_sync]
-swift_theme.patches.v1_0.enable_feature_flags
+# Order matters: get the stored values into the new shape first, so anything
+# later that loads the document sees values its fields still accept.
 swift_theme.patches.v1_0.migrate_to_preset_or_custom_colors
 swift_theme.patches.v1_0.rename_presets_to_marvel
+swift_theme.patches.v1_0.enable_feature_flags
