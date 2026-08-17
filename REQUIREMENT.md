@@ -123,7 +123,7 @@ The desk background **SHOULD** be more than a flat fill.
 - **MUST** Animation is transform/opacity only, and stops under performance mode,
   the animation switch, or `prefers-reduced-motion`.
 
----
+---   
 
 ## 4. Applying a theme
 
