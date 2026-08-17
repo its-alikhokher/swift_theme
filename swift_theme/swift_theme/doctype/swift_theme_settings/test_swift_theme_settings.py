@@ -121,6 +121,25 @@ def settings_patched(**values):
 
 
 @contextmanager
+def stale_single_value(field, value):
+    """Put a value in the row that the field would reject on save.
+
+    This is the state a site is genuinely in part-way through an upgrade, and
+    it cannot be reached through the ORM — which is the point, since the bugs
+    it reproduces are ones only that state triggers.
+    """
+    previous = frappe.db.get_single_value("Swift Theme Settings", field)
+    frappe.db.set_single_value("Swift Theme Settings", field, value)
+    frappe.clear_cache()
+    try:
+        yield
+    finally:
+        frappe.db.set_single_value("Swift Theme Settings", field, previous)
+        frappe.db.commit()
+        frappe.clear_cache()
+
+
+@contextmanager
 def no_user_preset():
     """Clear the session user's preset so the site setting is what's measured."""
     user = frappe.session.user
@@ -1391,6 +1410,83 @@ class TestSwiftThemeInstall(IntegrationTestCase):
             if entry.startswith("[") or entry.startswith("execute:"):
                 continue
             frappe.get_attr(f"{entry}.execute")
+
+    def test_value_migration_runs_before_the_flag_patch(self):
+        """Ordering is load-bearing, not cosmetic.
+
+        enable_feature_flags reads Settings. Until color_mode has been converted
+        to the new option list, loading it is a validation error waiting to
+        happen, so the conversion has to be listed first.
+        """
+        patches = frappe.get_file_items(frappe.get_app_path(APP, "patches.txt"))
+        order = [p for p in patches if not p.startswith("[")]
+        convert = order.index("swift_theme.patches.v1_0.migrate_to_preset_or_custom_colors")
+        flags = order.index("swift_theme.patches.v1_0.enable_feature_flags")
+        self.assertLess(
+            convert, flags,
+            "enable_feature_flags is listed before the value migration; on a site "
+            "upgrading from the old schema it will abort the whole bench migrate")
+
+    def test_flag_patch_survives_a_value_the_new_schema_rejects(self):
+        """The exact upgrade that broke: an old color_mode still in the row.
+
+        This is what a real pre-upgrade site looks like at the moment patches
+        start running. The patch has nothing to do with color_mode and must not
+        care about it.
+        """
+        from swift_theme.patches.v1_0.enable_feature_flags import execute
+
+        with stale_single_value("color_mode", "Preset Themes"):
+            frappe.db.set_single_value("Swift Theme Settings", "enable_switcher", 0)
+            execute()
+            self.assertEqual(
+                frappe.db.get_single_value("Swift Theme Settings", "enable_switcher"), 1,
+                "the flag patch did not turn the switcher back on")
+
+    def test_seeding_repairs_a_stale_select_instead_of_dying(self):
+        """One retired preset name must not cost every new field its default.
+
+        _seed_settings saves the document, so a value the Select no longer
+        offers raised ValidationError and every genuinely new field stayed NULL.
+        """
+        from swift_theme.install import _seed_settings
+
+        with stale_single_value("active_preset", "Midnight Pro"):
+            frappe.db.set_single_value("Swift Theme Settings", "custom_mode", None)
+            _seed_settings()
+
+            settings = frappe.get_single("Swift Theme Settings")
+            self.assertIn(
+                settings.active_preset, PREMIUM_THEMES,
+                "the retired preset name was left in place")
+            self.assertEqual(
+                settings.custom_mode, "Dark",
+                "seeding aborted, so the new field never got its default")
+
+    def test_every_select_can_account_for_being_blank(self):
+        """A Select must either be seeded or genuinely allow blank.
+
+        Some fields are deliberately blank — `backdrop` blank means "whatever
+        this preset ships with" — and those list "" as an option. A Select that
+        does neither shows an empty box the form will refuse to save, which is
+        how custom_mode and custom_strength shipped.
+        """
+        from swift_theme.install import SETTINGS_DEFAULTS
+
+        meta = frappe.get_meta("Swift Theme Settings")
+        offenders = []
+        for field in meta.fields:
+            if field.fieldtype != "Select" or field.hidden:
+                continue
+            if field.fieldname in SETTINGS_DEFAULTS:
+                continue
+            if "" in (field.options or "").split("\n"):
+                continue          # blank is a real choice here
+            offenders.append(field.fieldname)
+
+        self.assertEqual(
+            offenders, [],
+            f"these Selects show blank but do not accept blank: {offenders}")
 
 
 class TestSwiftThemeLoginPage(IntegrationTestCase):
