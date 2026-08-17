@@ -32,6 +32,10 @@ USER_FIELDS = [
 SETTINGS_DEFAULTS = {
     "color_mode": "Theme Preset",
     "active_preset": "Iron Man",
+    # Without these the Settings form shows Custom Mode and Colour Strength
+    # blank, even though the code falls back to exactly these values.
+    "custom_mode": "Dark",
+    "custom_strength": "Subtle",
     "default_density": "Comfortable",
     "default_radius": "Rounded",
     "default_font_scale": "M",
@@ -116,6 +120,39 @@ def _seed_settings():
             settings.set(fieldname, value)
             changed = True
 
+    changed = _repair_stale_selects(settings) or changed
+
     if changed:
         settings.flags.ignore_permissions = True
         settings.save(ignore_permissions=True)
+
+
+def _repair_stale_selects(settings):
+    """Reset Select fields holding a value the field no longer offers.
+
+    A Select rejects a value outside its options on save, and this runs from
+    after_migrate: one stale value — say an `active_preset` left behind because
+    a rename patch didn't reach this site — raised ValidationError and took the
+    whole seeding step down with it, so every genuinely new field stayed NULL.
+    Repairing beats aborting: the site lands on a real default instead.
+    """
+    changed = False
+    for fieldname, default in SETTINGS_DEFAULTS.items():
+        field = settings.meta.get_field(fieldname)
+        if not field or field.fieldtype != "Select":
+            continue
+
+        options = [o.strip() for o in (field.options or "").split("\n")]
+        current = settings.get(fieldname)
+        if current in (None, "") or current in options:
+            continue
+
+        frappe.log_error(
+            title="Swift Theme: stale setting reset",
+            message=f"{fieldname} held {current!r}, which is no longer an option. "
+                    f"Reset to {default!r}.",
+        )
+        settings.set(fieldname, default)
+        changed = True
+
+    return changed

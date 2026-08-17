@@ -96,6 +96,44 @@ bench build --app swift_theme
 `bench migrate` needs redis running. Without it, it exits without doing the
 work and without saying so — treat a silent migrate as a failure.
 
+## Upgrading from an earlier release
+
+```bash
+bench --site your-site migrate
+bench build --app swift_theme
+bench --site your-site clear-cache
+```
+
+Migrate carries the site across on its own — the old colour mode becomes
+**Theme Preset** or **Custom Colors**, an old gradient pair becomes the
+primary/secondary pair, retired fields are dropped, and every preset name is
+renamed to its closest new one, for the site and for each user who picked one.
+Nothing needs setting by hand.
+
+Two things worth knowing if you are watching it run:
+
+- Presets were renamed, so a site on *Midnight Pro* comes back as
+  **Black Panther**. The mapping is in
+  `patches/v1_0/rename_presets_to_marvel.py`.
+- Should a stored value no longer be offered by its field, it is reset to the
+  default and the reason is written to the Error Log rather than stopping the
+  migrate.
+
+The upgrade can be rehearsed on a scratch site — rewind it to the old schema,
+migrate, and check the result field by field:
+
+```bash
+bench --site scratch.local execute swift_theme.scripts.verify_upgrade.rewind
+```
+
+Then `bench --site scratch.local migrate`, then:
+
+```bash
+bench --site scratch.local execute swift_theme.scripts.verify_upgrade.verify
+```
+
+`rewind` is destructive, so keep it off anything real.
+
 ## Working on it
 
 The palette in

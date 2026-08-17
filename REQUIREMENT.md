@@ -185,6 +185,25 @@ Hard constraints, each from a real failure.
 - **MUST** Every element the theme's JS injects has CSS. Pin buttons, the sidebar
   restore button and the whole switcher palette each shipped unstyled.
 
+### 7.1 Upgrading a site that predates this work
+
+A patch runs while the stored values are still in the *old* shape. Nothing in a
+patch may assume otherwise.
+
+- **MUST NOT** load or save Swift Theme Settings as a document from a patch that
+  only needs one field. A save validates every field, so `enable_feature_flags`
+  died on a stale `color_mode` it never touched — and took the entire
+  `bench migrate` with it, before the patch that repairs `color_mode` could run.
+  Write single fields with `frappe.db.set_single_value`.
+- **MUST** list the value migrations ahead of anything that reads the document.
+  Order in `patches.txt` is load-bearing here, so a test asserts it.
+- **MUST** repair a Select holding a value the field no longer offers, rather
+  than letting the save raise. Seeding runs from `after_migrate`; one retired
+  preset name aborted it and left every genuinely new field NULL.
+- **MUST** seed every Select the form shows, or list `""` among its options so
+  blank is a real choice. `backdrop` is deliberately blank — it means "whatever
+  this preset ships with".
+
 ---
 
 ## 8. Login page
