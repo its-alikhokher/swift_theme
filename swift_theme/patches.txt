@@ -3,3 +3,4 @@
 [post_model_sync]
 swift_theme.patches.v1_0.enable_feature_flags
 swift_theme.patches.v1_0.migrate_to_preset_or_custom_colors
+swift_theme.patches.v1_0.rename_presets_to_marvel

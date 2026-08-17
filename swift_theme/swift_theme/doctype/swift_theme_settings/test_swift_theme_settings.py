@@ -279,7 +279,7 @@ class TestSwiftThemeSwitchPermission(IntegrationTestCase):
         frappe.set_user(user)
         try:
             with self.assertRaises(frappe.PermissionError):
-                set_user_pref("swift_preset", "Crimson Red")
+                set_user_pref("swift_preset", "Hulk")
             with self.assertRaises(frappe.PermissionError):
                 set_user_pref("swift_primary", "#123456")
         finally:
@@ -327,11 +327,11 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 
     def test_saved_value_is_visible_to_the_next_read(self):
         with no_user_preset():
-            with settings_patched(active_preset="Emerald Luxury"):
+            with settings_patched(active_preset="Loki"):
                 prefs = get_effective_prefs()
-        self.assertEqual(prefs["preset_name"], "Emerald Luxury")
-        self.assertEqual(prefs["preset"], "emerald-luxury")
-        self.assertEqual(prefs["theme_css"], "/assets/swift_theme/css/themes/emerald-luxury.css")
+        self.assertEqual(prefs["preset_name"], "Loki")
+        self.assertEqual(prefs["preset"], "loki")
+        self.assertEqual(prefs["theme_css"], "/assets/swift_theme/css/themes/loki.css")
 
     def test_saving_a_new_colour_clears_stale_user_overrides(self):
         """The exact bug: Save appeared to do nothing.
@@ -347,7 +347,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         current = frappe.db.get_single_value("Swift Theme Settings", "active_preset")
         target = next(n for n in PREMIUM_THEMES if n != current)
         try:
-            frappe.db.set_value("User", user, "swift_preset", "Midnight Pro")
+            frappe.db.set_value("User", user, "swift_preset", "Black Panther")
 
             with settings_patched(color_mode="Theme Preset", active_preset=target):
                 self.assertIsNone(
@@ -363,10 +363,10 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         user = frappe.session.user
         previous = frappe.db.get_value("User", user, "swift_preset")
         try:
-            frappe.db.set_value("User", user, "swift_preset", "Midnight Pro")
+            frappe.db.set_value("User", user, "swift_preset", "Black Panther")
             with settings_patched(login_tagline="Unrelated change"):
                 self.assertEqual(
-                    frappe.db.get_value("User", user, "swift_preset"), "Midnight Pro"
+                    frappe.db.get_value("User", user, "swift_preset"), "Black Panther"
                 )
         finally:
             frappe.db.set_value("User", user, "swift_preset", previous)
@@ -397,7 +397,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         )
         try:
             frappe.db.set_value(
-                "User", user, {"swift_preset": "Crimson Red", "swift_primary": "#0abab5"}
+                "User", user, {"swift_preset": "Hulk", "swift_primary": "#0abab5"}
             )
             self.assertEqual(get_effective_prefs()["primary"], "#0abab5")
         finally:
@@ -426,9 +426,9 @@ class TestSwiftThemePreferences(IntegrationTestCase):
         previous = frappe.db.get_value("User", user, "swift_preset")
         try:
             # Set the override *after* the site colour, so it isn't released.
-            with settings_patched(color_mode="Theme Preset", active_preset="Emerald Luxury"):
-                frappe.db.set_value("User", user, "swift_preset", "Crimson Red")
-                self.assertEqual(get_effective_prefs()["preset_name"], "Crimson Red")
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki"):
+                frappe.db.set_value("User", user, "swift_preset", "Hulk")
+                self.assertEqual(get_effective_prefs()["preset_name"], "Hulk")
 
             with settings_patched(
                 color_mode="Custom Colors", primary_color="#123456", secondary_color="#654321"
@@ -450,7 +450,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 
         frappe.publish_realtime = spy
         try:
-            with settings_patched(active_preset="Emerald Luxury"):
+            with settings_patched(active_preset="Loki"):
                 pass
         finally:
             frappe.publish_realtime = original
@@ -480,10 +480,10 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 class TestSwiftThemeColors(IntegrationTestCase):
     def test_theme_config_flattens_colours(self):
         """login.js reads config.primary, not config.colors.primary."""
-        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
             config = get_active_theme_config()
 
-        expected = theme_colors("Midnight Pro")
+        expected = theme_colors("Black Panther")
         self.assertEqual(config["primary"], expected["primary"])
         self.assertEqual(config["secondary"], expected["secondary"])
         # bg1/bg2 are what the page's gradient variables bind to.
@@ -491,9 +491,9 @@ class TestSwiftThemeColors(IntegrationTestCase):
         self.assertEqual(config["bg2"], expected["bg_card"])
 
     def test_dark_preset_reports_dark_mode(self):
-        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
             self.assertIs(get_active_theme_config()["is_dark_mode"], True)
-        with settings_patched(color_mode="Theme Preset", active_preset="Pearl White"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Captain America"):
             self.assertIs(get_active_theme_config()["is_dark_mode"], False)
 
     ROLES = ("canvas", "surface", "surface_alt", "on_canvas", "on_surface",
@@ -545,6 +545,75 @@ class TestSwiftThemeColors(IntegrationTestCase):
                 r["on_primary"], readable_on(r["primary"]),
                 f"{name}: on_primary does not contrast best on {r['primary']}")
 
+    def test_every_shipped_stylesheet_belongs_to_a_preset(self):
+        """Renaming presets leaves the old files behind unless they are removed,
+        and an orphan stylesheet is dead weight that can still be requested."""
+        shipped = {n[:-4] for n in os.listdir(os.path.join(CSS_DIR, "themes"))
+                   if n.endswith(".css")}
+        expected = {d["slug"] for d in PREMIUM_THEMES.values()}
+        self.assertEqual(shipped, expected, f"orphans: {sorted(shipped - expected)}")
+
+    def test_renamed_presets_are_carried_over(self):
+        """active_preset stores the name. Without a mapping every site holding
+        an old name silently drops to the default on upgrade."""
+        from swift_theme.patches.v1_0.rename_presets_to_marvel import RENAMED
+
+        # The module existing is not enough — an unregistered patch never runs.
+        registered = frappe.get_file_items(frappe.get_app_path(APP, "patches.txt"))
+        self.assertIn(
+            "swift_theme.patches.v1_0.rename_presets_to_marvel", registered,
+            "the rename patch is not listed in patches.txt, so it will never run")
+
+        for old, new in RENAMED.items():
+            self.assertNotIn(old, PREMIUM_THEMES, f"{old} is still a live preset")
+            self.assertIn(new, PREMIUM_THEMES, f"{old} maps to {new}, which does not exist")
+
+    def test_user_preset_options_are_repaired_not_just_created(self):
+        """_ensure_user_fields skipped any field that already existed, so a
+        rename left swift_preset holding the retired options for ever.
+
+        Asserting the current options would pass on a database an earlier
+        migrate had already fixed, so this puts stale options back first and
+        checks the installer repairs them.
+        """
+        from swift_theme.install import _ensure_user_fields
+
+        name = frappe.db.get_value(
+            "Custom Field", {"dt": "User", "fieldname": "swift_preset"}, "name")
+        self.assertTrue(name, "swift_preset custom field is missing")
+
+        field = frappe.get_doc("Custom Field", name)
+        good = field.options
+        try:
+            field.options = "\nSwift Blue\nMidnight Pro"      # the retired list
+            field.save(ignore_permissions=True)
+            frappe.clear_cache(doctype="User")
+
+            _ensure_user_fields()
+            frappe.clear_cache(doctype="User")
+
+            options = frappe.get_meta("User").get_field("swift_preset").options.split("\n")
+            for preset in PREMIUM_THEMES:
+                self.assertIn(preset, options, f"{preset} was not restored")
+            stale = [o for o in options if o and o not in PREMIUM_THEMES]
+            self.assertEqual(stale, [], f"retired presets still offered: {stale}")
+        finally:
+            field = frappe.get_doc("Custom Field", name)
+            field.options = good
+            field.save(ignore_permissions=True)
+            frappe.clear_cache(doctype="User")
+
+    def test_presets_are_the_marvel_set(self):
+        expected = {
+            "Iron Man", "Captain America", "Doctor Strange", "Star-Lord",
+            "Vision", "Scarlet Witch", "Black Panther", "Loki", "Hulk",
+            "Thanos", "Venom", "Winter Soldier",
+        }
+        self.assertEqual(set(PREMIUM_THEMES), expected)
+        modes = [d["mode"] for d in PREMIUM_THEMES.values()]
+        self.assertEqual(modes.count("light"), 6, "six light presets expected")
+        self.assertEqual(modes.count("dark"), 6, "six dark presets expected")
+
     def test_stylesheets_match_the_palette(self):
         """themes/*.css is generated; a hand edit or a stale file is a bug."""
         import subprocess
@@ -581,11 +650,11 @@ class TestSwiftThemeColors(IntegrationTestCase):
         user = frappe.session.user
         previous = frappe.db.get_value("User", user, ["desk_theme", "swift_preset"], as_dict=True)
         try:
-            apply_theme("Midnight Pro")
+            apply_theme("Black Panther")
             stored = frappe.db.get_value("User", user, "desk_theme")
             options = frappe.get_meta("User").get_field("desk_theme").options.split("\n")
             self.assertIn(stored, options)
-            self.assertEqual(frappe.db.get_value("User", user, "swift_preset"), "Midnight Pro")
+            self.assertEqual(frappe.db.get_value("User", user, "swift_preset"), "Black Panther")
         finally:
             # swift_preset overrides the site preset, so leaving it set would
             # leak into every other test that reads the effective preferences.
@@ -1074,10 +1143,10 @@ class TestSwiftThemeInstall(IntegrationTestCase):
         """after_migrate runs it on every migrate; it must not clobber choices."""
         from swift_theme.install import _seed_settings
 
-        with settings_patched(active_preset="Rose Gold", enable_switcher=0):
+        with settings_patched(active_preset="Scarlet Witch", enable_switcher=0):
             _seed_settings()
             settings = frappe.get_single("Swift Theme Settings")
-            self.assertEqual(settings.active_preset, "Rose Gold")
+            self.assertEqual(settings.active_preset, "Scarlet Witch")
             self.assertEqual(settings.enable_switcher, 0)
 
     def test_user_preference_fields_exist(self):
@@ -1126,13 +1195,13 @@ class TestSwiftThemeLoginPage(IntegrationTestCase):
         self.assertIn('action="/api/method/login"', self.render())
 
     def test_login_page_is_themed_server_side(self):
-        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
             html = self.render()
-        primary = theme_colors("Midnight Pro")["primary"]
+        primary = theme_colors("Black Panther")["primary"]
         self.assertIn(f"--primary: {primary}", html)
 
     def test_login_page_marks_dark_presets(self):
-        with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
+        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
             self.assertIn("dark-mode", self.render())
 
     def test_login_layout_reaches_the_markup(self):

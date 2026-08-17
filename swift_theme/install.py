@@ -31,7 +31,7 @@ USER_FIELDS = [
 # command palette and focus mode outright.
 SETTINGS_DEFAULTS = {
     "color_mode": "Theme Preset",
-    "active_preset": "Swift Blue",
+    "active_preset": "Iron Man",
     "default_density": "Comfortable",
     "default_radius": "Rounded",
     "default_font_scale": "M",
@@ -69,7 +69,20 @@ def after_migrate():
 def _ensure_user_fields():
     insert_after = "desk_theme"
     for fieldname, fieldtype, label, options, default in USER_FIELDS:
-        if frappe.db.exists("Custom Field", {"dt": "User", "fieldname": fieldname}):
+        existing = frappe.db.get_value(
+            "Custom Field", {"dt": "User", "fieldname": fieldname}, "name"
+        )
+        if existing:
+            # Skipping outright was wrong: renaming the presets left
+            # swift_preset holding the old option list for ever, so the new
+            # presets were not selectable and apply_theme wrote a value the
+            # Select rejected.
+            if options is not None:
+                field = frappe.get_doc("Custom Field", existing)
+                if (field.options or "") != options:
+                    field.options = options
+                    field.save(ignore_permissions=True)
+            insert_after = fieldname
             continue
         doc = {
             "doctype": "Custom Field",
