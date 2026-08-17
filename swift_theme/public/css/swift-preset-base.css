@@ -263,6 +263,7 @@ html[data-swift-themed] .kanban-card {
    ======================================================================== */
 html[data-swift-themed] .body-sidebar-container,
 html[data-swift-themed] .body-sidebar {
+  width: 66px !important; 
   background: color-mix(in oklab, var(--fg-color) 82%, transparent) !important;
   border-right: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
   backdrop-filter: blur(6px);
