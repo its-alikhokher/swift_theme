@@ -28,6 +28,7 @@ from frappe.tests import IntegrationTestCase
 from swift_theme.api.boot import can_switch_theme, get_effective_prefs, set_user_pref
 from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
     PREMIUM_THEMES,
+    theme_colors,
     apply_theme,
     get_active_theme_config,
     get_premium_themes,
@@ -482,7 +483,7 @@ class TestSwiftThemeColors(IntegrationTestCase):
         with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             config = get_active_theme_config()
 
-        expected = PREMIUM_THEMES["Midnight Pro"]["colors"]
+        expected = theme_colors("Midnight Pro")
         self.assertEqual(config["primary"], expected["primary"])
         self.assertEqual(config["secondary"], expected["secondary"])
         # bg1/bg2 are what the page's gradient variables bind to.
@@ -495,11 +496,69 @@ class TestSwiftThemeColors(IntegrationTestCase):
         with settings_patched(color_mode="Theme Preset", active_preset="Pearl White"):
             self.assertIs(get_active_theme_config()["is_dark_mode"], False)
 
-    def test_every_preset_defines_the_colours_the_client_reads(self):
+    ROLES = ("canvas", "surface", "surface_alt", "on_canvas", "on_surface",
+             "muted", "border", "primary", "secondary", "tint", "on_primary")
+
+    def test_every_preset_defines_every_role(self):
+        """A theme is a palette. One colour with shades derived from it is
+        what made every preset read as a single flat tint."""
         for name, data in PREMIUM_THEMES.items():
-            for key in ("primary", "secondary", "bg_body", "bg_card"):
-                self.assertIn(key, data["colors"], f"preset {name} is missing {key}")
+            missing = [r for r in self.ROLES if r not in data["roles"]]
+            self.assertEqual(missing, [], f"preset {name} is missing roles: {missing}")
             self.assertIn(data["mode"], ("light", "dark"), f"preset {name} has no valid mode")
+            self.assertTrue(data.get("slug"), f"preset {name} has no slug")
+
+    def test_dark_presets_lift_the_card_above_the_canvas(self):
+        """In a dark UI elevation comes from light, not shadow. A card darker
+        than the page sinks into it."""
+        from swift_theme.scripts.colour import luminance
+
+        for name, data in PREMIUM_THEMES.items():
+            if data["mode"] != "dark":
+                continue
+            r = data["roles"]
+            self.assertGreater(
+                luminance(r["surface"]), luminance(r["canvas"]),
+                f"{name}: card {r['surface']} is darker than canvas {r['canvas']}",
+            )
+
+    def test_text_is_legible_on_every_surface(self):
+        """on_surface is computed per surface, not one global text colour."""
+        from swift_theme.scripts.colour import contrast
+
+        for name, data in PREMIUM_THEMES.items():
+            r = data["roles"]
+            for text, bg, label in ((r["on_surface"], r["surface"], "card"),
+                                    (r["on_canvas"], r["canvas"], "page"),
+                                    (r["on_primary"], r["primary"], "accent")):
+                ratio = contrast(text, bg)
+                self.assertGreaterEqual(
+                    ratio, 4.5, f"{name}: text on {label} is {ratio:.1f}:1, below 4.5:1")
+
+    def test_on_primary_picks_the_better_of_black_or_white(self):
+        """A luminance cut-off put white on gold, at 2.2:1."""
+        from swift_theme.scripts.colour import readable_on
+
+        for name, data in PREMIUM_THEMES.items():
+            r = data["roles"]
+            self.assertEqual(
+                r["on_primary"], readable_on(r["primary"]),
+                f"{name}: on_primary does not contrast best on {r['primary']}")
+
+    def test_stylesheets_match_the_palette(self):
+        """themes/*.css is generated; a hand edit or a stale file is a bug."""
+        import subprocess
+        import sys
+
+        script = frappe.get_app_path(APP, "scripts", "generate_theme_css.py")
+        before = {n: open(os.path.join(CSS_DIR, "themes", n)).read()
+                  for n in sorted(os.listdir(os.path.join(CSS_DIR, "themes")))}
+        result = subprocess.run([sys.executable, script], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        after = {n: open(os.path.join(CSS_DIR, "themes", n)).read()
+                 for n in sorted(os.listdir(os.path.join(CSS_DIR, "themes")))}
+        stale = [n for n in after if before.get(n) != after[n]]
+        self.assertEqual(stale, [], f"regenerating changed {stale} — commit the rebuild")
 
     def test_custom_colors_mode_returns_the_chosen_pair(self):
         with settings_patched(
@@ -627,7 +686,7 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         )
 
         for name, data in PREMIUM_THEMES.items():
-            slug = data["value"]
+            slug = data["slug"]
             path = frappe.get_app_path(APP, "public", "css", "themes", f"{slug}.css")
             self.assertTrue(os.path.exists(path), f"{name} has no stylesheet at {path}")
             self.assertIsNotNone(preset_stylesheet(slug))
@@ -636,14 +695,14 @@ class TestSwiftThemeStyling(IntegrationTestCase):
             self.assertIn(f'html[data-swift-preset="{slug}"]', body)
             # A preset file must not style any other preset.
             for other in PREMIUM_THEMES.values():
-                if other["value"] != slug:
-                    self.assertNotIn(f'data-swift-preset="{other["value"]}"', body)
+                if other["slug"] != slug:
+                    self.assertNotIn(f'data-swift-preset="{other["slug"]}"', body)
 
     def test_preset_dropdown_matches_the_shipped_stylesheets(self):
         """A preset offered in Settings with no file would silently do nothing."""
         for option in settings_json_options("active_preset"):
             self.assertIn(option, PREMIUM_THEMES, f"{option!r} is not a known preset")
-            slug = PREMIUM_THEMES[option]["value"]
+            slug = PREMIUM_THEMES[option]["slug"]
             self.assertTrue(
                 os.path.exists(frappe.get_app_path(APP, "public", "css", "themes", f"{slug}.css")),
                 f"preset {option!r} is selectable but ships no stylesheet",
@@ -830,9 +889,9 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         self.assertIn("swift-ambient-drift", base)
         self.assertIn("--swift-ambient", base)
         for data in PREMIUM_THEMES.values():
-            path = os.path.join(CSS_DIR, "themes", f"{data['value']}.css")
+            path = os.path.join(CSS_DIR, "themes", f"{data['slug']}.css")
             self.assertIn("--swift-ambient", open(path).read(),
-                          f"{data['value']} defines no ambient background")
+                          f"{data['slug']} defines no ambient background")
 
     def test_performance_mode_uses_the_attribute_boot_actually_sets(self):
         """The old rule keyed off data-swift-performance, which nothing set."""
@@ -1069,7 +1128,7 @@ class TestSwiftThemeLoginPage(IntegrationTestCase):
     def test_login_page_is_themed_server_side(self):
         with settings_patched(color_mode="Theme Preset", active_preset="Midnight Pro"):
             html = self.render()
-        primary = PREMIUM_THEMES["Midnight Pro"]["colors"]["primary"]
+        primary = theme_colors("Midnight Pro")["primary"]
         self.assertIn(f"--primary: {primary}", html)
 
     def test_login_page_marks_dark_presets(self):

@@ -1,51 +1,49 @@
 /* Swift Theme — Crimson Red
-   Generated from PREMIUM_THEMES["Crimson Red"]. Loaded on its own; only the
-   selected preset's stylesheet is ever added to the page. */
+   Generated from PREMIUM_THEMES["Crimson Red"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
 
 html[data-swift-preset="crimson-red"] {
   color-scheme: dark;
 
-  /* Brand */
+  /* Brand pair */
   --swift-primary:      #ef4444;
   --swift-secondary:    #dc2626;
   --swift-primary-soft: rgba(239, 68, 68, 0.14);
 
-  /* Accent aliases — everything else in the app reads these */
+  /* Accent aliases — the rest of the app reads these */
   --swift-accent:       #ef4444;
   --swift-accent-hover: #f16060;
-  --swift-accent-fg:    #ffffff;
+  --swift-accent-fg:    #0b0d12;
   --swift-accent-soft:  rgba(239, 68, 68, 0.14);
   --swift-accent-tint:  #f87171;
 
-  /* Frappe surface variables */
+  /* Roles */
+  --swift-canvas:       #450a0a;
+  --swift-surface:      #7f1d1d;
+  --swift-surface-alt:  #861f1f;
+  --swift-on-canvas:    #fef2f2;
+  --swift-on-surface:   #fef2f2;
+
+  /* Mapped onto the variables Frappe itself paints with */
   --bg-color:            #450a0a;
   --fg-color:            #7f1d1d;
   --card-bg:             #7f1d1d;
   --subtle-fg:           #861f1f;
-  --subtle-accent:       #821e1e;
-  --control-bg:          #821e1e;
+  --subtle-accent:       #831f1f;
+  --control-bg:          #831f1f;
   --control-bg-on-gray:  #861f1f;
   --border-color:        rgba(254, 242, 242, 0.16);
   --text-color:          #fef2f2;
   --text-muted:          #fca5a5;
   --text-light:          #fca5a5;
   --heading-color:       #fef2f2;
-  --sidebar-bg:          #651414;
+  --sidebar-bg:          #861f1f;
   --navbar-bg:           rgba(127, 29, 29, 0.82);
 
-  /* Ambient wash behind the desk */
+  /* Fallback wash for when no backdrop is selected */
   --swift-ambient:
     radial-gradient(1200px 600px at 8% -10%, rgba(239, 68, 68, 0.16), transparent 60%),
     radial-gradient(900px 500px at 100% 110%, rgba(220, 38, 38, 0.12), transparent 60%);
-}
-
-/* Buttons and links pick up the brand pair */
-html[data-swift-preset="crimson-red"] .btn-primary {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border-color: transparent;
-  color: #ffffff;
-}
-
-html[data-swift-preset="crimson-red"] .btn-primary:hover {
-  background: linear-gradient(135deg, #f16060, #ef4444);
 }
