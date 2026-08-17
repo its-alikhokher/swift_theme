@@ -1,0 +1,49 @@
+/* Swift Theme — Winter Soldier
+   Generated from PREMIUM_THEMES["Winter Soldier"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="winter-soldier"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #3b82f6;
+  --swift-secondary:    #94a3b8;
+  --swift-primary-soft: rgba(59, 130, 246, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #3b82f6;
+  --swift-accent-hover: #5895f7;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(59, 130, 246, 0.14);
+  --swift-accent-tint:  #7dd3fc;
+
+  /* Roles */
+  --swift-canvas:       #0b0f14;
+  --swift-surface:      #1c2024;
+  --swift-surface-alt:  #282c30;
+  --swift-on-canvas:    #e6edf5;
+  --swift-on-surface:   #e6edf5;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #0b0f14;
+  --fg-color:            #1c2024;
+  --card-bg:             #1c2024;
+  --subtle-fg:           #282c30;
+  --subtle-accent:       #1d242c;
+  --control-bg:          #1d242c;
+  --control-bg-on-gray:  #282c30;
+  --border-color:        rgba(230, 237, 245, 0.14);
+  --text-color:          #e6edf5;
+  --text-muted:          #8a9097;
+  --text-light:          #8a9097;
+  --heading-color:       #e6edf5;
+  --sidebar-bg:          #282c30;
+  --navbar-bg:           rgba(28, 32, 36, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(59, 130, 246, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(148, 163, 184, 0.12), transparent 60%);
+}

@@ -1,0 +1,49 @@
+/* Swift Theme — Hulk
+   Generated from PREMIUM_THEMES["Hulk"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="hulk"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #65a30d;
+  --swift-secondary:    #7c3aed;
+  --swift-primary-soft: rgba(101, 163, 13, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #65a30d;
+  --swift-accent-hover: #7cb131;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(101, 163, 13, 0.14);
+  --swift-accent-tint:  #a3e635;
+
+  /* Roles */
+  --swift-canvas:       #0b1206;
+  --swift-surface:      #1c2317;
+  --swift-surface-alt:  #282e24;
+  --swift-on-canvas:    #eef6e4;
+  --swift-on-surface:   #eef6e4;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #0b1206;
+  --fg-color:            #1c2317;
+  --card-bg:             #1c2317;
+  --subtle-fg:           #282e24;
+  --subtle-accent:       #1f2817;
+  --control-bg:          #1f2817;
+  --control-bg-on-gray:  #282e24;
+  --border-color:        rgba(238, 246, 228, 0.14);
+  --text-color:          #eef6e4;
+  --text-muted:          #8f9687;
+  --text-light:          #8f9687;
+  --heading-color:       #eef6e4;
+  --sidebar-bg:          #282e24;
+  --navbar-bg:           rgba(28, 35, 23, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(101, 163, 13, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(124, 58, 237, 0.12), transparent 60%);
+}

@@ -1,0 +1,49 @@
+/* Swift Theme — Black Panther
+   Generated from PREMIUM_THEMES["Black Panther"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="black-panther"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #8b5cf6;
+  --swift-secondary:    #c4b5fd;
+  --swift-primary-soft: rgba(139, 92, 246, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #8b5cf6;
+  --swift-accent-hover: #9c74f7;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(139, 92, 246, 0.14);
+  --swift-accent-tint:  #a78bfa;
+
+  /* Roles */
+  --swift-canvas:       #0a0a10;
+  --swift-surface:      #1b1b21;
+  --swift-surface-alt:  #27272d;
+  --swift-on-canvas:    #ecebf5;
+  --swift-on-surface:   #ecebf5;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #0a0a10;
+  --fg-color:            #1b1b21;
+  --card-bg:             #1b1b21;
+  --subtle-fg:           #27272d;
+  --subtle-accent:       #1f1e2a;
+  --control-bg:          #1f1e2a;
+  --control-bg-on-gray:  #27272d;
+  --border-color:        rgba(236, 235, 245, 0.14);
+  --text-color:          #ecebf5;
+  --text-muted:          #8d8c95;
+  --text-light:          #8d8c95;
+  --heading-color:       #ecebf5;
+  --sidebar-bg:          #27272d;
+  --navbar-bg:           rgba(27, 27, 33, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(139, 92, 246, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(196, 181, 253, 0.12), transparent 60%);
+}
