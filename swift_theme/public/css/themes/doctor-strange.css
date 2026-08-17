@@ -1,0 +1,49 @@
+/* Swift Theme — Doctor Strange
+   Generated from PREMIUM_THEMES["Doctor Strange"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="doctor-strange"] {
+  color-scheme: light;
+
+  /* Brand pair */
+  --swift-primary:      #0f766e;
+  --swift-secondary:    #b91c1c;
+  --swift-primary-soft: rgba(15, 118, 110, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #0f766e;
+  --swift-accent-hover: #0d645e;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(15, 118, 110, 0.14);
+  --swift-accent-tint:  #2dd4bf;
+
+  /* Roles */
+  --swift-canvas:       #f0f6f5;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #f3f8f8;
+  --swift-on-canvas:    #0c211f;
+  --swift-on-surface:   #0c211f;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #f0f6f5;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #f3f8f8;
+  --subtle-accent:       #f5faf9;
+  --control-bg:          #f5faf9;
+  --control-bg-on-gray:  #f3f8f8;
+  --border-color:        rgba(12, 33, 31, 0.13);
+  --text-color:          #0c211f;
+  --text-muted:          #73817f;
+  --text-light:          #73817f;
+  --heading-color:       #0c211f;
+  --sidebar-bg:          #f3f8f8;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(15, 118, 110, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(185, 28, 28, 0.12), transparent 60%);
+}

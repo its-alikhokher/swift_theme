@@ -1,0 +1,49 @@
+/* Swift Theme — Captain America
+   Generated from PREMIUM_THEMES["Captain America"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="captain-america"] {
+  color-scheme: light;
+
+  /* Brand pair */
+  --swift-primary:      #1d4ed8;
+  --swift-secondary:    #c0392b;
+  --swift-primary-soft: rgba(29, 78, 216, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #1d4ed8;
+  --swift-accent-hover: #1942b8;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(29, 78, 216, 0.14);
+  --swift-accent-tint:  #60a5fa;
+
+  /* Roles */
+  --swift-canvas:       #f2f5fa;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #f4f6fd;
+  --swift-on-canvas:    #0f1b2e;
+  --swift-on-surface:   #0f1b2e;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #f2f5fa;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #f4f6fd;
+  --subtle-accent:       #f6f8fd;
+  --control-bg:          #f6f8fd;
+  --control-bg-on-gray:  #f4f6fd;
+  --border-color:        rgba(15, 27, 46, 0.13);
+  --text-color:          #0f1b2e;
+  --text-muted:          #757d8a;
+  --text-light:          #757d8a;
+  --heading-color:       #0f1b2e;
+  --sidebar-bg:          #f4f6fd;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(29, 78, 216, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(192, 57, 43, 0.12), transparent 60%);
+}

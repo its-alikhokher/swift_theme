@@ -1,0 +1,49 @@
+/* Swift Theme — Scarlet Witch
+   Generated from PREMIUM_THEMES["Scarlet Witch"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="scarlet-witch"] {
+  color-scheme: light;
+
+  /* Brand pair */
+  --swift-primary:      #be123c;
+  --swift-secondary:    #7f1d1d;
+  --swift-primary-soft: rgba(190, 18, 60, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #be123c;
+  --swift-accent-hover: #a20f33;
+  --swift-accent-fg:    #ffffff;
+  --swift-accent-soft:  rgba(190, 18, 60, 0.14);
+  --swift-accent-tint:  #fb7185;
+
+  /* Roles */
+  --swift-canvas:       #fdf3f5;
+  --swift-surface:      #ffffff;
+  --swift-surface-alt:  #fcf3f5;
+  --swift-on-canvas:    #251016;
+  --swift-on-surface:   #251016;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #fdf3f5;
+  --fg-color:            #ffffff;
+  --card-bg:             #ffffff;
+  --subtle-fg:           #fcf3f5;
+  --subtle-accent:       #fcf6f7;
+  --control-bg:          #fcf6f7;
+  --control-bg-on-gray:  #fcf3f5;
+  --border-color:        rgba(37, 16, 22, 0.13);
+  --text-color:          #251016;
+  --text-muted:          #86767a;
+  --text-light:          #86767a;
+  --heading-color:       #251016;
+  --sidebar-bg:          #fcf3f5;
+  --navbar-bg:           rgba(255, 255, 255, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(190, 18, 60, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(127, 29, 29, 0.12), transparent 60%);
+}

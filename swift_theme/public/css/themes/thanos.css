@@ -1,0 +1,49 @@
+/* Swift Theme — Thanos
+   Generated from PREMIUM_THEMES["Thanos"] by scripts/generate_theme_css.py.
+   Do not edit by hand; the palette is the source of truth.
+
+   Loaded on its own — only the selected preset's stylesheet is ever added. */
+
+html[data-swift-preset="thanos"] {
+  color-scheme: dark;
+
+  /* Brand pair */
+  --swift-primary:      #d4a017;
+  --swift-secondary:    #9333ea;
+  --swift-primary-soft: rgba(212, 160, 23, 0.14);
+
+  /* Accent aliases — the rest of the app reads these */
+  --swift-accent:       #d4a017;
+  --swift-accent-hover: #daae3a;
+  --swift-accent-fg:    #0b0d12;
+  --swift-accent-soft:  rgba(212, 160, 23, 0.14);
+  --swift-accent-tint:  #facc15;
+
+  /* Roles */
+  --swift-canvas:       #120c17;
+  --swift-surface:      #231d27;
+  --swift-surface-alt:  #2e2933;
+  --swift-on-canvas:    #f4eefa;
+  --swift-on-surface:   #f4eefa;
+
+  /* Mapped onto the variables Frappe itself paints with */
+  --bg-color:            #120c17;
+  --fg-color:            #231d27;
+  --card-bg:             #231d27;
+  --subtle-fg:           #2e2933;
+  --subtle-accent:       #2a2226;
+  --control-bg:          #2a2226;
+  --control-bg-on-gray:  #2e2933;
+  --border-color:        rgba(244, 238, 250, 0.14);
+  --text-color:          #f4eefa;
+  --text-muted:          #958f9b;
+  --text-light:          #958f9b;
+  --heading-color:       #f4eefa;
+  --sidebar-bg:          #2e2933;
+  --navbar-bg:           rgba(35, 29, 39, 0.82);
+
+  /* Fallback wash for when no backdrop is selected */
+  --swift-ambient:
+    radial-gradient(1200px 600px at 8% -10%, rgba(212, 160, 23, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgba(147, 51, 234, 0.12), transparent 60%);
+}
