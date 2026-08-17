@@ -73,9 +73,9 @@
    "fieldname": "active_preset",
    "fieldtype": "Select",
    "label": "Active Preset",
-   "options": "Swift Blue\nMidnight Pro\nEmerald Luxury\nRose Gold\nSapphire Elite\nGolden Hour\nCarbon Fiber\nPearl White\nRoyal Purple\nOcean Depth\nForest Mist\nCrimson Red",
+   "options": "Iron Man\nCaptain America\nDoctor Strange\nStar-Lord\nVision\nScarlet Witch\nBlack Panther\nLoki\nHulk\nThanos\nVenom\nWinter Soldier",
    "mandatory_depends_on": "eval:doc.color_mode=='Theme Preset'",
-   "default": "Swift Blue",
+   "default": "Iron Man",
    "description": "Each preset ships its own stylesheet; only the selected one is loaded."
   },
   {
@@ -375,7 +375,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-12 03:00:00.000000",
+ "modified": "2026-08-13 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",
