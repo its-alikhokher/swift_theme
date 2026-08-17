@@ -126,7 +126,8 @@
         );
 
         $card.find(".theme-title").text(p.label);
-        $card.attr("title", p.label + " · " + (p.mode === "dark" ? __("Dark") : __("Light")));
+        $card.attr("title", p.label + " · " + (p.mode === "dark" ? __("Dark") : __("Light"))
+            + (p.backdrop && p.backdrop !== "none" ? " · " + p.backdrop : ""));
         $card.find(".background").css({
             "--bg-color": p.bg,
             "--card-bg": p.card,

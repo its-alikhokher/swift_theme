@@ -61,6 +61,7 @@ html[data-swift-backdrop="aurora"] body::before {
    2. MESH — a still, dense gradient mesh. The quiet SaaS look.
    ------------------------------------------------------------------ */
 html[data-swift-backdrop="mesh"] body::before {
+  animation: none;
   background:
     radial-gradient(40vw 40vw at 8% 12%,
       color-mix(in oklab, var(--swift-primary) 26%, transparent), transparent 58%),
@@ -79,6 +80,7 @@ html[data-swift-backdrop="mesh"] body::before {
    3. GRAIN — mesh under a fine film grain. Matte, expensive-looking.
    ------------------------------------------------------------------ */
 html[data-swift-backdrop="grain"] body::before {
+  animation: none;
   background:
     radial-gradient(46vw 42vh at 10% 0%,
       color-mix(in oklab, var(--swift-primary) 30%, transparent), transparent 60%),
@@ -101,6 +103,7 @@ html[data-swift-backdrop="grain"] body::after {
    4. FACETS — wide angular planes. Editorial, matches the login panel.
    ------------------------------------------------------------------ */
 html[data-swift-backdrop="facets"] body::before {
+  animation: none;
   background:
     linear-gradient(118deg,
       color-mix(in oklab, var(--swift-primary) 20%, transparent) 0 34%,

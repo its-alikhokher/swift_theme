@@ -27,6 +27,7 @@ def preset_catalog():
             "card": data["roles"]["surface"],
             "muted": data["roles"]["muted"],
             "css": preset_stylesheet(data["slug"]),
+            "backdrop": data.get("backdrop") or "none",
         }
         for name, data in PREMIUM_THEMES.items()
     ]
@@ -57,6 +58,7 @@ def extend_bootinfo(bootinfo):
 GUEST_KEYS = {
     "color_mode", "color_source", "preset", "preset_name",
     "theme_css", "primary", "secondary", "is_dark", "roles",
+    "backdrop", "backdrop_pinned",
     "density", "radius", "font_scale", "font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
@@ -92,6 +94,10 @@ def get_effective_prefs():
         "secondary":   colors["secondary"],
         "is_dark":     colors["is_dark"],
         "roles":       colors.get("roles") or {},
+        "backdrop":    resolve_backdrop(s.get("backdrop"), colors.get("preset_backdrop")),
+        # True when Settings pins one, so switching preset in the navbar keeps
+        # the admin's choice instead of reverting to the preset's own default.
+        "backdrop_pinned": 1 if (s.get("backdrop") or "").strip().lower() in BACKDROPS else 0,
 
         # layout
         "density":     u.get("swift_density")     or s.get("default_density")   or "Comfortable",
@@ -179,6 +185,20 @@ def set_user_pref(field, value):
     return {"ok": True, "field": field, "value": value}
 
 
+BACKDROPS = ("aurora", "mesh", "grain", "facets", "silk", "none")
+
+
+def resolve_backdrop(settings_value, preset_default):
+    """Settings wins; otherwise the preset's own choice; otherwise nothing.
+
+    The Select stores a label ("Aurora"), the CSS keys off a slug ("aurora").
+    """
+    chosen = (settings_value or "").strip().lower()
+    if chosen in BACKDROPS:
+        return chosen
+    return preset_default if preset_default in BACKDROPS else "none"
+
+
 def _custom_colors(primary, secondary, source, mode="Dark", strength="Subtle"):
     """Two hexes, one full palette.
 
@@ -196,6 +216,8 @@ def _custom_colors(primary, secondary, source, mode="Dark", strength="Subtle"):
         "theme_css": None,
         "custom_mode": mode,
         "custom_strength": strength,
+        # Custom colours ship no preset, so there is no default to inherit.
+        "preset_backdrop": "mesh",
         "roles": roles,
         "primary": roles["primary"],
         "secondary": roles["secondary"],
@@ -238,6 +260,7 @@ def _preset_colors(name, source):
         "preset_name": name if name in PREMIUM_THEMES else DEFAULT_PRESET,
         "theme_css": preset_stylesheet(data["slug"]),
         "roles": data["roles"],
+        "preset_backdrop": data.get("backdrop") or "none",
         "primary": data["roles"]["primary"],
         "secondary": data["roles"]["secondary"],
         "is_dark": 1 if data["mode"] == "dark" else 0,

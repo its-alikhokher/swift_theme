@@ -22,6 +22,7 @@ PREMIUM_THEMES = {
     "Iron Man": {
         "slug": "iron-man",
         "mode": "light",
+        "backdrop": "facets",
         "roles": {
             "canvas": "#f7f3f1",
             "surface": "#ffffff",
@@ -39,6 +40,7 @@ PREMIUM_THEMES = {
     "Captain America": {
         "slug": "captain-america",
         "mode": "light",
+        "backdrop": "mesh",
         "roles": {
             "canvas": "#f2f5fa",
             "surface": "#ffffff",
@@ -56,6 +58,7 @@ PREMIUM_THEMES = {
     "Doctor Strange": {
         "slug": "doctor-strange",
         "mode": "light",
+        "backdrop": "aurora",
         "roles": {
             "canvas": "#f0f6f5",
             "surface": "#ffffff",
@@ -73,6 +76,7 @@ PREMIUM_THEMES = {
     "Star-Lord": {
         "slug": "star-lord",
         "mode": "light",
+        "backdrop": "silk",
         "roles": {
             "canvas": "#faf5ef",
             "surface": "#ffffff",
@@ -90,6 +94,7 @@ PREMIUM_THEMES = {
     "Vision": {
         "slug": "vision",
         "mode": "light",
+        "backdrop": "grain",
         "roles": {
             "canvas": "#fbf7ee",
             "surface": "#ffffff",
@@ -107,6 +112,7 @@ PREMIUM_THEMES = {
     "Scarlet Witch": {
         "slug": "scarlet-witch",
         "mode": "light",
+        "backdrop": "aurora",
         "roles": {
             "canvas": "#fdf3f5",
             "surface": "#ffffff",
@@ -124,6 +130,7 @@ PREMIUM_THEMES = {
     "Black Panther": {
         "slug": "black-panther",
         "mode": "dark",
+        "backdrop": "grain",
         "roles": {
             "canvas": "#0a0a10",
             "surface": "#1b1b21",
@@ -141,6 +148,7 @@ PREMIUM_THEMES = {
     "Loki": {
         "slug": "loki",
         "mode": "dark",
+        "backdrop": "silk",
         "roles": {
             "canvas": "#07130f",
             "surface": "#182420",
@@ -158,6 +166,7 @@ PREMIUM_THEMES = {
     "Hulk": {
         "slug": "hulk",
         "mode": "dark",
+        "backdrop": "facets",
         "roles": {
             "canvas": "#0b1206",
             "surface": "#1c2317",
@@ -175,6 +184,7 @@ PREMIUM_THEMES = {
     "Thanos": {
         "slug": "thanos",
         "mode": "dark",
+        "backdrop": "aurora",
         "roles": {
             "canvas": "#120c17",
             "surface": "#231d27",
@@ -192,6 +202,7 @@ PREMIUM_THEMES = {
     "Venom": {
         "slug": "venom",
         "mode": "dark",
+        "backdrop": "grain",
         "roles": {
             "canvas": "#08080a",
             "surface": "#19191b",
@@ -209,6 +220,7 @@ PREMIUM_THEMES = {
     "Winter Soldier": {
         "slug": "winter-soldier",
         "mode": "dark",
+        "backdrop": "mesh",
         "roles": {
             "canvas": "#0b0f14",
             "surface": "#1c2024",
