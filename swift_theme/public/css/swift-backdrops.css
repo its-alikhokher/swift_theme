@@ -1,0 +1,168 @@
+/* Swift Theme — Backdrops
+
+   The desk background used to be two soft radial gradients, which is why every
+   preset read as one flat colour. These are richer treatments, selected with
+   data-swift-backdrop on <html>.
+
+   Every one is built from the theme's own --swift-primary / --swift-secondary,
+   so a backdrop works with any preset and with custom colours; nothing here
+   hardcodes a hue.
+
+   Two fixed layers, both behind the content and both click-through:
+       body::before  the colour field
+       body::after   the texture or pattern on top of it
+
+   Neither may create a containing block for the desk — see swift-perf.css for
+   what paint containment did to the child-table editor. position:fixed with a
+   negative z-index and pointer-events:none is safe: it paints behind without
+   capping or clipping anything.
+
+   Only transform and opacity are animated, so nothing repaints on scroll. */
+
+html[data-swift-themed] body::before,
+html[data-swift-themed] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-attachment: fixed;
+}
+
+/* The texture layer stays out of the way unless a backdrop asks for it */
+html[data-swift-themed] body::after {
+  content: none;
+}
+
+/* ------------------------------------------------------------------
+   1. AURORA — large soft lights drifting. Colourful without being loud.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="aurora"] body::before {
+  background:
+    radial-gradient(58vw 46vh at 12% -8%,
+      color-mix(in oklab, var(--swift-primary) 34%, transparent), transparent 62%),
+    radial-gradient(50vw 42vh at 88% 8%,
+      color-mix(in oklab, var(--swift-secondary) 30%, transparent), transparent 60%),
+    radial-gradient(46vw 40vh at 72% 96%,
+      color-mix(in oklab, var(--swift-primary) 22%, transparent), transparent 62%),
+    radial-gradient(38vw 34vh at 26% 82%,
+      color-mix(in oklab, var(--swift-secondary) 18%, transparent), transparent 64%),
+    var(--bg-color);
+  animation: swift-aurora 28s ease-in-out infinite alternate;
+}
+
+@keyframes swift-aurora {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-1.5%, 1%, 0) scale(1.05); }
+  100% { transform: translate3d(1.5%, -1%, 0) scale(1.03); }
+}
+
+/* ------------------------------------------------------------------
+   2. MESH — a still, dense gradient mesh. The quiet SaaS look.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="mesh"] body::before {
+  background:
+    radial-gradient(40vw 40vw at 8% 12%,
+      color-mix(in oklab, var(--swift-primary) 26%, transparent), transparent 58%),
+    radial-gradient(36vw 36vw at 92% 18%,
+      color-mix(in oklab, var(--swift-secondary) 24%, transparent), transparent 56%),
+    radial-gradient(44vw 44vw at 78% 88%,
+      color-mix(in oklab, var(--swift-primary) 18%, transparent), transparent 58%),
+    radial-gradient(32vw 32vw at 18% 92%,
+      color-mix(in oklab, var(--swift-secondary) 20%, transparent), transparent 56%),
+    radial-gradient(60vw 40vw at 50% 50%,
+      color-mix(in oklab, var(--swift-primary) 8%, transparent), transparent 70%),
+    var(--bg-color);
+}
+
+/* ------------------------------------------------------------------
+   3. GRAIN — mesh under a fine film grain. Matte, expensive-looking.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="grain"] body::before {
+  background:
+    radial-gradient(46vw 42vh at 10% 0%,
+      color-mix(in oklab, var(--swift-primary) 30%, transparent), transparent 60%),
+    radial-gradient(42vw 38vh at 90% 14%,
+      color-mix(in oklab, var(--swift-secondary) 26%, transparent), transparent 58%),
+    radial-gradient(50vw 44vh at 74% 94%,
+      color-mix(in oklab, var(--swift-primary) 18%, transparent), transparent 62%),
+    var(--bg-color);
+}
+
+html[data-swift-backdrop="grain"] body::after {
+  content: "";
+  /* feTurbulence, inline — no request, no binary asset to ship */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
+
+/* ------------------------------------------------------------------
+   4. FACETS — wide angular planes. Editorial, matches the login panel.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="facets"] body::before {
+  background:
+    linear-gradient(118deg,
+      color-mix(in oklab, var(--swift-primary) 20%, transparent) 0 34%,
+      transparent 34.3%),
+    linear-gradient(206deg,
+      color-mix(in oklab, var(--swift-secondary) 16%, transparent) 0 46%,
+      transparent 46.3%),
+    linear-gradient(324deg,
+      color-mix(in oklab, var(--swift-primary) 12%, transparent) 0 40%,
+      transparent 40.3%),
+    radial-gradient(70vw 50vh at 50% -10%,
+      color-mix(in oklab, var(--swift-secondary) 18%, transparent), transparent 70%),
+    var(--bg-color);
+}
+
+/* ------------------------------------------------------------------
+   5. SILK — soft folded bands. Warm and tactile.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="silk"] body::before {
+  background:
+    repeating-linear-gradient(104deg,
+      color-mix(in oklab, var(--swift-primary) 11%, transparent) 0 3vw,
+      transparent 3vw 9vw),
+    repeating-linear-gradient(76deg,
+      color-mix(in oklab, var(--swift-secondary) 9%, transparent) 0 4vw,
+      transparent 4vw 11vw),
+    radial-gradient(70vw 60vh at 20% 10%,
+      color-mix(in oklab, var(--swift-primary) 22%, transparent), transparent 66%),
+    radial-gradient(60vw 50vh at 90% 90%,
+      color-mix(in oklab, var(--swift-secondary) 20%, transparent), transparent 64%),
+    var(--bg-color);
+  animation: swift-silk 34s ease-in-out infinite alternate;
+}
+
+@keyframes swift-silk {
+  from { transform: translate3d(0, 0, 0) scale(1.02); }
+  to   { transform: translate3d(-2%, 1%, 0) scale(1.06); }
+}
+
+/* ------------------------------------------------------------------
+   None — flat theme colour, nothing behind.
+   ------------------------------------------------------------------ */
+html[data-swift-backdrop="none"] body::before {
+  background: var(--bg-color);
+  animation: none;
+}
+
+html[data-swift-backdrop="none"] body::after {
+  content: none;
+}
+
+/* Motion is decoration; drop it when asked, keep the colour field */
+html[data-swift-perf="on"] body::before,
+html[data-swift-anim="off"] body::before,
+html[data-swift-perf="on"] body::after,
+html[data-swift-anim="off"] body::after {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-swift-themed] body::before,
+  html[data-swift-themed] body::after {
+    animation: none !important;
+  }
+}

@@ -137,17 +137,27 @@
         return "rgba(" + c[0] + ", " + c[1] + ", " + c[2] + ", " + alpha + ")";
     }
 
-    // Black or white, whichever stays legible on the given colour. Mirrors the
-    // same decision the preset stylesheets bake in at build time.
-    function readableOn(hex) {
+    function luminance(hex) {
         var c = channels(hex);
-        if (!c) return "#ffffff";
+        if (!c) return 0;
         var lin = c.map(function (v) {
             v /= 255;
             return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
         });
-        var luminance = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-        return luminance > 0.45 ? "#0b0d12" : "#ffffff";
+        return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+    }
+
+    function contrast(a, b) {
+        var la = luminance(a), lb = luminance(b);
+        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+    }
+
+    // Black or white, whichever actually contrasts better. A luminance
+    // threshold is not enough for mid-tones: gold sits just under 0.45, so a
+    // cut-off picked white and rendered at 2.2:1. Mirrors colour.readable_on.
+    function readableOn(hex) {
+        if (!channels(hex)) return "#ffffff";
+        return contrast(hex, "#0b0d12") >= contrast(hex, "#ffffff") ? "#0b0d12" : "#ffffff";
     }
 
     // ---- Public API ----

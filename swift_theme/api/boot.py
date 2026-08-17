@@ -15,17 +15,17 @@ def preset_catalog():
     """
     return [
         {
-            "key": data["value"],
+            "key": data["slug"],
             "label": name,
             "mode": data["mode"],
-            "primary": data["colors"]["primary"],
-            "secondary": data["colors"]["secondary"],
-            # Surface colours so the switcher can draw a true preview card
+            "primary": data["roles"]["primary"],
+            "secondary": data["roles"]["secondary"],
+            # Surface roles too, so the switcher draws a true preview card
             # rather than a flat swatch.
-            "bg": data["colors"]["bg_body"],
-            "card": data["colors"]["bg_card"],
-            "muted": data["colors"]["text_muted"],
-            "css": preset_stylesheet(data["value"]),
+            "bg": data["roles"]["canvas"],
+            "card": data["roles"]["surface"],
+            "muted": data["roles"]["muted"],
+            "css": preset_stylesheet(data["slug"]),
         }
         for name, data in PREMIUM_THEMES.items()
     ]
@@ -216,11 +216,11 @@ def _preset_colors(name, source):
     return {
         "color_mode": "Theme Preset",
         "color_source": source,
-        "preset": data["value"],
+        "preset": data["slug"],
         "preset_name": name if name in PREMIUM_THEMES else DEFAULT_PRESET,
-        "theme_css": preset_stylesheet(data["value"]),
-        "primary": data["colors"]["primary"],
-        "secondary": data["colors"]["secondary"],
+        "theme_css": preset_stylesheet(data["slug"]),
+        "primary": data["roles"]["primary"],
+        "secondary": data["roles"]["secondary"],
         "is_dark": 1 if data["mode"] == "dark" else 0,
     }
 
