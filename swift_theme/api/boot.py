@@ -1,5 +1,6 @@
 import frappe
 
+from swift_theme.scripts.colour import derive_roles
 from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
     DEFAULT_PRESET,
     PREMIUM_THEMES,
@@ -55,7 +56,7 @@ def extend_bootinfo(bootinfo):
 # it has no business receiving custom CSS/JS or anything else site-internal.
 GUEST_KEYS = {
     "color_mode", "color_source", "preset", "preset_name",
-    "theme_css", "primary", "secondary", "is_dark",
+    "theme_css", "primary", "secondary", "is_dark", "roles",
     "density", "radius", "font_scale", "font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
@@ -90,6 +91,7 @@ def get_effective_prefs():
         "primary":     colors["primary"],
         "secondary":   colors["secondary"],
         "is_dark":     colors["is_dark"],
+        "roles":       colors.get("roles") or {},
 
         # layout
         "density":     u.get("swift_density")     or s.get("default_density")   or "Comfortable",
@@ -177,16 +179,27 @@ def set_user_pref(field, value):
     return {"ok": True, "field": field, "value": value}
 
 
-def _custom_colors(primary, secondary, source):
+def _custom_colors(primary, secondary, source, mode="Dark", strength="Subtle"):
+    """Two hexes, one full palette.
+
+    This used to return the pair and a hardcoded is_dark=1, leaving canvas and
+    card to Frappe's own defaults — so a custom colour only ever changed the
+    accent, and the login page (which had its own hardcoded navy) disagreed
+    with the desk. Both now read the same derived roles.
+    """
+    roles = derive_roles(primary or "#0b84f3", secondary or "#0056b3", mode, strength)
     return {
         "color_mode": "Custom Colors",
         "color_source": source,
         "preset": None,
         "preset_name": None,
         "theme_css": None,
-        "primary": primary or "#0b84f3",
-        "secondary": secondary or "#0056b3",
-        "is_dark": 1,
+        "custom_mode": mode,
+        "custom_strength": strength,
+        "roles": roles,
+        "primary": roles["primary"],
+        "secondary": roles["secondary"],
+        "is_dark": 1 if mode == "Dark" else 0,
     }
 
 
@@ -199,14 +212,19 @@ def _colors(s, u):
       3. whatever the site is configured for
     Saving a new site colour clears 1 and 2, so an admin change still lands.
     """
+    mode = s.get("custom_mode") or "Dark"
+    strength = s.get("custom_strength") or "Subtle"
+
     if u.get("swift_primary"):
-        return _custom_colors(u.get("swift_primary"), u.get("swift_secondary"), "user")
+        return _custom_colors(
+            u.get("swift_primary"), u.get("swift_secondary"), "user", mode, strength)
 
     if u.get("swift_preset"):
         return _preset_colors(u["swift_preset"], "user")
 
     if (s.get("color_mode") or "Theme Preset") == "Custom Colors":
-        return _custom_colors(s.get("primary_color"), s.get("secondary_color"), "site")
+        return _custom_colors(
+            s.get("primary_color"), s.get("secondary_color"), "site", mode, strength)
 
     return _preset_colors(s.get("active_preset") or DEFAULT_PRESET, "site")
 
@@ -219,6 +237,7 @@ def _preset_colors(name, source):
         "preset": data["slug"],
         "preset_name": name if name in PREMIUM_THEMES else DEFAULT_PRESET,
         "theme_css": preset_stylesheet(data["slug"]),
+        "roles": data["roles"],
         "primary": data["roles"]["primary"],
         "secondary": data["roles"]["secondary"],
         "is_dark": 1 if data["mode"] == "dark" else 0,

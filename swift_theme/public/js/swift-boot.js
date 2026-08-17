@@ -81,25 +81,13 @@
         // In preset mode the stylesheet owns the palette, so inline values are
         // cleared rather than left shadowing it.
         if (preset) {
-            [
-                "--swift-primary", "--swift-secondary", "--swift-accent",
-                "--swift-accent-hover", "--swift-accent-soft",
-                "--swift-accent-fg", "--swift-ambient",
-            ].forEach(function (name) { html.style.removeProperty(name); });
+            clearRoles();
         } else if (primary) {
-            var second = secondary || primary;
-            html.style.setProperty("--swift-primary", primary);
-            html.style.setProperty("--swift-secondary", second);
-            html.style.setProperty("--swift-accent", primary);
-            html.style.setProperty("--swift-accent-hover", second);
-            html.style.setProperty("--swift-accent-soft", rgba(primary, 0.14));
-            // Preset files ship these two; in custom mode nothing else would
-            // define them, leaving text on accent unreadable and the animated
-            // background wash missing entirely.
-            html.style.setProperty("--swift-accent-fg", readableOn(primary));
-            html.style.setProperty("--swift-ambient",
-                "radial-gradient(1200px 600px at 8% -10%, " + rgba(primary, 0.16) + ", transparent 60%)," +
-                "radial-gradient(900px 500px at 100% 110%, " + rgba(second, 0.12) + ", transparent 60%)");
+            // No preset stylesheet in custom mode, so the whole palette is
+            // written inline — canvas and card included. Setting only the
+            // accent left the surfaces on Frappe's defaults, which is why a
+            // custom colour never looked like a theme.
+            applyRoles(c.roles || deriveRoles(primary, secondary, c.mode, c.strength));
         }
 
         set("preset", preset);
@@ -160,9 +148,111 @@
         return contrast(hex, "#0b0d12") >= contrast(hex, "#ffffff") ? "#0b0d12" : "#ffffff";
     }
 
+    // Roles -> the variables the desk and Frappe itself paint with.
+    var ROLE_VARS = {
+        canvas:      ["--swift-canvas", "--bg-color"],
+        surface:     ["--swift-surface", "--card-bg", "--fg-color"],
+        surface_alt: ["--swift-surface-alt", "--subtle-fg", "--sidebar-bg", "--control-bg"],
+        on_canvas:   ["--swift-on-canvas", "--heading-color"],
+        on_surface:  ["--swift-on-surface", "--text-color"],
+        muted:       ["--text-muted", "--text-light"],
+        border:      ["--border-color"],
+        primary:     ["--swift-primary", "--swift-accent"],
+        secondary:   ["--swift-secondary", "--swift-accent-hover"],
+        on_primary:  ["--swift-accent-fg"],
+    };
+
+    var CUSTOM_VARS = (function () {
+        var all = ["--swift-accent-soft", "--swift-ambient", "--navbar-bg"];
+        Object.keys(ROLE_VARS).forEach(function (role) {
+            all = all.concat(ROLE_VARS[role]);
+        });
+        return all;
+    })();
+
+    function applyRoles(r) {
+        if (!r) return;
+        Object.keys(ROLE_VARS).forEach(function (role) {
+            if (!r[role]) return;
+            ROLE_VARS[role].forEach(function (name) {
+                html.style.setProperty(name, r[role]);
+            });
+        });
+        html.style.setProperty("--swift-accent-soft", rgba(r.primary, 0.14));
+        html.style.setProperty("--navbar-bg", rgba(r.surface, 0.82));
+        html.style.setProperty("--swift-ambient",
+            "radial-gradient(1200px 600px at 8% -10%, " + rgba(r.primary, 0.16) + ", transparent 60%)," +
+            "radial-gradient(900px 500px at 100% 110%, " + rgba(r.secondary, 0.12) + ", transparent 60%)");
+    }
+
+    function clearRoles() {
+        CUSTOM_VARS.forEach(function (name) { html.style.removeProperty(name); });
+    }
+
+    /* Mirror of colour.derive_roles in Python, so the Settings preview can
+       react to a colour picker without a round trip. A test runs both against
+       the same inputs and compares, so they cannot drift apart. */
+    function deriveRoles(primary, secondary, mode, strength) {
+        var dark = (mode || "Dark") === "Dark";
+        var bold = (strength || "Subtle") === "Bold";
+        secondary = secondary || primary;
+        primary = ensureReadable(primary);
+
+        var canvas, surface, surfaceAlt, ink, border;
+        if (dark) {
+            canvas = mix("#070910", primary, 0.06);
+            surface = bold ? ensureReadable(mix(primary, "#0a0c12", 0.55))
+                           : mix(canvas, "#ffffff", 0.07);
+            surfaceAlt = mix(canvas, "#ffffff", 0.11);
+            ink = mix("#f2f5fa", primary, 0.07);
+            border = rgba(ink, 0.14);
+        } else {
+            canvas = mix("#ffffff", primary, 0.035);
+            surface = bold ? primary : "#ffffff";
+            surfaceAlt = mix("#ffffff", primary, 0.07);
+            ink = mix("#12151a", primary, 0.10);
+            border = rgba(ink, 0.13);
+        }
+
+        return {
+            canvas: canvas, surface: surface, surface_alt: surfaceAlt,
+            on_canvas: ink, on_surface: readableOn(surface),
+            muted: mix(ink, canvas, 0.45), border: border,
+            primary: primary, secondary: secondary, tint: secondary,
+            on_primary: readableOn(primary),
+        };
+    }
+
+    function mix(base, tint, amount) {
+        var a = channels(base), b = channels(tint);
+        if (!a || !b) return base;
+        var out = [0, 1, 2].map(function (i) {
+            return Math.max(0, Math.min(255, Math.round(a[i] * (1 - amount) + b[i] * amount)));
+        });
+        return "#" + out.map(function (v) {
+            return ("0" + v.toString(16)).slice(-2);
+        }).join("");
+    }
+
+    // Some mid-tones reach 4.5:1 with neither black nor white. Nudge until one
+    // does, rather than refuse the colour or ship unreadable text.
+    function ensureReadable(hex, target) {
+        target = target || 4.5;
+        if (!channels(hex)) return hex;
+        if (contrast(hex, readableOn(hex)) >= target) return hex;
+        var toward = luminance(hex) > 0.18 ? "#000000" : "#ffffff";
+        var candidate = hex;
+        for (var step = 1; step <= 24; step++) {
+            candidate = mix(hex, toward, step / 100);
+            if (contrast(candidate, readableOn(candidate)) >= target) return candidate;
+        }
+        return candidate;
+    }
+
     // ---- Public API ----
     var API = {
         applyColors: applyColors,
+        deriveRoles: deriveRoles,
         applyPrefs: function (p) {
             if (!p) return;
             if ("preset" in p || "primary" in p) {
@@ -171,6 +261,9 @@
                     primary: p.primary,
                     secondary: p.secondary,
                     theme_css: p.theme_css,
+                    roles: p.roles,
+                    mode: p.custom_mode,
+                    strength: p.custom_strength,
                 });
             }
             if ("density" in p)         { applyAttr("density", p.density); set("density", p.density); }
@@ -218,9 +311,18 @@
         },
 
         // Pick your own two colours instead of a preset.
-        setCustomColors: function (primary, secondary) {
+        setCustomColors: function (primary, secondary, mode, strength) {
             if (!primary) return;
-            applyColors({ preset: "", primary: primary, secondary: secondary || primary });
+            var boot = (window.frappe && frappe.boot && frappe.boot.swift_theme) || {};
+            applyColors({
+                preset: "",
+                primary: primary,
+                secondary: secondary || primary,
+                // Fall back to whatever the site is configured for, so applying
+                // a colour never silently flips the desk from Light to Dark.
+                mode: mode || boot.custom_mode,
+                strength: strength || boot.custom_strength,
+            });
             persist("swift_primary", primary);
             persist("swift_secondary", secondary || primary);
             persist("swift_preset", "");
@@ -290,6 +392,9 @@
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
                 pin_behavior: boot.pin_behavior,
+                roles: boot.roles,
+                custom_mode: boot.custom_mode,
+                custom_strength: boot.custom_strength,
                 enable_perf_mode: boot.enable_perf_mode,
                 enable_styled_scrollbar: boot.enable_styled_scrollbar,
                 enable_toast_theming: boot.enable_toast_theming,

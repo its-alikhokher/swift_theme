@@ -327,7 +327,7 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 
     def test_saved_value_is_visible_to_the_next_read(self):
         with no_user_preset():
-            with settings_patched(active_preset="Loki"):
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki"):
                 prefs = get_effective_prefs()
         self.assertEqual(prefs["preset_name"], "Loki")
         self.assertEqual(prefs["preset"], "loki")
@@ -475,6 +475,115 @@ class TestSwiftThemePreferences(IntegrationTestCase):
 
         unscoped = [c for c in calls if not c[0] and not c[1]]
         self.assertEqual(unscoped, [], "on_update must scope its cache invalidation")
+
+
+class TestSwiftThemeCustomColors(IntegrationTestCase):
+    """Two hexes must produce a whole palette, not just an accent swap."""
+
+    # A handful of cases missed a rounding disagreement between Python and JS
+    # that only showed on about one blend in a hundred, so sweep the hue wheel
+    # and both switches instead.
+    HUES = [
+        "#39e4a5", "#F21667", "#e0a422", "#0b84f3", "#8b5cf6", "#ef4444",
+        "#14b8a6", "#84cc16", "#f97316", "#ec4899", "#64748b", "#ffffff",
+        "#000000", "#6366f1", "#7c3aed", "#22d3ee", "#1d4ed8", "#be123c",
+        "#d4a017", "#0f766e",
+    ]
+    CASES = [
+        (hue, "#888888", mode, strength)
+        for hue in HUES
+        for mode in ("Dark", "Light")
+        for strength in ("Subtle", "Bold")
+    ]
+
+    def test_derivation_produces_every_role(self):
+        from swift_theme.scripts.colour import derive_roles
+
+        roles = ("canvas", "surface", "surface_alt", "on_canvas", "on_surface",
+                 "muted", "border", "primary", "secondary", "tint", "on_primary")
+        for primary, secondary, mode, strength in self.CASES:
+            r = derive_roles(primary, secondary, mode, strength)
+            missing = [k for k in roles if not r.get(k)]
+            self.assertEqual(missing, [], f"{primary} {mode}/{strength} missing {missing}")
+
+    def test_derived_palettes_are_legible(self):
+        """A user may pick any colour, including ones where neither black nor
+        white clears 4.5:1 — the accent is nudged until one does."""
+        from swift_theme.scripts.colour import contrast, derive_roles, luminance
+
+        for primary, secondary, mode, strength in self.CASES:
+            r = derive_roles(primary, secondary, mode, strength)
+            for text, bg, label in ((r["on_surface"], r["surface"], "card"),
+                                    (r["on_canvas"], r["canvas"], "page"),
+                                    (r["on_primary"], r["primary"], "accent")):
+                ratio = contrast(text, bg)
+                self.assertGreaterEqual(
+                    ratio, 4.5,
+                    f"{primary} {mode}/{strength}: {label} is {ratio:.2f}:1")
+            if mode == "Dark" and strength == "Subtle":
+                self.assertGreater(
+                    luminance(r["surface"]), luminance(r["canvas"]),
+                    f"{primary} Dark/Subtle: card does not lift above the canvas")
+
+    def test_python_and_javascript_derive_identically(self):
+        """The maths exists twice — Python for the server, JS for the live
+        preview. Duplicated logic drifts, so prove they agree hex for hex."""
+        import json
+        import shutil
+        import subprocess
+
+        from swift_theme.scripts.colour import derive_roles
+
+        node = shutil.which("node")
+        if not node:
+            self.skipTest("node is not installed")
+
+        harness = frappe.get_app_path(APP, "tests", "derive_roles_parity.js")
+        result = subprocess.run(
+            [node, harness, json.dumps([list(c) for c in self.CASES])],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+        from_js = json.loads(result.stdout)
+        for case, js in zip(self.CASES, from_js):
+            py = derive_roles(*case)
+            for role in sorted(py):
+                self.assertEqual(
+                    str(js.get(role)).lower(), str(py[role]).lower(),
+                    f"{case} role {role!r}: JS {js.get(role)} vs Python {py[role]}")
+
+    def test_custom_mode_and_strength_are_configurable(self):
+        """Both were impossible to express: custom colour was hardcoded dark
+        and always subtle."""
+        meta = frappe.get_meta("Swift Theme Settings")
+        for field, options in (("custom_mode", {"Dark", "Light"}),
+                               ("custom_strength", {"Subtle", "Bold"})):
+            self.assertTrue(meta.has_field(field), f"{field} is missing")
+            got = {o for o in meta.get_field(field).options.split("\n") if o}
+            self.assertEqual(got, options)
+
+    def test_custom_colours_reach_the_client_as_roles(self):
+        with settings_patched(color_mode="Custom Colors", primary_color="#39e4a5",
+                              secondary_color="#F21667", custom_mode="Light",
+                              custom_strength="Bold"):
+            prefs = get_effective_prefs()
+        self.assertEqual(prefs["color_mode"], "Custom Colors")
+        self.assertTrue(prefs["roles"], "no roles sent; the desk would keep Frappe's surfaces")
+        self.assertEqual(prefs["roles"]["surface"].lower(), "#39e4a5",
+                         "Bold means the card takes the brand tone")
+        self.assertEqual(prefs["is_dark"], 0, "Light mode was requested")
+
+    def test_login_page_and_desk_agree_on_custom_colours(self):
+        """The login page used a hardcoded navy while the desk used Frappe's
+        defaults, so the two looked like different products."""
+        with settings_patched(color_mode="Custom Colors", primary_color="#39e4a5",
+                              secondary_color="#F21667", custom_mode="Dark",
+                              custom_strength="Subtle"):
+            prefs = get_effective_prefs()
+            config = get_active_theme_config()
+        self.assertEqual(config["primary"].lower(), prefs["primary"].lower())
+        self.assertEqual(config["bg_body"].lower(), prefs["roles"]["canvas"].lower())
+        self.assertEqual(config["bg_card"].lower(), prefs["roles"]["surface"].lower())
 
 
 class TestSwiftThemeColors(IntegrationTestCase):

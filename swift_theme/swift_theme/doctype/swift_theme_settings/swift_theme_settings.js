@@ -36,6 +36,14 @@ frappe.ui.form.on("Swift Theme Settings", {
         previewColors(frm);
     },
 
+    custom_mode(frm) {
+        previewColors(frm);
+    },
+
+    custom_strength(frm) {
+        previewColors(frm);
+    },
+
     enable_sounds(frm) {
         toggleFieldVisibility(frm);
         showSoundHint(frm);
@@ -70,6 +78,10 @@ function previewColors(frm) {
             preset: "",
             primary: frm.doc.primary_color,
             secondary: frm.doc.secondary_color,
+            // Without these the preview always derived a Dark/Subtle palette,
+            // so switching Custom Mode to Light showed nothing until saved.
+            mode: frm.doc.custom_mode,
+            strength: frm.doc.custom_strength,
         });
         return;
     }

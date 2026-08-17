@@ -145,6 +145,32 @@ check("mid-tone gold gets dark text, not white",
     html.style.getPropertyValue("--swift-accent-fg") === "#0b0d12",
     html.style.getPropertyValue("--swift-accent-fg"));
 
+console.log("\n== 3c. Custom mode must paint the surfaces, not just the accent ==");
+API.applyPrefs({ preset: null, primary: "#39e4a5", secondary: "#F21667",
+                 theme_css: null, custom_mode: "Dark", custom_strength: "Subtle" });
+const v = (n) => html.style.getPropertyValue(n);
+check("--bg-color set (canvas)", !!v("--bg-color"), v("--bg-color"));
+check("--card-bg set (surface)", !!v("--card-bg"), v("--card-bg"));
+check("--text-color set per surface", !!v("--text-color"), v("--text-color"));
+check("--border-color set", !!v("--border-color"), v("--border-color"));
+check("--sidebar-bg set", !!v("--sidebar-bg"), v("--sidebar-bg"));
+check("card lifts above canvas in dark", (() => {
+    const lum = (h) => {
+        const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+            .map((x) => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+    return lum(v("--card-bg")) > lum(v("--bg-color"));
+})(), v("--card-bg") + " vs " + v("--bg-color"));
+
+const darkCanvas = v("--bg-color");
+API.applyPrefs({ preset: null, primary: "#39e4a5", secondary: "#F21667",
+                 theme_css: null, custom_mode: "Light", custom_strength: "Bold" });
+check("Light mode gives a different canvas", v("--bg-color") !== darkCanvas,
+    v("--bg-color") + " vs dark " + darkCanvas);
+check("Bold puts the brand tone on the card",
+    v("--card-bg").toLowerCase() === "#39e4a5", v("--card-bg"));
+
 console.log("\n== 4. Back to a preset: inline vars must not shadow the stylesheet ==");
 API.applyPrefs({
     preset: "swift-blue", primary: "#0b84f3", secondary: "#0056b3",
@@ -158,6 +184,10 @@ check("inline --swift-accent-fg cleared (preset file owns it)",
     html.style.getPropertyValue("--swift-accent-fg") === undefined);
 check("inline --swift-ambient cleared",
     html.style.getPropertyValue("--swift-ambient") === undefined);
+check("inline surface roles cleared so the stylesheet owns them",
+    html.style.getPropertyValue("--bg-color") === undefined &&
+    html.style.getPropertyValue("--card-bg") === undefined,
+    html.style.getPropertyValue("--bg-color") + " / " + html.style.getPropertyValue("--card-bg"));
 check("stylesheet back", themeLink() && themeLink().getAttribute("href").endsWith("swift-blue.css"));
 
 console.log("\n== 5. Persistence for the next page load (no flash) ==");

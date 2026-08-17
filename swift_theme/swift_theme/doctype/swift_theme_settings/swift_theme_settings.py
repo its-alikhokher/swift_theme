@@ -3,6 +3,8 @@ import os
 import frappe
 from frappe.model.document import Document
 
+from swift_theme.scripts.colour import derive_roles
+
 
 # Each preset is a set of roles, not one colour with shades derived from it.
 # A single hue applied to every surface is what made every theme read as one
@@ -227,14 +229,12 @@ PRESET_SLUGS = {name: data["slug"] for name, data in PREMIUM_THEMES.items()}
 DEFAULT_PRESET = "Iron Man"
 
 
-def theme_colors(name):
+def roles_to_colors(r):
     """The flat colour shape the login page and its template consume.
 
-    Roles are the source of truth; this is only a view over them, so the two
-    can never disagree.
+    Roles are the source of truth; this is only a view over them, so a preset
+    and a derived custom palette reach the client in one shape.
     """
-    data = PREMIUM_THEMES.get(name) or PREMIUM_THEMES[DEFAULT_PRESET]
-    r = data["roles"]
     return {
         "primary": r["primary"],
         "secondary": r["secondary"],
@@ -246,6 +246,11 @@ def theme_colors(name):
         "bg1": r["canvas"],
         "bg2": r["surface"],
     }
+
+
+def theme_colors(name):
+    data = PREMIUM_THEMES.get(name) or PREMIUM_THEMES[DEFAULT_PRESET]
+    return roles_to_colors(data["roles"])
 
 
 def preset_stylesheet(slug):
@@ -393,27 +398,23 @@ def get_active_theme_config():
     }
 
     if settings.color_mode == "Custom Colors":
-        primary = settings.primary_color or "#0b84f3"
-        secondary = settings.secondary_color or "#0056b3"
-        # Custom colours describe the brand, not the page surface, so pair them
-        # with a neutral canvas rather than tinting the whole background.
-        colors = {
-            "primary": primary,
-            "secondary": secondary,
-            "accent": secondary,
-            "bg_body": "#0f172a",
-            "bg_card": "#1e293b",
-            "text_main": "#f1f5f9",
-            "text_muted": "#94a3b8",
-            "bg1": "#0f172a",
-            "bg2": "#1e293b",
-        }
+        # The same derivation the desk uses. This used to pair the brand pair
+        # with a hardcoded navy canvas, so the login page and the desk showed
+        # two different themes for one setting.
+        mode = settings.custom_mode or "Dark"
+        roles = derive_roles(
+            settings.primary_color or "#0b84f3",
+            settings.secondary_color or "#0056b3",
+            mode,
+            settings.custom_strength or "Subtle",
+        )
+        colors = roles_to_colors(roles)
         config["preset"] = None
         config["preset_name"] = None
         config["theme_css"] = None
-        config["mode"] = "dark"
+        config["mode"] = mode.lower()
         config["colors"] = colors
-        config["is_dark_mode"] = True
+        config["is_dark_mode"] = mode == "Dark"
     else:
         preset_name = settings.active_preset or DEFAULT_PRESET
         theme_data = PREMIUM_THEMES.get(preset_name, PREMIUM_THEMES[DEFAULT_PRESET])
