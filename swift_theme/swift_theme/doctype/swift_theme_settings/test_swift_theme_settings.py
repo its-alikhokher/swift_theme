@@ -995,6 +995,24 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
                 resolve_backdrop(None, data.get("backdrop")), data.get("backdrop"),
                 f"{name} does not get its own backdrop when Settings leaves it blank")
 
+    def test_no_stylesheet_asks_for_an_asset_that_is_not_shipped(self):
+        """A url to a file the app does not ship is a 404 on every page load.
+
+        swift-fonts.css named an optional local Inter that has never been in
+        the repo, so every install fetched it and failed before falling through
+        to the CDN.
+        """
+        app_path = frappe.get_app_path(APP)
+        missing = []
+        for name in sorted(n for n in os.listdir(CSS_DIR) if n.endswith(".css")):
+            for url in re.findall(r"/assets/swift_theme/([A-Za-z0-9._/-]+)",
+                                  read_css(name)):
+                if not os.path.exists(os.path.join(app_path, "public", url)):
+                    missing.append(f"{name} -> {url}")
+
+        self.assertEqual(
+            missing, [], f"these stylesheets point at files that do not ship: {missing}")
+
     def test_settings_preview_keeps_the_backdrop(self):
         """The live preview must pass the backdrop, not just the colours.
 

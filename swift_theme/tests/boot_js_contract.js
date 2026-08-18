@@ -202,5 +202,68 @@ check("pin behaviour mapped to its CSS token",
     html.getAttribute("data-swift-pin") === "hover", html.getAttribute("data-swift-pin"));
 
 console.log("\n" + "=".repeat(46));
+/* ------------------------------------------------------------------
+   Cold start with a preset already in localStorage.
+
+   The 35 checks above all run against a module that loaded successfully, so
+   none of them could see the file failing to load at all. It did: the role
+   tables were declared with `var` *below* the bootstrap call that uses them,
+   so a browser that had ever applied a preset hit undefined.forEach inside
+   clearRoles on every load. window.SwiftTheme was then never assigned, which
+   took the preset, the navbar switcher and apply-on-save down with it.
+
+   Booted in its own context, because it has to be a first load.
+   ------------------------------------------------------------------ */
+(function returningVisitorBoots() {
+    const attrs = {};
+    const el = {
+        setAttribute: (k, val) => { attrs[k] = val; },
+        removeAttribute: (k) => { delete attrs[k]; },
+        getAttribute: (k) => (k in attrs ? attrs[k] : null),
+        style: { setProperty() {}, removeProperty() {} },
+    };
+    const saved = {
+        swift_preset: "iron-man",
+        swift_themeCss: "/assets/swift_theme/css/themes/iron-man.css",
+        swift_backdrop: "iron-man",
+    };
+    const ctx = {
+        document: {
+            documentElement: el, getElementById: () => null,
+            head: { appendChild() {} }, querySelector: () => null,
+            createElement: () => ({ setAttribute() {}, style: {} }),
+            addEventListener() {},
+        },
+        window: {},
+        localStorage: {
+            getItem: (k) => (k in saved ? saved[k] : null),
+            setItem: (k, val) => { saved[k] = String(val); },
+            removeItem: (k) => { delete saved[k]; },
+        },
+        CustomEvent: function (t, i) { return { type: t, detail: i && i.detail }; },
+        console, setTimeout, Date,
+    };
+    ctx.window.document = ctx.document;
+    ctx.globalThis = ctx;
+    vm.createContext(ctx);
+
+    let threw = null;
+    try {
+        vm.runInContext(src, ctx);
+    } catch (e) {
+        threw = e.message;
+    }
+
+    check("returning visitor: boot.js does not throw", threw === null, threw);
+    check("returning visitor: SwiftTheme is published",
+        !!ctx.window.SwiftTheme);
+    check("returning visitor: the switcher can call setPreset",
+        typeof (ctx.window.SwiftTheme || {}).setPreset === "function");
+    check("returning visitor: the stored preset is applied",
+        attrs["data-swift-preset"] === "iron-man", attrs["data-swift-preset"]);
+    check("returning visitor: the backdrop survives the restore",
+        attrs["data-swift-backdrop"] === "iron-man", attrs["data-swift-backdrop"]);
+})();
+
 console.log(`  ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

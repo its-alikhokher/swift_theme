@@ -5,8 +5,11 @@
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url("/assets/swift_theme/fonts/inter-var.woff2") format("woff2-variations"),
-       url("https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2") format("woff2");
+  /* No local file ships, and naming one here cost every install a guaranteed
+     404 on every page load before the browser fell through to the CDN. To
+     serve Inter offline, drop the file in public/fonts/ and add its url back
+     as the first src — see public/fonts/README.txt. */
+  src: url("https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2") format("woff2");
 }
 @font-face {
   font-family: "Poppins"; font-style: normal; font-weight: 300 700; font-display: swap;

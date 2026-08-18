@@ -40,6 +40,35 @@
         else html.setAttribute("data-swift-" + name, val);
     }
 
+    /* Defined before the first applyColors call below, not after it.
+
+       These are `var`s, so until their assignment runs they are undefined —
+       and the bootstrap call is the first thing that happens. Any browser with
+       a preset in localStorage therefore hit `undefined.forEach` inside
+       clearRoles on every load, which aborted this whole file: window.SwiftTheme
+       was never assigned, so no preset applied, the navbar switcher threw, and
+       saving Settings could not reapply anything. */
+    var ROLE_VARS = {
+        canvas:      ["--swift-canvas", "--bg-color"],
+        surface:     ["--swift-surface", "--card-bg", "--fg-color"],
+        surface_alt: ["--swift-surface-alt", "--subtle-fg", "--sidebar-bg", "--control-bg"],
+        on_canvas:   ["--swift-on-canvas", "--heading-color"],
+        on_surface:  ["--swift-on-surface", "--text-color"],
+        muted:       ["--text-muted", "--text-light"],
+        border:      ["--border-color"],
+        primary:     ["--swift-primary", "--swift-accent"],
+        secondary:   ["--swift-secondary", "--swift-accent-hover"],
+        on_primary:  ["--swift-accent-fg"],
+    };
+
+    var CUSTOM_VARS = (function () {
+        var all = ["--swift-accent-soft", "--swift-ambient", "--navbar-bg"];
+        Object.keys(ROLE_VARS).forEach(function (role) {
+            all = all.concat(ROLE_VARS[role]);
+        });
+        return all;
+    })();
+
     // ---- Apply from localStorage immediately (no flash of unstyled theme) ----
     applyColors({
         preset: get("preset") || "",
@@ -154,26 +183,6 @@
     }
 
     // Roles -> the variables the desk and Frappe itself paint with.
-    var ROLE_VARS = {
-        canvas:      ["--swift-canvas", "--bg-color"],
-        surface:     ["--swift-surface", "--card-bg", "--fg-color"],
-        surface_alt: ["--swift-surface-alt", "--subtle-fg", "--sidebar-bg", "--control-bg"],
-        on_canvas:   ["--swift-on-canvas", "--heading-color"],
-        on_surface:  ["--swift-on-surface", "--text-color"],
-        muted:       ["--text-muted", "--text-light"],
-        border:      ["--border-color"],
-        primary:     ["--swift-primary", "--swift-accent"],
-        secondary:   ["--swift-secondary", "--swift-accent-hover"],
-        on_primary:  ["--swift-accent-fg"],
-    };
-
-    var CUSTOM_VARS = (function () {
-        var all = ["--swift-accent-soft", "--swift-ambient", "--navbar-bg"];
-        Object.keys(ROLE_VARS).forEach(function (role) {
-            all = all.concat(ROLE_VARS[role]);
-        });
-        return all;
-    })();
 
     function applyRoles(r) {
         if (!r) return;
