@@ -1,0 +1,51 @@
+/* Swift Theme — Show Backdrop Through Panels
+
+   The backdrop sits behind the desk, and the desk's panels are opaque, so
+   normally you only catch it in the gaps. This makes the surfaces translucent
+   so the backdrop reads through them.
+
+   Done by redefining the surface tokens rather than restating every rule:
+   the whole desk already paints with var(--card-bg) / var(--sidebar-bg), so
+   changing what those mean reaches all of it at once and cannot fall out of
+   step with swift-desk.css.
+
+   The !important is deliberate and is only on the token definitions. In Custom
+   Colors mode the palette is written as inline custom properties on <html>,
+   and an inline declaration outranks any selector — !important is the only
+   thing that reaches it. It overrides values, never Frappe's mechanics.
+
+   No backdrop-filter anywhere in here. It would make each of these elements a
+   containing block for position:fixed descendants, which is exactly what once
+   trapped the child-table editor (see REQUIREMENT.md §7). Translucency alone
+   is a colour change and traps nothing. */
+
+html[data-swift-glass="on"] {
+  --card-bg:     color-mix(in oklab, var(--swift-surface) 70%, transparent) !important;
+  --fg-color:    color-mix(in oklab, var(--swift-surface) 70%, transparent) !important;
+  --sidebar-bg:  color-mix(in oklab, var(--swift-surface-alt) 58%, transparent) !important;
+  --control-bg:  color-mix(in oklab, var(--swift-surface-alt) 66%, transparent) !important;
+  --navbar-bg:   color-mix(in oklab, var(--swift-surface) 66%, transparent) !important;
+  --subtle-fg:   color-mix(in oklab, var(--swift-surface-alt) 55%, transparent) !important;
+}
+
+/* Anything that floats above the page has to stay readable: a translucent
+   dropdown over a translucent card over a moving backdrop is unreadable, and
+   these are exactly the surfaces a user is reading when they appear. */
+html[data-swift-glass="on"] .modal-content,
+html[data-swift-glass="on"] .dropdown-menu,
+html[data-swift-glass="on"] .popover,
+html[data-swift-glass="on"] .awesomplete > ul,
+html[data-swift-glass="on"] .datepicker,
+html[data-swift-glass="on"] .frappe-control .form-control,
+html[data-swift-glass="on"] .autocomplete-list,
+html[data-swift-glass="on"] .form-in-grid,
+html[data-swift-glass="on"] .grid-row-open {
+  background-color: var(--swift-surface) !important;
+}
+
+/* Hairlines carry more of the shape once the fills are see-through. */
+html[data-swift-glass="on"] .widget,
+html[data-swift-glass="on"] .form-section,
+html[data-swift-glass="on"] .list-row-container {
+  border-color: color-mix(in oklab, var(--swift-on-surface) 14%, transparent);
+}

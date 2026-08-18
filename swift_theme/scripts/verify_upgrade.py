@@ -103,6 +103,14 @@ def verify():
         ("preset owns its backdrop",
          prefs["backdrop"] == PREMIUM_THEMES[prefs["preset_name"]]["backdrop"],
          prefs["backdrop"]),
+        # A new Check field lands as 0 on an existing site, and seeding skips it
+        # because 0 is a real answer. Without the backfill patch every upgrading
+        # site would quietly lose its backdrop.
+        ("backdrop feature backfilled on",
+         rows.get("enable_backdrops") == "1", rows.get("enable_backdrops")),
+        ("show-through left opt-in",
+         rows.get("show_backdrop_through") in ("0", None),
+         rows.get("show_backdrop_through")),
         ("full role set delivered", len(prefs["roles"]) == 11, len(prefs["roles"])),
         ("no duplicated single rows", all(c == 1 for c in counts), "one row per field"),
     ]

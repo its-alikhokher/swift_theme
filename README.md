@@ -77,6 +77,18 @@ Aurora and Silk drift slowly; Mesh, Grain and Facets are still by design. The
 motion is a `transform` on a fixed, non-interactive layer, so it is composited
 rather than repainted. It stops when the browser asks for reduced motion.
 
+Two switches in Settings govern all of this:
+
+- **Enable Backdrops** — on by default. Off gives a plain, flat background.
+- **Show Backdrop Through Panels** — off by default. On makes cards, the
+  sidebar and table headers translucent so the backdrop reads through the desk
+  instead of only appearing in the gaps. Menus, modals and the child-table
+  editor stay opaque, because they have to stay readable.
+
+The translucency is a colour change and nothing more — no `backdrop-filter`,
+which would make each panel a containing block for the `position: fixed`
+child-table editor.
+
 No image is shipped for any of this: it is CSS plus one inline SVG for the
 grain, so there is nothing extra to download.
 
@@ -87,12 +99,18 @@ preview cards as Light / Dark / Automatic. Custom Colors is a card there too;
 its two pickers appear once it is chosen. Restricted to **Administrator** and
 **System Manager**, enforced on the server as well as hidden in the UI.
 
+**Enable Theme Switcher** governs all three places a theme can be changed — the
+navbar chip, that dialog, and the command palette — so turning it off closes
+every route rather than some of them.
+
 Saving Swift Theme Settings applies immediately in every open desk session.
 
 ## Also included
 
 - **Sounds** on desk events, configurable per event. No audio ships, so events
-  with no file attached stay silent.
+  with no file attached stay silent. With Sounds on, the theme answers alone —
+  Frappe's own audio steps aside, so a save makes one noise instead of two.
+  With Sounds off, Frappe's own sounds play exactly as they normally would.
 - **Login page** in three layouts (Split, Centered, Minimal), themed from the
   active palette and rendered server-side so it paints correctly on first load.
 - **Density, shape, font scale and family**, per user.

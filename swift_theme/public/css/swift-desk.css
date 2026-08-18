@@ -1088,3 +1088,12 @@ html[data-swift-themed] .form-in-grid .awesomplete > ul li[aria-selected="true"]
     background: var(--swift-accent-soft);
     color: var(--swift-accent);
 }
+
+
+/* Workspaces is the one route Frappe paints .layout-main-section on itself
+   ([data-page-route="Workspaces"] in desktop.scss). Left alone it would be the
+   single page where the backdrop stays hidden. */
+html[data-swift-themed]:not([data-swift-backdrop="none"])
+  [data-page-route="Workspaces"] .layout-main-section {
+  background-color: transparent;
+}

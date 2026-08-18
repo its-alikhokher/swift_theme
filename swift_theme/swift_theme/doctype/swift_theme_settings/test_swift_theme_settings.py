@@ -1030,6 +1030,175 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
             "backdrop: chosen.backdrop", preview,
             "the preset preview drops the backdrop, so previewing flattens it")
 
+    def test_every_switcher_surface_honours_the_setting(self):
+        """Enable Theme Switcher has to reach all three places it appears.
+
+        The navbar chip checked it; the section injected into Frappe's own
+        Switch Theme dialog and the command palette did not, so turning the
+        switcher off left two ways to change the theme still standing.
+        """
+        surfaces = {
+            "swift-switcher.js": "the navbar chip",
+            "swift-theme-dialog.js": "the Switch Theme dialog",
+            "swift-palette.js": "the command palette",
+        }
+        for filename, what in surfaces.items():
+            js = read_js(filename)
+            self.assertIn(
+                "enable_switcher", js,
+                f"{what} ignores Enable Theme Switcher, so turning it off "
+                f"still leaves a way in")
+
+    def test_theme_sounds_replace_frappes_own(self):
+        """Saving made two noises: Frappe's click, then ours.
+
+        form.js calls frappe.utils.play_sound("click") on every save, so with
+        the theme's sound engine on you heard both. Wrapped rather than
+        removed, and checked per call, so switching sounds off in Settings
+        hands Frappe's own back without a reload.
+        """
+        js = read_js("swift-sounds.js")
+        wrapper = js.split("function silenceFrappesOwnSounds", 1)
+        self.assertEqual(len(wrapper), 2,
+                         "nothing intercepts Frappe's own sounds, so save double-plays")
+        body = wrapper[1].split("\n    }", 1)[0]
+        self.assertIn("__frappeOriginal", body,
+                      "Frappe's own function must be kept, not thrown away")
+        self.assertIn("cfg.enabled", body,
+                      "the check must be per call, or the setting needs a reload")
+        self.assertIn("original.apply", body,
+                      "Frappe's sounds must come back when the theme's are off")
+
+    def test_backdrop_switches_are_reachable_in_every_colour_mode(self):
+        """Both switches govern Theme Preset and Custom Colors alike.
+
+        They were first placed beside the Backdrop select, inside
+        custom_colors_section — and a section's depends_on hides everything in
+        it, so picking a preset made both checkboxes disappear with no way to
+        reach them.
+        """
+        meta = frappe.get_meta("Swift Theme Settings")
+        fields = {f.fieldname: f for f in meta.fields}
+        order = [f.fieldname for f in meta.fields]
+
+        for name in ("enable_backdrops", "show_backdrop_through"):
+            section = None
+            for fieldname in order[:order.index(name)]:
+                if fields[fieldname].fieldtype in ("Section Break", "Tab Break"):
+                    section = fields[fieldname]
+
+            gates = [fields[name].depends_on or "", (section.depends_on or "") if section else ""]
+            self.assertNotIn(
+                "color_mode", " ".join(gates),
+                f"{name} is hidden by colour mode"
+                + (f" via section {section.fieldname}" if section else ""))
+
+    # Containers that span the viewport. Painting any of these opaquely hides
+    # the backdrop completely, however correctly it was drawn.
+    FULL_PAGE = (".layout-main-section", ".layout-main-section-wrapper",
+                 ".layout-main", ".desk-body", ".page-container")
+
+    def test_nothing_full_page_paints_over_the_backdrop(self):
+        """The backdrop was wired end to end and still invisible.
+
+        `.layout-main-section` was painted with var(--card-bg) on every route,
+        so a full-page opaque slab sat on top of it. Frappe itself only paints
+        that container on Workspaces; doing it everywhere was ours.
+        """
+        offenders = []
+        for filename in ("swift-preset-base.css", "swift-desk.css", "swift-layout.css"):
+            for selector, declarations in css_rules(filename):
+                if 'data-swift-backdrop="none"' in selector:
+                    continue                      # no backdrop to hide
+                target = selector.split("{")[0]
+                if not any(c in target for c in self.FULL_PAGE):
+                    continue
+                match = re.search(
+                    r"(^|;)\s*background(-color)?\s*:\s*([^;]+)", declarations)
+                if not match:
+                    continue
+                value = match.group(3).strip()
+                if value.startswith("transparent") or value.startswith("none"):
+                    continue
+                offenders.append(f"{filename}: {target} -> {value[:40]}")
+
+        self.assertEqual(
+            offenders, [],
+            f"these cover the whole page, so no backdrop can be seen: {offenders}")
+
+    def test_backdrops_switch_off_when_the_feature_is_off(self):
+        """The feature is one checkbox, and off has to mean off."""
+        with no_user_preset():
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki",
+                                  enable_backdrops=0):
+                prefs = get_effective_prefs()
+        self.assertEqual(
+            prefs["backdrop"], "none",
+            "the preset's backdrop is still being drawn with the feature off")
+
+        with no_user_preset():
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki",
+                                  enable_backdrops=1):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["backdrop"], PREMIUM_THEMES["Loki"]["backdrop"])
+
+    def test_show_through_reaches_the_client(self):
+        for value in (0, 1):
+            with settings_patched(enable_backdrops=1, show_backdrop_through=value):
+                prefs = get_effective_prefs()
+            self.assertEqual(
+                prefs["show_backdrop_through"], value,
+                "the desk cannot apply a switch it is never told about")
+
+    def test_show_through_cannot_outlive_the_feature(self):
+        """Its field is hidden when backdrops are off, so it must stop too.
+
+        Otherwise a stored 1 keeps the desk translucent with no control left in
+        the form to switch it back.
+        """
+        with settings_patched(enable_backdrops=0, show_backdrop_through=1):
+            prefs = get_effective_prefs()
+        self.assertEqual(
+            prefs["show_backdrop_through"], 0,
+            "translucent surfaces survive with the feature off and no way back")
+
+    def test_show_through_has_css_behind_it(self):
+        """Both switches must reach CSS, or the checkbox does nothing."""
+        css = read_css("swift-glass.css")
+        self.assertIn('html[data-swift-glass="on"]', css)
+        for token in ("--card-bg", "--sidebar-bg", "--navbar-bg"):
+            self.assertIn(token, css, f"{token} stays opaque, so panels still hide it")
+
+    def test_glass_stylesheet_is_loaded_after_the_desk(self):
+        """It answers swift-desk.css, so it has to come after it."""
+        for hook in ("app_include_css", "web_include_css"):
+            sheets = frappe.get_hooks(hook) or []
+            self.assertIn("/assets/swift_theme/css/swift-glass.css", sheets,
+                          f"swift-glass.css is not in {hook}, so it never applies")
+        desk = frappe.get_hooks("app_include_css").index(
+            "/assets/swift_theme/css/swift-desk.css")
+        glass = frappe.get_hooks("app_include_css").index(
+            "/assets/swift_theme/css/swift-glass.css")
+        self.assertGreater(glass, desk, "swift-desk.css would override the glass tokens")
+
+    def test_glass_never_creates_a_containing_block(self):
+        """The constraint that broke the child-table editor twice already.
+
+        backdrop-filter and filter make an element the containing block for its
+        position:fixed descendants, and the grid row editor is exactly that.
+        """
+        css = read_css("swift-glass.css")
+        for prop in ("backdrop-filter", "-webkit-backdrop-filter", "filter:"):
+            self.assertNotIn(
+                prop, css,
+                f"{prop} in the glass layer would trap the child-table editor")
+
+    def test_overlays_stay_opaque_when_glass_is_on(self):
+        """A translucent dropdown over a moving backdrop cannot be read."""
+        css = read_css("swift-glass.css")
+        for selector in (".modal-content", ".dropdown-menu", ".form-in-grid"):
+            self.assertIn(selector, css, f"{selector} would be left see-through")
+
     def test_every_preset_has_its_own_backdrop(self):
         """The backdrop is meant to say which preset you are looking at.
 

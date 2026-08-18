@@ -58,7 +58,7 @@ def extend_bootinfo(bootinfo):
 GUEST_KEYS = {
     "color_mode", "color_source", "preset", "preset_name",
     "theme_css", "primary", "secondary", "is_dark", "roles",
-    "backdrop", "backdrop_pinned",
+    "backdrop", "backdrop_pinned", "enable_backdrops", "show_backdrop_through",
     "density", "radius", "font_scale", "font_family",
     "navbar_variant", "sidebar_variant", "pin_behavior",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
@@ -94,9 +94,19 @@ def get_effective_prefs():
         "secondary":   colors["secondary"],
         "is_dark":     colors["is_dark"],
         "roles":       colors.get("roles") or {},
-        "backdrop":    resolve_backdrop(
+        # One gate for the whole feature: off means the flat theme colour, which
+        # is exactly what the "none" backdrop already draws.
+        "backdrop": resolve_backdrop(
             s.get("backdrop"), colors.get("preset_backdrop"),
-            is_preset=bool(colors.get("preset"))),
+            is_preset=bool(colors.get("preset"))
+        ) if int(s.get("enable_backdrops") or 0) else "none",
+        "enable_backdrops": int(s.get("enable_backdrops") or 0),
+        # Translucent surfaces, so the backdrop reads through the desk instead
+        # of only showing in the gaps between panels. Tied to the same gate: the
+        # field is hidden in the form when backdrops are off, so a stored 1
+        # would otherwise keep applying with no control left to turn it off.
+        "show_backdrop_through": int(s.get("show_backdrop_through") or 0)
+        if int(s.get("enable_backdrops") or 0) else 0,
         # Only Custom Colors can pin one now — in preset mode the preset owns
         # the backdrop, so the navbar must follow each preset's own choice.
         "backdrop_pinned": 0 if colors.get("preset") else (

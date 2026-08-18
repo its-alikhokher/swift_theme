@@ -21,6 +21,8 @@
   "enable_switcher",
   "enable_command_palette",
   "enable_focus_mode",
+  "enable_backdrops",
+  "show_backdrop_through",
   "features_col_break",
   "enable_perf_mode",
   "enable_styled_scrollbar",
@@ -128,7 +130,7 @@
    "fieldtype": "Select",
    "label": "Backdrop",
    "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone",
-   "depends_on": "eval:doc.color_mode==\"Custom Colors\""
+   "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1"
   },
   {
    "collapsible": 1,
@@ -194,6 +196,21 @@
    "fieldname": "enable_focus_mode",
    "fieldtype": "Check",
    "label": "Enable Focus / Reading Mode"
+  },
+  {
+   "default": "1",
+   "description": "Draw the preset's own background behind the desk. Turn this off for a plain, flat background.",
+   "fieldname": "enable_backdrops",
+   "fieldtype": "Check",
+   "label": "Enable Backdrops"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.enable_backdrops==1",
+   "description": "Let the background show through cards, the sidebar and table headers instead of being hidden behind them.",
+   "fieldname": "show_backdrop_through",
+   "fieldtype": "Check",
+   "label": "Show Backdrop Through Panels"
   },
   {
    "fieldname": "features_col_break",

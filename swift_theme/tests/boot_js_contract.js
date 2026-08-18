@@ -203,6 +203,60 @@ check("pin behaviour mapped to its CSS token",
 
 console.log("\n" + "=".repeat(46));
 /* ------------------------------------------------------------------
+   swift-sounds.js: the theme's sounds replace Frappe's, they don't stack.
+
+   A source grep cannot tell whether the wrapper actually suppresses anything,
+   so this runs the file and calls play_sound for real.
+   ------------------------------------------------------------------ */
+(function soundsDoNotDoublePlay() {
+    function boot(soundsEnabled) {
+        let frappePlayed = 0;
+        const ready = [];
+        const frappe = {
+            boot: { swift_theme: { sounds: { enabled: soundsEnabled, volume: 0.5, files: {} } } },
+            utils: { play_sound: () => { frappePlayed += 1; } },
+            after_ajax: (fn) => ready.push(fn),
+            ui: { form: {} },
+            realtime: { on() {} },
+            show_alert: () => {},
+        };
+        const ctx = { window: { frappe }, frappe, console, setTimeout, Date, Audio: function () {} };
+        ctx.globalThis = ctx;
+        vm.createContext(ctx);
+        vm.runInContext(
+            fs.readFileSync(bootPath.replace("swift-boot.js", "swift-sounds.js"), "utf8"), ctx);
+        ready.forEach((fn) => fn());
+        frappe.utils.play_sound("click");
+        return frappePlayed;
+    }
+
+    check("theme sounds on: Frappe's own save click is suppressed",
+        boot(true) === 0, boot(true));
+    // Off hands the desk back to Frappe rather than silencing it: the checkbox
+    // chooses which engine answers, it does not turn sound off altogether.
+    check("theme sounds off: Frappe's own sounds play as normal",
+        boot(false) === 1, boot(false));
+})();
+
+/* The glass switch has to travel the same road as the backdrop: applied, and
+   persisted so it survives the next load without waiting for the boot call. */
+API.applyPrefs({ preset: "loki", theme_css: "/x.css", backdrop: "loki",
+                 show_backdrop_through: 1 });
+check("show-through sets the glass attribute",
+    html.getAttribute("data-swift-glass") === "on",
+    html.getAttribute("data-swift-glass"));
+check("show-through is remembered for the next load",
+    store.swift_glass === "on", store.swift_glass);
+
+API.applyPrefs({ preset: "loki", theme_css: "/x.css", backdrop: "loki",
+                 show_backdrop_through: 0 });
+check("turning show-through off clears the attribute",
+    html.getAttribute("data-swift-glass") === null,
+    html.getAttribute("data-swift-glass"));
+check("turning it off clears the stored value",
+    !("swift_glass" in store), store.swift_glass);
+
+/* ------------------------------------------------------------------
    Cold start with a preset already in localStorage.
 
    The 35 checks above all run against a module that loaded successfully, so

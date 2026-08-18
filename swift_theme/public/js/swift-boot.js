@@ -10,6 +10,7 @@
         secondary:    "swift_secondary",
         themeCss:     "swift_theme_css",
         backdrop:     "swift_backdrop",
+        glass:        "swift_glass",
         density:      "swift_density",
         radius:       "swift_radius",
         font_family:  "swift_font_family",
@@ -76,6 +77,7 @@
         secondary: get("secondary") || "",
         theme_css: get("themeCss") || "",
         backdrop: get("backdrop") || "",
+        glass: get("glass") === "on",
     });
     applyAttr("density",          get("density")     || "");
     applyAttr("radius",           get("radius")      || "");
@@ -104,6 +106,9 @@
         applyAttr("preset", preset);
         // The colour field behind the desk. Blank leaves the fallback wash.
         applyAttr("backdrop", c.backdrop || "");
+        // Translucent surfaces are part of the colour scheme, so they restore
+        // with it rather than waiting for the boot payload to arrive.
+        applyAttr("glass", c.glass ? "on" : "");
         // Marks "a Swift colour scheme is active" for the shared desk styling,
         // whichever of the two modes produced it.
         if (preset || primary) html.setAttribute("data-swift-themed", "");
@@ -128,6 +133,7 @@
         set("secondary", secondary);
         set("themeCss", (preset && c.theme_css) || "");
         set("backdrop", c.backdrop || "");
+        set("glass", c.glass ? "on" : "");
     }
 
     // One <link> that is retargeted, so switching presets never stacks
@@ -276,6 +282,7 @@
                     secondary: p.secondary,
                     theme_css: p.theme_css,
                     backdrop: p.backdrop,
+                    glass: p.show_backdrop_through,
                     roles: p.roles,
                     mode: p.custom_mode,
                     strength: p.custom_strength,
@@ -312,6 +319,7 @@
                 secondary: chosen.secondary,
                 theme_css: chosen.css,
                 backdrop: boot.backdrop_pinned ? boot.backdrop : chosen.backdrop,
+                glass: boot.show_backdrop_through,
             });
 
             // Keep Frappe's own Light/Dark in step with the preset's brightness.
@@ -411,6 +419,7 @@
                 pin_behavior: boot.pin_behavior,
                 roles: boot.roles,
                 backdrop: boot.backdrop,
+                show_backdrop_through: boot.show_backdrop_through,
                 custom_mode: boot.custom_mode,
                 custom_strength: boot.custom_strength,
                 enable_perf_mode: boot.enable_perf_mode,

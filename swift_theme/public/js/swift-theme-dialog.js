@@ -41,6 +41,11 @@
 
     function render(switcher) {
         var prefs = boot();
+        // Both gates, not just the permission one. Enable Theme Switcher is the
+        // site-wide switch, and it has to reach here too: the navbar chip
+        // honoured it while this section carried on adding presets to Frappe's
+        // own Switch Theme dialog, so turning the switcher off only half worked.
+        if (!prefs.enable_switcher) return;          // turned off site-wide
         if (!prefs.can_switch_theme) return;         // restricted to admins
         var presets = prefs.presets || [];
         if (!presets.length) return;

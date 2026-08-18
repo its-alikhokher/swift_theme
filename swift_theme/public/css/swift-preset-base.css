@@ -80,8 +80,24 @@ html[data-swift-themed] .layout-side-section {
 
 /* Cards / form sections — refined surfaces with hairline border */
 html[data-swift-themed] .frappe-card,
-html[data-swift-themed] .form-section,
-html[data-swift-themed] .layout-main-section {
+html[data-swift-themed] .form-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* The page area is not a card. Painting it as one covered the viewport on
+   every route, which is why no backdrop was ever visible: it was drawn
+   correctly and then hidden behind a full-page opaque slab. Frappe itself only
+   paints this on Workspaces and leaves the page showing through everywhere
+   else, so yielding here is both the stock behaviour and the one that lets a
+   backdrop be seen. The border stays — it is what gave the area its shape. */
+html[data-swift-themed]:not([data-swift-backdrop="none"]) .layout-main-section {
+  background: transparent;
+  border: 1px solid var(--border-color);
+}
+
+/* No backdrop to show, so keep the surface it used to have. */
+html[data-swift-themed][data-swift-backdrop="none"] .layout-main-section {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
 }

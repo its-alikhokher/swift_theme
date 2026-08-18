@@ -45,7 +45,34 @@
         hookFormActions();
         hookFeedback();
         hookNotifications();
+        silenceFrappesOwnSounds();
     });
+
+    /* Frappe plays its own audio for the same moments we do — form.js fires
+       play_sound("click") on every save — so a save made two noises.
+
+       The checkbox picks which engine answers, it does not silence the desk:
+       Sounds on means only the theme's files play, Sounds off hands the desk
+       straight back to Frappe's own audio.
+
+       Read per call rather than once at startup, so toggling the setting takes
+       effect without a reload. Frappe's own function is kept rather than
+       overwritten, so nothing else that reaches for it breaks. */
+    function silenceFrappesOwnSounds() {
+        var utils = frappe.utils;
+        if (!utils || !utils.play_sound || utils.play_sound.__swiftWrapped) return;
+
+        var original = utils.play_sound;
+        var wrapped = function () {
+            var cfg = config();
+            if (cfg && cfg.enabled) return;      // the theme answers instead
+            return original.apply(this, arguments);
+        };
+        wrapped.__swiftWrapped = true;
+        wrapped.__frappeOriginal = original;
+        copyProps(original, wrapped);
+        utils.play_sound = wrapped;
+    }
 
     // Save / Submit / Cancel / Amend all funnel through frappe.ui.form.save,
     // whose signature is (frm, action, callback, btn).

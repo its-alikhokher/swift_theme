@@ -36,6 +36,8 @@ SETTINGS_DEFAULTS = {
     # blank, even though the code falls back to exactly these values.
     "custom_mode": "Dark",
     "custom_strength": "Subtle",
+    "enable_backdrops": 1,
+    "show_backdrop_through": 0,
     "default_density": "Comfortable",
     "default_radius": "Rounded",
     "default_font_scale": "M",
