@@ -61,7 +61,7 @@ def rewind():
 
 def verify():
     """Check what the migrate actually did. Exits non-zero on any failure."""
-    from swift_theme.api.boot import get_effective_prefs
+    from swift_theme.api.boot import BACKDROPS, get_effective_prefs
     from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
         PREMIUM_THEMES,
     )
@@ -99,8 +99,9 @@ def verify():
          prefs["preset_name"] in PREMIUM_THEMES, prefs["preset_name"]),
         ("stylesheet served",
          bool(prefs["theme_css"]), (prefs["theme_css"] or "").split("/")[-1]),
-        ("backdrop resolved",
-         prefs["backdrop"] in ("aurora", "mesh", "grain", "facets", "silk", "none"),
+        ("backdrop resolved", prefs["backdrop"] in BACKDROPS, prefs["backdrop"]),
+        ("preset owns its backdrop",
+         prefs["backdrop"] == PREMIUM_THEMES[prefs["preset_name"]]["backdrop"],
          prefs["backdrop"]),
         ("full role set delivered", len(prefs["roles"]) == 11, len(prefs["roles"])),
         ("no duplicated single rows", all(c == 1 for c in counts), "one row per field"),

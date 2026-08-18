@@ -123,11 +123,12 @@
    "options": "Subtle\nBold"
   },
   {
-   "description": "Leave blank to use the backdrop the selected preset ships with.",
+   "description": "Applies to Custom Colors only. In Theme Preset mode each preset brings its own backdrop, so this is ignored.",
    "fieldname": "backdrop",
    "fieldtype": "Select",
    "label": "Backdrop",
-   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone"
+   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone",
+   "depends_on": "eval:doc.color_mode==\"Custom Colors\""
   },
   {
    "collapsible": 1,

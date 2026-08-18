@@ -79,6 +79,35 @@ def read_css(filename=None):
     return blob
 
 
+RULE_RE = re.compile(r"([^{}]+)\{([^{}]*)\}")
+
+
+def css_rules(filename):
+    """Every innermost `selector { declarations }` pair in one stylesheet.
+
+    Nested at-rules are handled by only matching brace-free chunks, so a rule
+    inside @media is returned on its own.
+    """
+    for match in RULE_RE.finditer(read_css(filename)):
+        selector = " ".join(match.group(1).split())
+        if selector.startswith("@"):
+            continue
+        yield selector, match.group(2)
+
+
+def selects_the_backdrop(selector):
+    """Whether this selector reaches body::before / body::after.
+
+    The universal form counts: `*::before` matches the backdrop just as surely
+    as naming it, which is how perf mode came to flatten it by accident.
+    """
+    compact = selector.replace(" ", "")
+    if ":not(body)::before" in compact or ":not(body)::after" in compact:
+        return False
+    return any(part in compact for part in
+               ("body::before", "body::after", "*::before", "*::after"))
+
+
 def read_js(filename):
     with open(os.path.join(JS_DIR, filename)) as f:
         return f.read()
@@ -889,7 +918,145 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
             self.assertIn(data.get("backdrop"), BACKDROPS,
                           f"{name} has no valid default backdrop")
 
-    def test_settings_overrides_the_preset_default(self):
+    DESK_CSS = ("swift-preset-base.css", "swift-backdrops.css",
+                "swift-desk.css", "swift-perf.css")
+
+    def test_perf_mode_does_not_erase_the_backdrop(self):
+        """Perf mode ships on, so whatever it does to the backdrop is what
+        everyone sees.
+
+        `html[data-swift-perf="on"] body::before { background: var(--bg-color) }`
+        replaced all six backdrops with a flat colour on every stock install,
+        and no test caught it because each stylesheet was only ever checked on
+        its own — the damage was one file overriding another.
+        """
+        offenders = []
+        for filename in self.DESK_CSS:
+            for selector, declarations in css_rules(filename):
+                if 'data-swift-perf="on"' not in selector:
+                    continue
+                if not selects_the_backdrop(selector):
+                    continue
+                if re.search(r"(^|;)\s*background(-image|-color)?\s*:", declarations):
+                    offenders.append(f"{filename}: {selector}")
+
+        self.assertEqual(
+            offenders, [],
+            "perf mode paints over the backdrop, so no preset shows one: "
+            f"{offenders}")
+
+    def test_perf_mode_does_not_stop_the_backdrop_moving(self):
+        """Aurora and Silk are defined by their motion.
+
+        Perf mode neutralised it — once by name and once through a blanket
+        `*::before` rule — so the two animated backdrops were static for
+        everybody. Motion is switched off by data-swift-anim="off" and by
+        prefers-reduced-motion; those are the two that should own the decision.
+        """
+        offenders = []
+        for filename in self.DESK_CSS:
+            for selector, declarations in css_rules(filename):
+                if 'data-swift-perf="on"' not in selector:
+                    continue
+                if not selects_the_backdrop(selector):
+                    continue
+                if re.search(r"(^|;)\s*animation(-\w+)?\s*:", declarations):
+                    offenders.append(f"{filename}: {selector}")
+
+        self.assertEqual(
+            offenders, [],
+            f"perf mode freezes the backdrop for every user: {offenders}")
+
+    def test_animation_switch_still_stops_the_backdrop(self):
+        """The counterpart: exempting the backdrop from perf must not have
+        exempted it from the switch that genuinely means "no motion"."""
+        stoppers = [
+            selector
+            for filename in self.DESK_CSS
+            for selector, declarations in css_rules(filename)
+            if 'data-swift-anim="off"' in selector
+            and selects_the_backdrop(selector)
+            and re.search(r"(^|;)\s*animation(-\w+)?\s*:\s*none", declarations)
+        ]
+        self.assertTrue(
+            stoppers,
+            "nothing stops the backdrop animating when animation is turned off")
+
+    def test_each_preset_carries_its_own_backdrop(self):
+        """The backdrop is part of a preset's identity, not a global setting.
+
+        Picking a preset must bring its backdrop with it, so switching preset
+        visibly changes the background treatment and not just the hues.
+        """
+        from swift_theme.api.boot import resolve_backdrop
+
+        for name, data in PREMIUM_THEMES.items():
+            self.assertEqual(
+                resolve_backdrop(None, data.get("backdrop")), data.get("backdrop"),
+                f"{name} does not get its own backdrop when Settings leaves it blank")
+
+    def test_every_preset_has_its_own_backdrop(self):
+        """The backdrop is meant to say which preset you are looking at.
+
+        Five generic treatments shared twelve ways meant Doctor Strange,
+        Scarlet Witch and Thanos were the same background in three hues.
+        """
+        used = {name: data.get("backdrop") for name, data in PREMIUM_THEMES.items()}
+        duplicates = {b for b in used.values() if list(used.values()).count(b) > 1}
+        self.assertEqual(
+            duplicates, set(),
+            f"these backdrops are shared by more than one preset: {duplicates}")
+
+    def test_character_backdrops_are_actually_drawn(self):
+        """A preset pointing at a backdrop with no CSS shows a flat colour.
+
+        Checking for the key anywhere in the file was not enough: a backdrop
+        whose colour field had been deleted still passed on the strength of its
+        leftover texture rule, so this asks for the ::before layer by name.
+        """
+        selectors = {selector for selector, _ in css_rules("swift-backdrops.css")}
+        for name, data in PREMIUM_THEMES.items():
+            key = data.get("backdrop")
+            wanted = f'html[data-swift-backdrop="{key}"] body::before'
+            self.assertTrue(
+                any(wanted in selector for selector in selectors),
+                f"{name} asks for the {key!r} backdrop, but nothing paints it")
+
+    def test_character_backdrops_are_registered(self):
+        """resolve_backdrop drops anything not in BACKDROPS back to "none"."""
+        from swift_theme.api.boot import BACKDROPS
+
+        for name, data in PREMIUM_THEMES.items():
+            self.assertIn(
+                data.get("backdrop"), BACKDROPS,
+                f"{name}'s backdrop is not registered, so it resolves to none")
+
+    def test_custom_colors_only_offers_the_generic_backdrops(self):
+        """A character backdrop belongs to its preset, not to a dropdown."""
+        from swift_theme.api.boot import GENERIC_BACKDROPS
+
+        for option in settings_json_options("backdrop"):
+            self.assertIn(
+                option.lower(), GENERIC_BACKDROPS,
+                f"{option} is a preset's own backdrop and should not be selectable")
+
+    def test_preset_mode_ignores_the_settings_backdrop(self):
+        """In preset mode the preset owns the backdrop.
+
+        Otherwise one stored choice sits over all twelve and every preset looks
+        the same behind the content, which defeats shipping a treatment per
+        preset in the first place.
+        """
+        from swift_theme.api.boot import resolve_backdrop
+
+        self.assertEqual(
+            resolve_backdrop("Silk", "aurora", is_preset=True), "aurora",
+            "a stored backdrop is overriding the preset's own")
+        self.assertEqual(resolve_backdrop(None, "grain", is_preset=True), "grain")
+        self.assertEqual(resolve_backdrop("Mesh", None, is_preset=True), "none")
+
+    def test_custom_colors_still_choose_their_own_backdrop(self):
+        """Custom Colors has no preset to speak for it, so Settings decides."""
         from swift_theme.api.boot import resolve_backdrop
 
         self.assertEqual(resolve_backdrop("Silk", "aurora"), "silk", "Settings must win")
@@ -906,9 +1073,19 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
         self.assertEqual(prefs["backdrop"], PREMIUM_THEMES["Loki"]["backdrop"])
         self.assertEqual(prefs["backdrop_pinned"], 0)
 
+        # A leftover Settings choice must not sit over the preset's own.
         with no_user_preset():
             with settings_patched(color_mode="Theme Preset", active_preset="Loki",
                                   backdrop="Facets"):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["backdrop"], PREMIUM_THEMES["Loki"]["backdrop"])
+        self.assertEqual(prefs["backdrop_pinned"], 0)
+
+    def test_custom_colors_backdrop_reaches_the_client(self):
+        """With no preset in play, the Settings choice is the one that ships."""
+        with no_user_preset():
+            with settings_patched(color_mode="Custom Colors", primary_color="#39e4a5",
+                                  secondary_color="#7c3aed", backdrop="Facets"):
                 prefs = get_effective_prefs()
         self.assertEqual(prefs["backdrop"], "facets")
         self.assertEqual(prefs["backdrop_pinned"], 1)

@@ -155,10 +155,257 @@ html[data-swift-backdrop="none"] body::after {
   content: none;
 }
 
-/* Motion is decoration; drop it when asked, keep the colour field */
-html[data-swift-perf="on"] body::before,
+
+/* ==================================================================
+   CHARACTER BACKDROPS
+
+   One per preset, keyed by the preset's own slug, so choosing a preset
+   brings a background built for it rather than one of five generic
+   treatments shared twelve ways.
+
+   Every one is drawn from --swift-primary / --swift-secondary over
+   --bg-color, so each still reads correctly in both light and dark and
+   nothing here assumes a particular hue.
+
+   The generic six above remain, and are what Custom Colors picks from.
+   ================================================================== */
+
+/* Iron Man — arc reactor rings under angular armour plating */
+html[data-swift-backdrop="iron-man"] body::before {
+  animation: none;
+  background:
+    repeating-radial-gradient(circle at 50% 40%,
+      color-mix(in oklab, var(--swift-secondary) 13%, transparent) 0 1px,
+      transparent 1px 4.5vh),
+    radial-gradient(26vw 26vw at 50% 40%,
+      color-mix(in oklab, var(--swift-secondary) 30%, transparent), transparent 64%),
+    linear-gradient(122deg,
+      color-mix(in oklab, var(--swift-primary) 20%, transparent) 0 36%, transparent 36.3%),
+    linear-gradient(238deg,
+      color-mix(in oklab, var(--swift-primary) 15%, transparent) 0 42%, transparent 42.3%),
+    var(--bg-color);
+}
+
+/* Captain America — the shield, concentric bands off one corner */
+html[data-swift-backdrop="captain-america"] body::before {
+  animation: none;
+  background:
+    repeating-radial-gradient(circle at 88% 12%,
+      color-mix(in oklab, var(--swift-primary) 15%, transparent) 0 3.4vh,
+      transparent 3.4vh 6.8vh,
+      color-mix(in oklab, var(--swift-secondary) 11%, transparent) 6.8vh 10.2vh,
+      transparent 10.2vh 13.6vh),
+    radial-gradient(18vw 18vw at 88% 12%,
+      color-mix(in oklab, var(--swift-secondary) 34%, transparent), transparent 70%),
+    radial-gradient(60vw 50vh at 10% 96%,
+      color-mix(in oklab, var(--swift-primary) 16%, transparent), transparent 66%),
+    var(--bg-color);
+}
+
+/* Doctor Strange — a sling-ring portal, sparking and slowly turning */
+html[data-swift-backdrop="doctor-strange"] body::before {
+  background:
+    repeating-conic-gradient(from 0deg at 78% 22%,
+      color-mix(in oklab, var(--swift-secondary) 22%, transparent) 0deg 3deg,
+      transparent 3deg 9deg),
+    radial-gradient(circle at 78% 22%,
+      transparent 0 15vh,
+      color-mix(in oklab, var(--swift-secondary) 40%, transparent) 15vh 16.2vh,
+      transparent 16.4vh),
+    radial-gradient(30vw 30vw at 78% 22%,
+      color-mix(in oklab, var(--swift-primary) 26%, transparent), transparent 66%),
+    radial-gradient(50vw 44vh at 16% 88%,
+      color-mix(in oklab, var(--swift-primary) 18%, transparent), transparent 64%),
+    var(--bg-color);
+  animation: swift-portal 60s linear infinite;
+}
+
+@keyframes swift-portal {
+  from { transform: rotate(0deg)   scale(1.35); }
+  to   { transform: rotate(360deg) scale(1.35); }
+}
+
+/* Star-Lord — retro scanlines over a starfield */
+html[data-swift-backdrop="star-lord"] body::before {
+  animation: none;
+  background:
+    repeating-linear-gradient(0deg,
+      color-mix(in oklab, var(--swift-primary) 7%, transparent) 0 1px,
+      transparent 1px 4px),
+    radial-gradient(1.5px 1.5px at 18% 24%,
+      color-mix(in oklab, var(--swift-secondary) 70%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 62% 12%,
+      color-mix(in oklab, var(--swift-secondary) 60%, transparent), transparent),
+    radial-gradient(2px 2px at 84% 58%,
+      color-mix(in oklab, var(--swift-secondary) 65%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 34% 76%,
+      color-mix(in oklab, var(--swift-secondary) 55%, transparent), transparent),
+    radial-gradient(2px 2px at 72% 88%,
+      color-mix(in oklab, var(--swift-secondary) 60%, transparent), transparent),
+    radial-gradient(56vw 46vh at 8% 6%,
+      color-mix(in oklab, var(--swift-primary) 24%, transparent), transparent 62%),
+    radial-gradient(50vw 42vh at 94% 92%,
+      color-mix(in oklab, var(--swift-secondary) 20%, transparent), transparent 60%),
+    var(--bg-color);
+}
+
+/* Vision — the mind stone, a halo throwing soft rays */
+html[data-swift-backdrop="vision"] body::before {
+  background:
+    repeating-conic-gradient(from 200deg at 50% -6%,
+      color-mix(in oklab, var(--swift-secondary) 10%, transparent) 0deg 4deg,
+      transparent 4deg 14deg),
+    radial-gradient(22vw 22vw at 50% -6%,
+      color-mix(in oklab, var(--swift-secondary) 38%, transparent), transparent 68%),
+    radial-gradient(64vw 52vh at 50% 104%,
+      color-mix(in oklab, var(--swift-primary) 20%, transparent), transparent 66%),
+    var(--bg-color);
+  animation: swift-halo 22s ease-in-out infinite alternate;
+}
+
+@keyframes swift-halo {
+  from { transform: scale(1);    opacity: 0.92; }
+  to   { transform: scale(1.06); opacity: 1; }
+}
+
+/* Scarlet Witch — chaos magic, a slow swirl */
+html[data-swift-backdrop="scarlet-witch"] body::before {
+  background:
+    conic-gradient(from 40deg at 32% 30%,
+      color-mix(in oklab, var(--swift-primary) 30%, transparent),
+      transparent 28%,
+      color-mix(in oklab, var(--swift-secondary) 26%, transparent) 52%,
+      transparent 76%,
+      color-mix(in oklab, var(--swift-primary) 24%, transparent)),
+    radial-gradient(52vw 46vh at 84% 84%,
+      color-mix(in oklab, var(--swift-secondary) 22%, transparent), transparent 64%),
+    var(--bg-color);
+  animation: swift-chaos 48s linear infinite;
+}
+
+@keyframes swift-chaos {
+  from { transform: rotate(0deg)   scale(1.4); }
+  to   { transform: rotate(360deg) scale(1.4); }
+}
+
+/* Black Panther — vibranium weave, a fine cross-hatch under a vignette */
+html[data-swift-backdrop="black-panther"] body::before {
+  animation: none;
+  background:
+    repeating-linear-gradient(60deg,
+      color-mix(in oklab, var(--swift-primary) 9%, transparent) 0 1px,
+      transparent 1px 1.6vh),
+    repeating-linear-gradient(-60deg,
+      color-mix(in oklab, var(--swift-secondary) 8%, transparent) 0 1px,
+      transparent 1px 1.6vh),
+    radial-gradient(70vw 60vh at 50% 0%,
+      color-mix(in oklab, var(--swift-primary) 24%, transparent), transparent 68%),
+    var(--bg-color);
+}
+
+html[data-swift-backdrop="black-panther"] body::after {
+  content: "";
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+}
+
+/* Loki — Asgardian chevrons, horned and angular */
+html[data-swift-backdrop="loki"] body::before {
+  background:
+    repeating-linear-gradient(135deg,
+      color-mix(in oklab, var(--swift-secondary) 12%, transparent) 0 2px,
+      transparent 2px 6vh),
+    repeating-linear-gradient(45deg,
+      color-mix(in oklab, var(--swift-secondary) 9%, transparent) 0 2px,
+      transparent 2px 6vh),
+    radial-gradient(58vw 48vh at 14% 8%,
+      color-mix(in oklab, var(--swift-primary) 30%, transparent), transparent 64%),
+    radial-gradient(50vw 44vh at 90% 94%,
+      color-mix(in oklab, var(--swift-primary) 20%, transparent), transparent 62%),
+    var(--bg-color);
+  animation: swift-silk 34s ease-in-out infinite alternate;
+}
+
+/* Hulk — a gamma burst, irregular and loud */
+html[data-swift-backdrop="hulk"] body::before {
+  animation: none;
+  background:
+    radial-gradient(24vw 20vh at 22% 18%,
+      color-mix(in oklab, var(--swift-primary) 40%, transparent), transparent 58%),
+    radial-gradient(18vw 26vh at 40% 8%,
+      color-mix(in oklab, var(--swift-primary) 28%, transparent), transparent 60%),
+    radial-gradient(30vw 22vh at 82% 34%,
+      color-mix(in oklab, var(--swift-secondary) 26%, transparent), transparent 58%),
+    radial-gradient(26vw 30vh at 64% 92%,
+      color-mix(in oklab, var(--swift-primary) 24%, transparent), transparent 60%),
+    radial-gradient(20vw 18vh at 8% 76%,
+      color-mix(in oklab, var(--swift-secondary) 22%, transparent), transparent 58%),
+    var(--bg-color);
+}
+
+/* Thanos — deep cosmos with the gauntlet's ring */
+html[data-swift-backdrop="thanos"] body::before {
+  background:
+    radial-gradient(circle at 30% 68%,
+      transparent 0 22vh,
+      color-mix(in oklab, var(--swift-secondary) 26%, transparent) 22vh 23.4vh,
+      transparent 23.6vh),
+    radial-gradient(56vw 48vh at 30% 68%,
+      color-mix(in oklab, var(--swift-primary) 30%, transparent), transparent 66%),
+    radial-gradient(48vw 44vh at 88% 12%,
+      color-mix(in oklab, var(--swift-secondary) 26%, transparent), transparent 62%),
+    radial-gradient(70vw 60vh at 50% 50%,
+      color-mix(in oklab, var(--swift-primary) 10%, transparent), transparent 72%),
+    var(--bg-color);
+  animation: swift-aurora 40s ease-in-out infinite alternate;
+}
+
+/* Venom — symbiote tendrils, thick and creeping */
+html[data-swift-backdrop="venom"] body::before {
+  animation: none;
+  background:
+    repeating-radial-gradient(ellipse 30vw 8vh at 20% 12%,
+      color-mix(in oklab, var(--swift-primary) 14%, transparent) 0 1.2vh,
+      transparent 1.2vh 5vh),
+    repeating-radial-gradient(ellipse 26vw 7vh at 84% 88%,
+      color-mix(in oklab, var(--swift-secondary) 12%, transparent) 0 1vh,
+      transparent 1vh 4.4vh),
+    radial-gradient(60vw 54vh at 50% 50%,
+      color-mix(in oklab, var(--swift-primary) 22%, transparent), transparent 70%),
+    var(--bg-color);
+}
+
+html[data-swift-backdrop="venom"] body::after {
+  content: "";
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+}
+
+/* Winter Soldier — brushed metal striations and the red star */
+html[data-swift-backdrop="winter-soldier"] body::before {
+  animation: none;
+  background:
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, var(--swift-primary) 8%, transparent) 0 1px,
+      transparent 1px 3px),
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, var(--swift-secondary) 5%, transparent) 0 2px,
+      transparent 2px 11px),
+    radial-gradient(14vw 14vw at 74% 30%,
+      color-mix(in oklab, var(--swift-secondary) 34%, transparent), transparent 64%),
+    radial-gradient(62vw 52vh at 12% 4%,
+      color-mix(in oklab, var(--swift-primary) 24%, transparent), transparent 64%),
+    var(--bg-color);
+}
+
+/* Motion is decoration; drop it when asked, keep the colour field.
+
+   Perf mode is deliberately not listed here. It is on by default, so having it
+   stop the backdrop meant nobody ever saw one move. This layer only animates
+   transform, so it is the compositor's problem, not the main thread's. */
 html[data-swift-anim="off"] body::before,
-html[data-swift-perf="on"] body::after,
 html[data-swift-anim="off"] body::after {
   animation: none !important;
 }

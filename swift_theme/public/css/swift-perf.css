@@ -26,10 +26,17 @@
    is gone; what remains cuts motion and expensive effects, which is safe
    because none of it changes layout or hit-testing. */
 
-/* Cut animation and transitions */
+/* Cut animation and transitions.
+
+   body::before / body::after are exempt: that is the backdrop, a fixed
+   pointer-events:none layer animating only transform, so it is composited and
+   costs nothing to leave running. Including it here made perf mode — which is
+   on by default — silently flatten every backdrop the app ships. Motion is
+   still switched off by data-swift-anim="off" and by prefers-reduced-motion,
+   which is where that decision belongs. */
 html[data-swift-perf="on"] *,
-html[data-swift-perf="on"] *::before,
-html[data-swift-perf="on"] *::after {
+html[data-swift-perf="on"] :not(body)::before,
+html[data-swift-perf="on"] :not(body)::after {
   animation-duration: 0.001ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
@@ -41,11 +48,6 @@ html[data-swift-perf="on"] .body-sidebar,
 html[data-swift-perf="on"] .promotional-banner {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-}
-
-html[data-swift-perf="on"] body::before {
-  animation: none !important;
-  background: var(--bg-color) !important;
 }
 
 html[data-swift-perf="on"] .btn-primary::after {

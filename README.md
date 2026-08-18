@@ -61,7 +61,21 @@ write a file that fails either.
 The desk background can carry one of five treatments — **Aurora**, **Mesh**,
 **Grain**, **Facets**, **Silk** — or **None**. Each is built from the active
 theme's own two colours, so it works with every preset and with custom colours.
-Each preset ships a default; the Backdrop field in Settings overrides it.
+
+**Each preset also has a backdrop of its own**, drawn for that character and
+built from that preset's two colours: Iron Man's arc-reactor rings, Captain
+America's shield bands, Doctor Strange's turning portal, Black Panther's
+vibranium weave, Venom's tendrils, Winter Soldier's brushed metal. Switching
+preset brings its backdrop with it, so the background says which theme you are
+looking at rather than being one of five treatments shared twelve ways.
+
+The five generic treatments above are what **Custom Colors** picks from, using
+the Backdrop field in Settings; a preset's own backdrop is not selectable there,
+because it belongs to that preset.
+
+Aurora and Silk drift slowly; Mesh, Grain and Facets are still by design. The
+motion is a `transform` on a fixed, non-interactive layer, so it is composited
+rather than repainted. It stops when the browser asks for reduced motion.
 
 No image is shipped for any of this: it is CSS plus one inline SVG for the
 grain, so there is nothing extra to download.

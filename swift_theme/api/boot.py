@@ -94,10 +94,13 @@ def get_effective_prefs():
         "secondary":   colors["secondary"],
         "is_dark":     colors["is_dark"],
         "roles":       colors.get("roles") or {},
-        "backdrop":    resolve_backdrop(s.get("backdrop"), colors.get("preset_backdrop")),
-        # True when Settings pins one, so switching preset in the navbar keeps
-        # the admin's choice instead of reverting to the preset's own default.
-        "backdrop_pinned": 1 if (s.get("backdrop") or "").strip().lower() in BACKDROPS else 0,
+        "backdrop":    resolve_backdrop(
+            s.get("backdrop"), colors.get("preset_backdrop"),
+            is_preset=bool(colors.get("preset"))),
+        # Only Custom Colors can pin one now — in preset mode the preset owns
+        # the backdrop, so the navbar must follow each preset's own choice.
+        "backdrop_pinned": 0 if colors.get("preset") else (
+            1 if (s.get("backdrop") or "").strip().lower() in BACKDROPS else 0),
 
         # layout
         "density":     u.get("swift_density")     or s.get("default_density")   or "Comfortable",
@@ -185,14 +188,34 @@ def set_user_pref(field, value):
     return {"ok": True, "field": field, "value": value}
 
 
-BACKDROPS = ("aurora", "mesh", "grain", "facets", "silk", "none")
+# What Custom Colors can pick from, and the fallbacks any theme can use.
+GENERIC_BACKDROPS = ("aurora", "mesh", "grain", "facets", "silk", "none")
+
+# One per preset, keyed by the preset's own slug. Derived rather than listed so
+# a new preset cannot end up pointing at a backdrop that was never written.
+CHARACTER_BACKDROPS = tuple(
+    data["slug"] for data in PREMIUM_THEMES.values() if data.get("slug")
+)
+
+BACKDROPS = GENERIC_BACKDROPS + CHARACTER_BACKDROPS
 
 
-def resolve_backdrop(settings_value, preset_default):
-    """Settings wins; otherwise the preset's own choice; otherwise nothing.
+def resolve_backdrop(settings_value, preset_default, is_preset=False):
+    """Which background treatment the desk gets.
+
+    In Theme Preset mode the preset decides, full stop. The backdrop is part of
+    what makes a preset that preset — Venom's grain and Thanos's aurora are as
+    much its identity as the hues — so switching preset has to bring its
+    backdrop with it rather than leaving a stale global choice in place.
+
+    Custom Colors has no preset to speak for it, so there the Backdrop field in
+    Settings is the choice.
 
     The Select stores a label ("Aurora"), the CSS keys off a slug ("aurora").
     """
+    if is_preset:
+        return preset_default if preset_default in BACKDROPS else "none"
+
     chosen = (settings_value or "").strip().lower()
     if chosen in BACKDROPS:
         return chosen
