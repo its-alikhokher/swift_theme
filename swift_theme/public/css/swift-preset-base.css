@@ -67,8 +67,6 @@ html[data-swift-themed] .desk-sidebar-item.selected {
 /* Glassy navbar for premium themes */
 html[data-swift-themed] .navbar {
   background: var(--navbar-bg) !important;
-  backdrop-filter: saturate(160%) blur(14px);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -200,8 +198,6 @@ html[data-swift-themed] h3 {
 html[data-swift-themed] .navbar {
   background: color-mix(in oklab, var(--fg-color) 78%, transparent) !important;
   border-bottom: 1px solid var(--border-color) !important;
-  backdrop-filter: saturate(180%) blur(10px);
-  -webkit-backdrop-filter: saturate(180%) blur(10px);
   box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px -12px rgba(0,0,0,0.35);
 }
 html[data-swift-themed] .navbar .navbar-brand,
@@ -281,8 +277,6 @@ html[data-swift-themed] .body-sidebar-container,
 html[data-swift-themed] .body-sidebar {
   background: color-mix(in oklab, var(--fg-color) 82%, transparent) !important;
   border-right: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   box-shadow: inset -1px 0 0 rgba(255,255,255,0.02),
               4px 0 24px -14px color-mix(in oklab, var(--swift-accent) 60%, transparent);
 }
@@ -325,8 +319,6 @@ html[data-swift-themed] .promotional-banner {
     transparent 70%),
     color-mix(in oklab, var(--card-bg) 80%, transparent);
   border: 1px solid color-mix(in oklab, var(--swift-accent) 40%, var(--border-color));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 12px 30px -18px color-mix(in oklab, var(--swift-accent) 70%, transparent);
 }
 

@@ -42,13 +42,9 @@ html[data-swift-perf="on"] :not(body)::after {
   transition-duration: 0.001ms !important;
 }
 
-/* Drop the expensive compositing effects, keeping colours intact */
-html[data-swift-perf="on"] .navbar,
-html[data-swift-perf="on"] .body-sidebar,
-html[data-swift-perf="on"] .promotional-banner {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
+/* The backdrop-filter resets that used to live here are gone with the blurs
+   they answered: nothing in the theme applies one any more, because it made
+   the navbar and sidebar containing blocks for their own dropdowns. */
 
 html[data-swift-perf="on"] .btn-primary::after {
   display: none !important;

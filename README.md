@@ -114,7 +114,8 @@ Saving Swift Theme Settings applies immediately in every open desk session.
 - **Login page** in three layouts (Split, Centered, Minimal), themed from the
   active palette and rendered server-side so it paints correctly on first load.
 - **Density, shape, font scale and family**, per user.
-- **Focus / reading mode**, a command palette, and sidebar pinning.
+- **Focus / reading mode**, a command palette, and a hide-the-sidebar
+  toggle on Alt+B with a floating button to bring it back.
 
 ## Install
 

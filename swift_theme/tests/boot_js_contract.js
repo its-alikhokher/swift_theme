@@ -195,11 +195,12 @@ check("preset stored in localStorage", store["swift_preset"] === "swift-blue", s
 check("theme css url stored", (store["swift_theme_css"] || "").endsWith("swift-blue.css"));
 
 console.log("\n== 6. Other preferences still applied ==");
-API.applyPrefs({ density: "Compact", radius: "Pill", pin_behavior: "Hover to Expand" });
+API.applyPrefs({ density: "Compact", radius: "Pill" });
 check("density attribute", html.getAttribute("data-swift-density") === "Compact");
 check("radius attribute", html.getAttribute("data-swift-radius") === "Pill");
-check("pin behaviour mapped to its CSS token",
-    html.getAttribute("data-swift-pin") === "hover", html.getAttribute("data-swift-pin"));
+// Pinning was removed; nothing may resurrect the attribute it keyed off.
+check("no pin attribute is set any more",
+    html.getAttribute("data-swift-pin") === null, html.getAttribute("data-swift-pin"));
 
 console.log("\n" + "=".repeat(46));
 /* ------------------------------------------------------------------
@@ -209,11 +210,12 @@ console.log("\n" + "=".repeat(46));
    so this runs the file and calls play_sound for real.
    ------------------------------------------------------------------ */
 (function soundsDoNotDoublePlay() {
-    function boot(soundsEnabled) {
+    function boot(soundsEnabled, files) {
         let frappePlayed = 0;
         const ready = [];
         const frappe = {
-            boot: { swift_theme: { sounds: { enabled: soundsEnabled, volume: 0.5, files: {} } } },
+            boot: { swift_theme: { sounds: {
+                enabled: soundsEnabled, volume: 0.5, files: files || {} } } },
             utils: { play_sound: () => { frappePlayed += 1; } },
             after_ajax: (fn) => ready.push(fn),
             ui: { form: {} },
@@ -230,12 +232,16 @@ console.log("\n" + "=".repeat(46));
         return frappePlayed;
     }
 
-    check("theme sounds on: Frappe's own save click is suppressed",
-        boot(true) === 0, boot(true));
-    // Off hands the desk back to Frappe rather than silencing it: the checkbox
-    // chooses which engine answers, it does not turn sound off altogether.
-    check("theme sounds off: Frappe's own sounds play as normal",
-        boot(false) === 1, boot(false));
+    const withSave = { save: "/files/save.mp3" };
+
+    check("sounds on with a save file: Frappe's own click steps aside",
+        boot(true, withSave) === 0, boot(true, withSave));
+    // The app ships no audio. Suppressing regardless of that made ticking
+    // Sounds silence the desk outright, which is worse than leaving it alone.
+    check("sounds on but nothing attached: Frappe's own sound still plays",
+        boot(true, {}) === 1, boot(true, {}));
+    check("sounds off: Frappe's own sounds play as normal",
+        boot(false, withSave) === 1, boot(false, withSave));
 })();
 
 /* The glass switch has to travel the same road as the backdrop: applied, and

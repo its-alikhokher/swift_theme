@@ -3,18 +3,14 @@
 /* -------- Navbar variants -------- */
 html[data-swift-navbar="Solid"] .navbar {
   background: var(--fg-color) !important;
-  backdrop-filter: none;
   border-bottom: 1px solid var(--border-color);
 }
 html[data-swift-navbar="Glass"] .navbar {
   background: color-mix(in oklab, var(--fg-color) 65%, transparent) !important;
-  backdrop-filter: saturate(160%) blur(10px);
-  -webkit-backdrop-filter: saturate(160%) blur(10px);
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
 }
 html[data-swift-navbar="Transparent"] .navbar {
   background: transparent !important;
-  backdrop-filter: none;
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
 }
 

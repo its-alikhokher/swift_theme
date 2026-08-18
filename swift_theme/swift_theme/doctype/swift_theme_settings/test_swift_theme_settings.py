@@ -49,7 +49,7 @@ REQUIRED_SETTINGS_FIELDS = [
     "primary_color", "secondary_color",
     "default_density", "default_radius",
     "default_font_scale", "default_font_family",
-    "navbar_variant", "sidebar_variant", "pin_behavior",
+    "navbar_variant", "sidebar_variant",
     "enable_switcher", "enable_command_palette", "enable_focus_mode",
     "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
     "enable_print_theming", "print_font_family",
@@ -362,10 +362,6 @@ class TestSwiftThemePreferences(IntegrationTestCase):
             self.assertEqual(get_effective_prefs()["enable_switcher"], 1)
         with settings_patched(enable_switcher=0):
             self.assertEqual(get_effective_prefs()["enable_switcher"], 0)
-
-    def test_pin_behavior_is_exposed_to_the_client(self):
-        """CSS keys off data-swift-pin, which boot.js derives from this."""
-        self.assertIn("pin_behavior", get_effective_prefs())
 
     def test_sounds_config_is_shipped_in_boot(self):
         prefs = get_effective_prefs()
@@ -1068,6 +1064,9 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
                       "the check must be per call, or the setting needs a reload")
         self.assertIn("original.apply", body,
                       "Frappe's sounds must come back when the theme's are off")
+        self.assertIn("cfg.files", body,
+                      "suppression must depend on the theme actually having a "
+                      "file, or ticking Sounds silences a desk that ships no audio")
 
     def test_backdrop_switches_are_reachable_in_every_colour_mode(self):
         """Both switches govern Theme Preset and Custom Colors alike.
@@ -1601,25 +1600,90 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         self.assertIn("#alert-container", css)
         self.assertIn("bottom: auto", css)
 
-    def test_pin_and_restore_controls_are_styled(self):
+    def test_nothing_traps_a_dropdown_inside_itself(self):
+        """transform, filter and backdrop-filter all make an element the
+        containing block for its position:fixed descendants.
+
+        The navbar and the sidebar rows both host dropdowns — notifications
+        lives inside a sidebar row — and a blur on the sidebar plus a 3px
+        translate on row hover left that dropdown clipped and mispositioned.
+        Same rule that governs the child-table editor, applied where popups
+        actually live.
+        """
+        hosts = ("navbar", "sidebar", "dropdown", "item-anchor",
+                 "standard-sidebar-item", "desk-sidebar-item")
+        offenders = []
+        for filename in sorted(n for n in os.listdir(CSS_DIR) if n.endswith(".css")):
+            for selector, declarations in css_rules(filename):
+                if not any(host in selector for host in hosts):
+                    continue
+                if "swift-sidebar-restore" in selector:
+                    continue                 # our own button, hosts nothing
+                for prop in ("transform", "filter", "backdrop-filter", "perspective"):
+                    if re.search(rf"(^|;)\s*{prop}\s*:\s*(?!none)", declarations):
+                        offenders.append(f"{filename}: {selector[:50]} sets {prop}")
+
+        self.assertEqual(
+            offenders, [], f"these trap their own dropdowns: {offenders}")
+
+    def test_collapsed_sidebar_leaves_room_for_the_icon(self):
+        """The collapsed rail is icon-width; margin on the row squeezed it out.
+
+        8px either side left nothing for the icon, so the collapsed sidebar
+        showed clipped glyphs where its icons should be.
+        """
         css = read_css("swift-desk.css")
-        for selector in (".swift-pin-btn", ".swift-pinned", ".swift-sidebar-restore"):
-            self.assertIn(selector, css, f"{selector} is injected by JS but never styled")
+        self.assertIn(
+            ".body-sidebar-container:not(.expanded)", css,
+            "nothing narrows the row margin for the collapsed rail")
+
+    def test_user_theme_fields_follow_the_server_permission(self):
+        """The form must not offer what set_user_pref will refuse.
+
+        Those fields were editable regardless, so a user could change one and
+        have the save rejected, or stored and then ignored.
+        """
+        js = read_js("user_form.js")
+        for fieldname in ("swift_preset", "swift_primary", "swift_secondary"):
+            self.assertIn(fieldname, js, f"{fieldname} is left editable on the form")
+        self.assertIn("read_only", js)
+        self.assertIn("enable_switcher", js)
+        self.assertIn("can_switch_theme", js)
+
+        self.assertEqual(
+            frappe.get_hooks("doctype_js", {}).get("User"),
+            ["public/js/user_form.js"],
+            "the User form script is not registered, so it never runs")
+
+    def test_restore_control_is_styled(self):
+        css = read_css("swift-desk.css")
+        self.assertIn(".swift-sidebar-restore", css,
+                      ".swift-sidebar-restore is injected by JS but never styled")
+
+    def test_sidebar_pinning_is_gone_completely(self):
+        """Removed feature, removed remains.
+
+        Pinning put a star on Frappe's own sidebar rows and reordered its nav on
+        every mutation. Leaving any half of it behind — CSS with no JS, a stored
+        setting with nothing reading it — is how dead options accumulate.
+        """
+        for filename in sorted(n for n in os.listdir(CSS_DIR) if n.endswith(".css")):
+            css = read_css(filename)
+            for token in ("swift-pin-btn", "swift-pinned", "data-swift-pin"):
+                self.assertNotIn(token, css, f"{token} still styled in {filename}")
+
+        for filename in sorted(n for n in os.listdir(JS_DIR) if n.endswith(".js")):
+            self.assertNotIn("swift-pin-btn", read_js(filename),
+                             f"{filename} still injects a pin button")
+
+        self.assertFalse(
+            frappe.get_meta("Swift Theme Settings").has_field("pin_behavior"),
+            "the pin setting is still on the form with nothing reading it")
 
     def test_login_layouts_are_styled(self):
         css = read_css("login.css")
         for option in settings_json_options("login_layout"):
             self.assertIn(f'data-swift-login-layout="{option}"', css)
-
-    def test_pin_behaviour_tokens_agree_between_js_and_css(self):
-        """boot.js maps the label to a short token; CSS must use the same one."""
-        js = read_js("swift-boot.js")
-        css = read_css("swift-desk.css")
-        for label in settings_json_options("pin_behavior"):
-            self.assertIn(f'"{label}"', js, f"boot.js does not map pin behaviour {label!r}")
-        # "click" is the neutral default and intentionally has no rule.
-        for token in ("hover", "always"):
-            self.assertIn(f'data-swift-pin="{token}"', css)
 
 
 class TestSwiftThemeClientContract(IntegrationTestCase):
@@ -1646,11 +1710,19 @@ class TestSwiftThemeClientContract(IntegrationTestCase):
         ):
             self.assertIn(flag, read_js(filename), f"{filename} ignores {flag}")
 
-    def test_sidebar_does_not_re_enter_its_own_mutation_observer(self):
-        """Reordering pinned items re-triggered the observer every 120ms."""
-        js = read_js("swift-sidebar.js")
-        self.assertIn("withObserverPaused", js)
-        self.assertIn("takeRecords", js)
+    def test_sidebar_no_longer_watches_the_desk(self):
+        """The observer existed only to re-apply pins after every re-render.
+
+        With pinning gone it has no job, and a MutationObserver on Frappe's
+        sidebar is exactly the kind of standing cost a theme should not carry.
+        """
+        # Comments stripped first: read_js keeps them, unlike read_css, and the
+        # file's own note explaining the removal names the class.
+        js = COMMENT_RE.sub("", read_js("swift-sidebar.js"))
+        js = re.sub(r"//[^\n]*", "", js)
+        self.assertNotIn("new MutationObserver", js,
+                         "the sidebar still observes the desk with nothing to apply")
+
 
     def test_presets_are_offered_in_frappes_own_theme_dialog(self):
         """One place to switch theme, not two competing ones."""

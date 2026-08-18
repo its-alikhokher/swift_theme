@@ -60,7 +60,7 @@ GUEST_KEYS = {
     "theme_css", "primary", "secondary", "is_dark", "roles",
     "backdrop", "backdrop_pinned", "enable_backdrops", "show_backdrop_through",
     "density", "radius", "font_scale", "font_family",
-    "navbar_variant", "sidebar_variant", "pin_behavior",
+    "navbar_variant", "sidebar_variant",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
     "login_layout", "login_bg_image", "login_tagline", "login_show_signup",
     "presets",
@@ -119,7 +119,6 @@ def get_effective_prefs():
         "font_family": u.get("swift_font_family") or s.get("default_font_family") or "Inter",
         "navbar_variant":  s.get("navbar_variant")  or "Solid",
         "sidebar_variant": s.get("sidebar_variant") or "Attached",
-        "pin_behavior":    s.get("pin_behavior")    or "Click to Pin",
 
         # features
         "enable_switcher":         int(s.get("enable_switcher") or 0),

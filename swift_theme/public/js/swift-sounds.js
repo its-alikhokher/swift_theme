@@ -51,21 +51,39 @@
     /* Frappe plays its own audio for the same moments we do — form.js fires
        play_sound("click") on every save — so a save made two noises.
 
-       The checkbox picks which engine answers, it does not silence the desk:
-       Sounds on means only the theme's files play, Sounds off hands the desk
-       straight back to Frappe's own audio.
+       Frappe's own audio yields per event, not wholesale. The app ships no
+       sound files, so suppressing everything the moment Sounds was ticked made
+       the desk fall completely silent — a switch that promises sound and
+       delivers less than before it was touched.
 
-       Read per call rather than once at startup, so toggling the setting takes
-       effect without a reload. Frappe's own function is kept rather than
-       overwritten, so nothing else that reaches for it breaks. */
+       So: the theme wins an event only when it actually has a file for it.
+       Anything it has nothing for still gets Frappe's own sound, and Sounds off
+       hands the whole desk back.
+
+       Read per call rather than once at startup, so toggling the setting or
+       attaching a file takes effect without a reload. Frappe's own function is
+       kept rather than overwritten, so nothing else that reaches for it breaks. */
+
+    /* Frappe's sound names against ours. "click" is the one it plays on save,
+       which is where the two engines collided. Anything unmapped is left to
+       Frappe untouched. */
+    var FRAPPE_SOUNDS = {
+        click:  "save",
+        submit: "submit",
+        cancel: "cancel",
+        delete: "delete",
+        error:  "error",
+    };
     function silenceFrappesOwnSounds() {
         var utils = frappe.utils;
         if (!utils || !utils.play_sound || utils.play_sound.__swiftWrapped) return;
 
         var original = utils.play_sound;
-        var wrapped = function () {
+        var wrapped = function (name) {
             var cfg = config();
-            if (cfg && cfg.enabled) return;      // the theme answers instead
+            var key = FRAPPE_SOUNDS[String(name || "").toLowerCase()];
+            // Only stand aside where the theme genuinely has something to play.
+            if (cfg && cfg.enabled && key && cfg.files && cfg.files[key]) return;
             return original.apply(this, arguments);
         };
         wrapped.__swiftWrapped = true;

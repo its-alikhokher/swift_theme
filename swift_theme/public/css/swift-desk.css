@@ -87,95 +87,32 @@ html[data-swift-sidebar="off"] .layout-main-section {
     width: 26px;
 }
 
-/* ---- Pin behaviour ---- */
-html[data-swift-pin="hover"] .layout-side-section:not(:hover) .sidebar-inner {
-    opacity: 0.55;
-    transition: opacity var(--swift-sidebar-transition);
-}
-
-html[data-swift-pin="always"] .layout-side-section .sidebar-inner {
-    opacity: 1 !important;
-}
-
 /* ---- Pin button on sidebar items ---- */
-.standard-sidebar-item,
-.desk-sidebar-item,
-.list-sidebar .list-link {
-    position: relative;
-}
-
-.swift-pin-btn {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-muted, #94a3b8);
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease, color 0.15s ease;
-}
-
-/* Only surface the star on hover or when the item is pinned, so it doesn't
-   clutter every row. */
-.standard-sidebar-item:hover .swift-pin-btn,
-.desk-sidebar-item:hover .swift-pin-btn,
-.list-sidebar .list-link:hover .swift-pin-btn,
-.swift-pin-btn:focus-visible {
-    opacity: 1;
-}
-
-.swift-pin-btn:hover {
-    color: var(--swift-accent, #4f46e5);
-    background: color-mix(in oklab, var(--swift-accent, #4f46e5) 14%, transparent);
-}
-
-.swift-pinned > .swift-pin-btn {
-    opacity: 1;
-    color: var(--swift-accent, #4f46e5);
-}
-
-/* Pinned rows sit at the top with a divider closing the group */
-.swift-pinned {
-    background: color-mix(in oklab, var(--swift-accent, #4f46e5) 8%, transparent);
-}
-
-.swift-pinned-group {
-    margin-bottom: 6px !important;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
-}
-
-/* Icon-only sidebars have no room for the star */
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:not(:hover) .swift-pin-btn {
-    display: none;
-}
-
 /* Sidebar items — smooth hover, no jump.
    These used --accent-color, which nothing defines, so every theme got the
    same hardcoded blue here. */
 .standard-sidebar-item, .desk-sidebar-item {
-    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: background 0.15s ease, color 0.15s ease;
     border-radius: 8px;
     margin: 2px 8px;
 }
 
+/* Collapsed, the rail is only as wide as an icon, and 8px of margin either
+   side pushed the icon out of it — which is why the collapsed sidebar showed
+   clipped glyphs instead of icons. */
+.body-sidebar-container:not(.expanded) .standard-sidebar-item,
+.body-sidebar-container:not(.expanded) .desk-sidebar-item {
+    margin: 2px 4px;
+}
+
+/* No transform on hover. It nudged the row 3px and, in doing so, made the row
+   a containing block and a stacking context for its own descendants — and the
+   notifications dropdown lives inside one of these rows, so it opened clipped
+   and mispositioned. Colour is enough of a hover cue. */
 html[data-swift-themed] .standard-sidebar-item:hover,
 html[data-swift-themed] .desk-sidebar-item:hover {
     background: var(--swift-accent-soft) !important;
     color: var(--swift-accent) !important;
-    transform: translateX(3px);
 }
 
 html[data-swift-themed] .standard-sidebar-item.selected,
@@ -537,8 +474,6 @@ html[data-swift-themed] .widget .link-item a:hover {
 html[data-swift-themed] .navbar {
     background: var(--navbar-bg, var(--card-bg)) !important;
     border-bottom: 1px solid var(--border-color);
-    backdrop-filter: saturate(160%) blur(12px);
-    -webkit-backdrop-filter: saturate(160%) blur(12px);
 }
 
 html[data-swift-themed] .navbar .navbar-brand,

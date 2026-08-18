@@ -294,7 +294,6 @@
             if ("font_scale" in p)      { applyAttr("font-scale", p.font_scale); set("font_scale", p.font_scale); }
             if ("navbar_variant" in p)  { applyAttr("navbar", p.navbar_variant); set("navbar", p.navbar_variant); }
             if ("sidebar_variant" in p) { applyAttr("sidebar-variant", p.sidebar_variant); set("sidebar", p.sidebar_variant); }
-            if ("pin_behavior" in p)    { applyAttr("pin", pinKey(p.pin_behavior)); }
             if (p.enable_perf_mode === 0) { applyAttr("perf", null); set("perf", "off"); }
             if (p.enable_perf_mode === 1) { applyAttr("perf", "on"); set("perf", "on"); }
             if (p.enable_styled_scrollbar === 0) { applyAttr("scrollbar", null); set("scrollbar", "off"); }
@@ -386,12 +385,6 @@
         } catch (e) {}
     }
 
-    // "Click to Pin" -> "click", so CSS can key off a short token.
-    function pinKey(v) {
-        var map = { "Click to Pin": "click", "Hover to Expand": "hover", "Always Expanded": "always" };
-        return map[v] || "";
-    }
-
     // ---- Sync with server-side prefs when bootinfo lands ----
     document.addEventListener("app_ready", syncFromBoot);
     document.addEventListener("DOMContentLoaded", syncFromBoot);
@@ -416,7 +409,6 @@
                 font_scale: boot.font_scale,
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
-                pin_behavior: boot.pin_behavior,
                 roles: boot.roles,
                 backdrop: boot.backdrop,
                 show_backdrop_through: boot.show_backdrop_through,

@@ -44,7 +44,6 @@ SETTINGS_DEFAULTS = {
     "default_font_family": "Inter",
     "navbar_variant": "Solid",
     "sidebar_variant": "Floating",
-    "pin_behavior": "Click to Pin",
     "enable_switcher": 1,
     "enable_command_palette": 1,
     "enable_focus_mode": 1,

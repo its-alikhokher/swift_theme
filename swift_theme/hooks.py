@@ -49,6 +49,11 @@ web_include_js = [
     "/assets/swift_theme/js/swift-website.js",
 ]
 
+# ---- Form scripts ----
+# The theme fields this app adds to User are only editable when the server
+# would accept a change; the script keeps the form honest about that.
+doctype_js = {"User": "public/js/user_form.js"}
+
 # ---- Boot info ----
 # extend_bootinfo alone is enough; also registering boot_session would compute
 # the same preferences a second time on every desk load.

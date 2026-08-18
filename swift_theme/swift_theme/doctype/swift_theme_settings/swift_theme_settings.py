@@ -403,7 +403,6 @@ def get_active_theme_config():
     config = {
         "color_mode": settings.color_mode,
         "sidebar_variant": settings.sidebar_variant,
-        "pin_behavior": settings.pin_behavior,
         "enable_sounds": int(settings.enable_sounds or 0),
         "volume_level": settings.volume_level or 50,
         "custom_login_text": settings.login_tagline or "",

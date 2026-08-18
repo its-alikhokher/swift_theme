@@ -52,7 +52,6 @@
   "sidebar_section",
   "navbar_variant",
   "sidebar_variant",
-  "pin_behavior",
   "custom_code_section",
   "custom_css",
   "custom_js"
@@ -388,13 +387,6 @@
    "fieldtype": "Select",
    "label": "Sidebar Variant",
    "options": "Attached\nFloating\nIcon-only"
-  },
-  {
-   "default": "Click to Pin",
-   "fieldname": "pin_behavior",
-   "fieldtype": "Select",
-   "label": "Pin Behavior",
-   "options": "Click to Pin\nHover to Expand\nAlways Expanded"
   },
   {
    "collapsible": 1,
