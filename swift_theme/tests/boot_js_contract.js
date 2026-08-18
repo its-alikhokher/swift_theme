@@ -11,6 +11,7 @@ const fs = require("fs");
 const vm = require("vm");
 
 function makeElement(tag) {
+    const listeners = {};
     return {
         tagName: (tag || "").toUpperCase(),
         id: "",
@@ -27,7 +28,15 @@ function makeElement(tag) {
         removeAttribute(k) { delete this._attrs[k]; },
         appendChild(c) { (this.children = this.children || []).push(c); return c; },
         remove() { removed.push(this); },
-        addEventListener() {},
+        // Real, not a no-op: swift-boot.js waits on a stylesheet's load event
+        // to know when it is safe to remove its inline bridge, and that can
+        // only be tested by actually firing one.
+        addEventListener(type, fn) { (listeners[type] = listeners[type] || []).push(fn); },
+        removeEventListener(type, fn) {
+            if (!listeners[type]) return;
+            listeners[type] = listeners[type].filter((f) => f !== fn);
+        },
+        _fire(type) { (listeners[type] || []).slice().forEach((fn) => fn({ type })); },
         querySelector() { return null; },
     };
 }
@@ -190,11 +199,54 @@ check("inline surface roles cleared so the stylesheet owns them",
     html.style.getPropertyValue("--bg-color") + " / " + html.style.getPropertyValue("--card-bg"));
 check("stylesheet back", themeLink() && themeLink().getAttribute("href").endsWith("swift-blue.css"));
 
-console.log("\n== 5. Persistence for the next page load (no flash) ==");
+console.log("\n== 4a. Persistence for the next page load (no flash) ==");
 check("preset stored in localStorage", store["swift_preset"] === "swift-blue", store["swift_preset"]);
 check("theme css url stored", (store["swift_theme_css"] || "").endsWith("swift-blue.css"));
 
-console.log("\n== 6. Other preferences still applied ==");
+console.log("\n== 4b. Preset switch bridges with its own roles until the stylesheet loads ==");
+// This is the refresh-flash bug: without the bridge, the desk showed Frappe's
+// stock colours for however long the preset's stylesheet took to arrive over
+// the network. Passing `roles` (as frappe.boot.swift_theme and the
+// localStorage cache both now do) must paint the real colours immediately.
+API.applyPrefs({
+    preset: "black-panther", primary: "#6b3fa0", secondary: "#9b6fd6",
+    theme_css: "/assets/swift_theme/css/themes/black-panther.css",
+    roles: {
+        canvas: "#0e0a16", surface: "#1c1428", surface_alt: "#241a34",
+        on_canvas: "#f1eaff", on_surface: "#f1eaff", muted: "#b7a8d1",
+        border: "#3a2a54", primary: "#6b3fa0", secondary: "#9b6fd6",
+        on_primary: "#ffffff",
+    },
+});
+check("bridge: canvas painted before the stylesheet has loaded",
+    v("--bg-color") === "#0e0a16", v("--bg-color"));
+check("bridge: card painted before the stylesheet has loaded",
+    v("--card-bg") === "#1c1428", v("--card-bg"));
+check("bridge: the link is already pointed at the new preset",
+    themeLink() && themeLink().getAttribute("href").endsWith("black-panther.css"));
+
+themeLink()._fire("load");
+check("handoff: canvas cleared once the stylesheet has actually loaded",
+    v("--bg-color") === undefined, v("--bg-color"));
+check("handoff: card cleared once the stylesheet has actually loaded",
+    v("--card-bg") === undefined, v("--card-bg"));
+
+console.log("\n== 4c. A stalled or failed fetch must not strand the bridge ==");
+API.applyPrefs({
+    preset: "venom", primary: "#0f3d1f", secondary: "#39e07a",
+    theme_css: "/assets/swift_theme/css/themes/venom.css",
+    roles: { canvas: "#050705", surface: "#0d130d", surface_alt: "#101810",
+             on_canvas: "#e8f5e9", on_surface: "#e8f5e9", muted: "#9db89f",
+             border: "#1c2b1c", primary: "#0f3d1f", secondary: "#39e07a",
+             on_primary: "#ffffff" },
+});
+check("bridge active while the request is still in flight",
+    v("--bg-color") === "#050705", v("--bg-color"));
+themeLink()._fire("error"); // e.g. a 404 on the built asset
+check("a failed fetch still releases the bridge rather than hanging forever",
+    v("--bg-color") === undefined, v("--bg-color"));
+
+console.log("\n== 5. Other preferences still applied ==");
 API.applyPrefs({ density: "Compact", radius: "Pill" });
 check("density attribute", html.getAttribute("data-swift-density") === "Compact");
 check("radius attribute", html.getAttribute("data-swift-radius") === "Pill");

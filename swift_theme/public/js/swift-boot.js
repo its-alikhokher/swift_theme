@@ -11,6 +11,7 @@
         themeCss:     "swift_theme_css",
         backdrop:     "swift_backdrop",
         glass:        "swift_glass",
+        roles:        "swift_roles",
         density:      "swift_density",
         radius:       "swift_radius",
         font_family:  "swift_font_family",
@@ -70,14 +71,33 @@
         return all;
     })();
 
-    // ---- Apply from localStorage immediately (no flash of unstyled theme) ----
+    // ---- Apply immediately: frappe.boot when present, localStorage otherwise ----
+    // frappe.boot is already embedded inline in the page by the time this
+    // script runs — Frappe's own desk template writes `frappe.boot = {...}`
+    // right before the app_include_js block this file is loaded from — and it
+    // carries the resolved preset's full role set, computed server-side. Using
+    // it here means the very first paint already has the true colours instead
+    // of only the identifiers cached from a previous visit, with nothing to
+    // fetch over the network first: without this, every refresh painted
+    // Frappe's own default colour for as long as the preset's stylesheet took
+    // to arrive, which is the flash a preset with strong colours makes obvious.
+    var serverBoot = (window.frappe && frappe.boot && frappe.boot.swift_theme) || null;
+    var cachedRoles = null;
+    try {
+        var storedRoles = get("roles");
+        if (storedRoles) cachedRoles = JSON.parse(storedRoles);
+    } catch (e) { cachedRoles = null; }
+
     applyColors({
-        preset: get("preset") || "",
-        primary: get("primary") || "",
-        secondary: get("secondary") || "",
-        theme_css: get("themeCss") || "",
-        backdrop: get("backdrop") || "",
-        glass: get("glass") === "on",
+        preset: (serverBoot && serverBoot.preset) || get("preset") || "",
+        primary: (serverBoot && serverBoot.primary) || get("primary") || "",
+        secondary: (serverBoot && serverBoot.secondary) || get("secondary") || "",
+        theme_css: (serverBoot && serverBoot.theme_css) || get("themeCss") || "",
+        backdrop: (serverBoot && serverBoot.backdrop) || get("backdrop") || "",
+        glass: serverBoot ? !!serverBoot.show_backdrop_through : get("glass") === "on",
+        roles: (serverBoot && serverBoot.roles) || cachedRoles,
+        mode: serverBoot && serverBoot.custom_mode,
+        strength: serverBoot && serverBoot.custom_strength,
     });
     applyAttr("density",          get("density")     || "");
     applyAttr("radius",           get("radius")      || "");
@@ -114,19 +134,32 @@
         if (preset || primary) html.setAttribute("data-swift-themed", "");
         else html.removeAttribute("data-swift-themed");
 
-        swapThemeStylesheet(preset ? c.theme_css : null);
-
-        // In preset mode the stylesheet owns the palette, so inline values are
-        // cleared rather than left shadowing it.
+        // In preset mode the stylesheet is the long-term source of truth, but
+        // fetching it is a network round trip. Bridge with its own roles
+        // inline right away — same mechanism as Custom Colors below — so
+        // there is no window where Frappe's default colours show through,
+        // then hand off to the stylesheet once it has actually loaded: inline
+        // custom properties beat any stylesheet rule, so leaving the bridge in
+        // place afterwards would freeze the preset and break switching to a
+        // different one later. Falling back to clearRoles keeps the old
+        // behaviour on the rare call that has no roles to bridge with.
+        var appliedRoles = null;
         if (preset) {
-            clearRoles();
+            appliedRoles = c.roles || null;
+            if (appliedRoles) applyRoles(appliedRoles);
+            else clearRoles();
         } else if (primary) {
             // No preset stylesheet in custom mode, so the whole palette is
             // written inline — canvas and card included. Setting only the
             // accent left the surfaces on Frappe's defaults, which is why a
             // custom colour never looked like a theme.
-            applyRoles(c.roles || deriveRoles(primary, secondary, c.mode, c.strength));
+            appliedRoles = c.roles || deriveRoles(primary, secondary, c.mode, c.strength);
+            applyRoles(appliedRoles);
         }
+        swapThemeStylesheet(
+            preset ? c.theme_css : null,
+            preset && appliedRoles ? clearRoles : undefined
+        );
 
         set("preset", preset);
         set("primary", primary);
@@ -134,23 +167,40 @@
         set("themeCss", (preset && c.theme_css) || "");
         set("backdrop", c.backdrop || "");
         set("glass", c.glass ? "on" : "");
+        // Cached so the very next load's bootstrap call above can bridge
+        // correctly even before frappe.boot has had a chance to help.
+        set("roles", appliedRoles ? JSON.stringify(appliedRoles) : "");
     }
 
     // One <link> that is retargeted, so switching presets never stacks
     // stylesheets and the old palette can't linger.
-    function swapThemeStylesheet(href) {
+    // onReady, when given, fires once href is actually the stylesheet in
+    // effect — immediately if it already was, otherwise after its load event
+    // (or error, so a bridge can never be left stuck waiting on a 404).
+    function swapThemeStylesheet(href, onReady) {
         var link = document.getElementById("swift-theme-css");
         if (!href) {
             if (link) link.remove();
             return;
         }
+        var samePreset = link && link.getAttribute("href") === href;
         if (!link) {
             link = document.createElement("link");
             link.id = "swift-theme-css";
             link.rel = "stylesheet";
             document.head.appendChild(link);
         }
-        if (link.getAttribute("href") !== href) link.setAttribute("href", href);
+        if (!samePreset) link.setAttribute("href", href);
+
+        if (!onReady) return;
+        if (samePreset) { onReady(); return; }
+        var settle = function () {
+            link.removeEventListener("load", settle);
+            link.removeEventListener("error", settle);
+            onReady();
+        };
+        link.addEventListener("load", settle);
+        link.addEventListener("error", settle);
     }
 
     function channels(hex) {

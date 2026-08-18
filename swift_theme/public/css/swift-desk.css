@@ -330,32 +330,33 @@ html[data-swift-themed] .dashboard-section .frappe-card {
     overflow: hidden;
 }
 
-/* The header pill keeps its gradient — it just uses BOTH of the theme's
-   colours now instead of a hardcoded blue that ignored the theme. */
+/* The header used to be a full-width two-colour gradient bar with white text
+   on every widget, on every dashboard — a page with five widgets was five
+   identical loud stripes, and the number cards below carried the same
+   gradient again. It reads as the same surface as the rest of the card now,
+   with the pair kept to a slim left accent, so a dashboard full of widgets
+   looks like one calm design rather than a wall of colour repeated per tile. */
 html[data-swift-themed] .widget .widget-head,
 html[data-swift-themed] .widget-title,
 html[data-swift-themed] .widget-group-head {
-    background: linear-gradient(100deg,
-        var(--swift-primary, var(--swift-accent)),
-        var(--swift-secondary, var(--swift-accent-hover)) 62%,
-        transparent);
-    color: var(--swift-accent-fg) !important;
-    padding: 10px 16px;
+    background: var(--card-bg);
+    color: var(--heading-color);
+    padding: 10px 16px 10px 13px;
     font-weight: 650;
     border-radius: var(--swift-radius, 12px) var(--swift-radius, 12px) 0 0;
     border-bottom: 1px solid var(--border-color);
+    border-left: 3px solid var(--swift-primary, var(--swift-accent));
 }
 
 html[data-swift-themed] .widget .widget-head *,
 html[data-swift-themed] .widget .widget-head .widget-title,
 html[data-swift-themed] .widget .widget-head .drag-handle {
-    color: var(--swift-accent-fg) !important;
+    color: var(--heading-color);
 }
 
-/* Only the label carries the gradient; the action icons stay on the card */
 html[data-swift-themed] .widget .widget-head .widget-control svg,
 html[data-swift-themed] .widget .widget-head .dropdown-btn {
-    color: var(--swift-accent-fg) !important;
+    color: var(--text-muted);
     fill: currentColor;
     opacity: 0.85;
 }
@@ -366,28 +367,57 @@ html[data-swift-themed] .dashboard-section .text-muted {
     color: var(--text-muted) !important;
 }
 
+/* Number cards: the same surface as every other card, with the pair kept to
+   a slim top accent and the figure itself — a KPI tile should read as part
+   of the dashboard, not a louder, different product sitting on top of it. */
 html[data-swift-themed] .number-card,
 html[data-swift-themed] .number-widget-box {
-    background: linear-gradient(135deg,
-        var(--swift-primary, var(--swift-accent)),
-        var(--swift-secondary, var(--swift-accent-hover)));
-    color: var(--swift-accent-fg);
-    border: none;
+    position: relative;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     border-radius: var(--swift-radius, 12px);
     padding: 18px;
-    box-shadow: 0 10px 26px -12px var(--swift-primary, var(--swift-accent));
+    box-shadow: var(--swift-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
+    overflow: hidden;
 }
 
+html[data-swift-themed] .number-card::before,
+html[data-swift-themed] .number-widget-box::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)));
+}
+
+/* The figure itself carries the pair — gated behind @supports so a browser
+   without background-clip:text still shows it in a plain, readable colour
+   rather than a transparent one it can't fill any other way. */
 html[data-swift-themed] .number-card .number,
 html[data-swift-themed] .number-widget-box .widget-title,
 html[data-swift-themed] .number-widget-box .number {
-    color: var(--swift-accent-fg) !important;
+    color: var(--heading-color);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+    html[data-swift-themed] .number-card .number,
+    html[data-swift-themed] .number-widget-box .widget-title,
+    html[data-swift-themed] .number-widget-box .number {
+        background: linear-gradient(100deg,
+            var(--swift-primary, var(--swift-accent)),
+            var(--swift-secondary, var(--swift-accent-hover)) 80%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
 }
 
 html[data-swift-themed] .number-card .card-label,
 html[data-swift-themed] .number-widget-box .card-label {
-    color: var(--swift-accent-fg) !important;
-    opacity: 0.82;
+    color: var(--text-muted) !important;
 }
 
 /* ---- Charts ----

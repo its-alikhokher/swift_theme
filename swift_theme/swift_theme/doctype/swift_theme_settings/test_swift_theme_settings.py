@@ -606,6 +606,55 @@ class TestSwiftThemeCustomColors(IntegrationTestCase):
             got = {o for o in meta.get_field(field).options.split("\n") if o}
             self.assertEqual(got, options)
 
+    def test_preset_mode_also_reaches_the_client_as_roles(self):
+        """A refresh must be able to paint the real colours with no network
+        wait for the preset's own stylesheet.
+
+        boot.js bridges with these roles inline the instant it runs, before
+        that stylesheet has had a chance to arrive — without this key in the
+        boot payload there is nothing to bridge with, and every refresh shows
+        Frappe's own colours for as long as the stylesheet takes to load.
+        """
+        with no_user_preset():
+            with settings_patched(color_mode="Theme Preset", active_preset="Loki"):
+                prefs = get_effective_prefs()
+        self.assertEqual(prefs["color_mode"], "Theme Preset")
+        expected = PREMIUM_THEMES["Loki"]["roles"]
+        self.assertEqual(prefs["roles"], expected,
+                         "preset mode's roles must match the preset exactly, "
+                         "since boot.js paints them verbatim before the "
+                         "stylesheet is even requested")
+
+    def test_boot_bridges_preset_roles_until_the_stylesheet_loads(self):
+        """Source-level guard for the client half of the fix.
+
+        A JS harness proves the bridge behaves correctly; this locks in the
+        pieces it depends on existing at all, so a refactor cannot quietly
+        drop one half of the mechanism without a Python test noticing too.
+        """
+        js = read_js("swift-boot.js")
+
+        # Isolated to the bootstrap block specifically. frappe.boot.swift_theme
+        # is read in several unrelated places further down the file (the
+        # switcher, syncFromBoot), so a loose assertIn("frappe.boot...", js)
+        # would still pass with this specific read removed — it did, the first
+        # time this test was written, and caught nothing.
+        bootstrap = js.split("var serverBoot", 1)
+        self.assertEqual(
+            len(bootstrap), 2,
+            "the bootstrap call no longer reads frappe.boot.swift_theme at "
+            "all, so a cold load has nothing to bridge with")
+        self.assertIn(
+            "frappe.boot && frappe.boot.swift_theme", bootstrap[1][:120],
+            "serverBoot is no longer read from frappe.boot.swift_theme")
+
+        self.assertIn('addEventListener("load"', js,
+                      "nothing waits for the stylesheet to actually finish "
+                      "loading before handing off from the bridge")
+        self.assertIn('addEventListener("error"', js,
+                      "a failed stylesheet fetch would leave the bridge "
+                      "stuck forever with nothing to release it")
+
     def test_custom_colours_reach_the_client_as_roles(self):
         with settings_patched(color_mode="Custom Colors", primary_color="#39e4a5",
                               secondary_color="#F21667", custom_mode="Light",
@@ -1440,6 +1489,39 @@ class TestSwiftThemeStyling(IntegrationTestCase):
             self.assertIn(selector, css, f"{selector} has no themed rule")
         # Text sitting on the accent must use the computed on-accent colour.
         self.assertIn("--swift-accent-fg", css)
+
+    def test_number_cards_and_widget_heads_do_not_wash_the_whole_tile(self):
+        """A dashboard is several of these next to each other, not one hero card.
+
+        Both used to be painted with a full linear-gradient(primary, secondary)
+        wall to wall — every widget header the same loud stripe, every number
+        card the same bright tile — which is fine once and garish repeated five
+        times on one screen. The pair now shows as a slim accent (a left border,
+        a top bar, the figure's own text) on the theme's normal card surface, so
+        a dashboard full of these reads as one design, not a wall of colour.
+        """
+        for filename in ("swift-preset-base.css", "swift-desk.css"):
+            for selector, declarations in css_rules(filename):
+                target = selector.split("{")[0]
+                is_number_card = ".number-card" in target or ".number-widget-box" in target
+                is_widget_head = ".widget-head" in target or ".widget-group-head" in target
+                if not (is_number_card or is_widget_head):
+                    continue
+                # A slim accent legitimately carries a gradient: the ::before
+                # top bar, or the figure's own text clipped to it
+                # (background-clip:text — a colour on the digits, not a fill
+                # behind them). The tile or header's own opaque `background`
+                # must not — and must still be checked even when the same rule
+                # also sets a plain border-left accent alongside it.
+                if "::before" in target or "background-clip" in declarations:
+                    continue
+                match = re.search(r"(^|;)\s*background\s*:\s*([^;]+)", declarations)
+                if not match:
+                    continue
+                self.assertNotIn(
+                    "gradient", match.group(2),
+                    f"{filename}: {target} washes the whole tile in a gradient "
+                    f"again -> {match.group(2)[:60]}")
 
     def test_gradients_use_both_of_the_users_colours(self):
         """A user picks a pair; both should be visible, not just the first.
