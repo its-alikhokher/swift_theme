@@ -995,6 +995,23 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
                 resolve_backdrop(None, data.get("backdrop")), data.get("backdrop"),
                 f"{name} does not get its own backdrop when Settings leaves it blank")
 
+    def test_settings_preview_keeps_the_backdrop(self):
+        """The live preview must pass the backdrop, not just the colours.
+
+        applyColors clears data-swift-backdrop when the value is blank, so a
+        preview that omitted it flattened the background the moment the preset
+        dropdown was touched, and only a page reload brought it back.
+        """
+        path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "swift_theme_settings.js")
+        with open(path) as f:
+            js = f.read()
+
+        preview = js.split("function previewColors", 1)[1].split("\nfunction ", 1)[0]
+        self.assertIn(
+            "backdrop: chosen.backdrop", preview,
+            "the preset preview drops the backdrop, so previewing flattens it")
+
     def test_every_preset_has_its_own_backdrop(self):
         """The backdrop is meant to say which preset you are looking at.
 

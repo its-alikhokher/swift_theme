@@ -95,6 +95,9 @@ function previewColors(frm) {
         primary: chosen.primary,
         secondary: chosen.secondary,
         theme_css: chosen.css,
+        // Without this the preview cleared data-swift-backdrop, so touching the
+        // preset dropdown flattened the background until the page was reloaded.
+        backdrop: chosen.backdrop,
     });
 }
 
