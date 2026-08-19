@@ -52,7 +52,10 @@ def rewind():
 
     frappe.db.set_value("User", "Administrator", "swift_preset", OLD_USER_PRESET)
     frappe.db.sql("delete from `tabPatch Log` where patch like %s", "%swift_theme%")
-    frappe.db.commit()
+    # A developer script driven by `bench execute`, whose whole purpose is to
+    # leave the database rewound for the `bench migrate` that runs next — in a
+    # separate process, which would never see an uncommitted transaction.
+    frappe.db.commit()  # nosemgrep: frappe-manual-commit
     frappe.clear_cache()
 
     print(f"Rewound {frappe.local.site} to the pre-upgrade schema.")
