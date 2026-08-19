@@ -63,7 +63,12 @@ SETTINGS_DEFAULTS = {
 def after_install():
     _ensure_user_fields()
     _seed_settings()
-    frappe.db.commit()
+    # Frappe's own install flow commits after this hook, but not every caller
+    # does — bench, new-site and a hosted provisioner each drive it differently.
+    # These writes create the Custom Fields the desk reads on every page, so a
+    # silent rollback here would leave a site installed but unthemed with
+    # nothing to say why.
+    frappe.db.commit()  # nosemgrep: frappe-manual-commit
 
 
 def after_migrate():

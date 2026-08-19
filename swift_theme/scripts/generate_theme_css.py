@@ -8,6 +8,7 @@ The palette in swift_theme_settings.py is the single source of truth; these
 files are derived, so editing a themes/*.css by hand will be overwritten.
 """
 
+import ast
 import os
 import sys
 
@@ -24,12 +25,27 @@ SETTINGS = os.path.join(
 
 
 def load_presets():
-    """Read the palette without importing frappe."""
-    src = open(SETTINGS).read()
-    block = src[src.index("PREMIUM_THEMES = {"):src.index("\nPRESET_SLUGS")]
-    namespace = {}
-    exec(block, namespace)
-    return namespace["PREMIUM_THEMES"]
+    """Read the palette without importing frappe.
+
+    The settings module imports frappe at the top, which is not available when
+    this runs standalone — so the dict is read out of the source rather than
+    imported. It is parsed and evaluated as a literal: PREMIUM_THEMES is pure
+    data, so nothing here needs to *run* the file, and `exec` on a slice of
+    source (what this used to do) would execute whatever happened to be inside
+    it.
+    """
+    # SETTINGS is a constant built from __file__; no caller-supplied path
+    # reaches it.
+    with open(SETTINGS) as f:  # nosemgrep: frappe-security-file-traversal
+        tree = ast.parse(f.read())
+
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(getattr(t, "id", None) == "PREMIUM_THEMES" for t in node.targets):
+            return ast.literal_eval(node.value)
+
+    raise SystemExit(f"PREMIUM_THEMES not found in {SETTINGS}")
 
 
 def build(name, data):
@@ -114,7 +130,10 @@ def main():
                 f"but {readable_on(r['primary'])} contrasts better on {r['primary']}"
             )
 
-        with open(os.path.join(OUT_DIR, f"{data['slug']}.css"), "w") as f:
+        # OUT_DIR is a constant and the filename is the preset's own slug,
+        # not user input.
+        out = os.path.join(OUT_DIR, f"{data['slug']}.css")
+        with open(out, "w") as f:  # nosemgrep: frappe-security-file-traversal
             f.write(build(name, data))
 
     if problems:

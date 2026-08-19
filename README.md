@@ -68,29 +68,19 @@ Saving Swift Theme Settings applies immediately in every open desk session.
 No images are shipped for any of the theming: it is CSS plus one inline SVG,
 so there is nothing extra to download.
 
-## Install
+## Requirements
 
-```bash
-bench get-app https://github.com/its-alikhokher/swift_theme --branch version-16
-bench --site your-site install-app swift_theme
-bench --site your-site migrate
-bench build --app swift_theme
-```
+Frappe **v16** (`>=16.0.0,<17.0.0`) and Python 3.10 or newer.
 
-`bench migrate` needs redis running. Without it, it exits without doing the work
-and without saying so — treat a silent migrate as a failure.
+Setup steps are in the
+[wiki](https://github.com/its-alikhokher/swift_theme/wiki/Installation), which
+also covers upgrading and uninstalling.
 
 ## Upgrading
 
-```bash
-bench --site your-site migrate
-bench build --app swift_theme
-bench --site your-site clear-cache
-```
-
-Migrate carries the site across on its own — nothing needs setting by hand. The
-presets were renamed along the way, so a site that was on *Midnight Pro* comes
-back as **Black Panther**; the full mapping is in
+Upgrades carry the site across on their own — nothing needs setting by hand.
+The presets were renamed along the way, so a site that was on *Midnight Pro*
+comes back as **Black Panther**; the full mapping is in
 `patches/v1_0/rename_presets_to_marvel.py`.
 
 ## Contributing

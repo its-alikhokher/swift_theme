@@ -347,7 +347,13 @@ class SwiftThemeSettings(Document):
         # permissions, metadata) on every theme save.
         frappe.clear_cache(doctype=self.doctype)
         frappe.cache.delete_key("bootinfo")
-        frappe.publish_realtime("swift_theme_updated", {}, after_commit=True)
+        # room="all" is what publish_realtime would pick anyway with no room
+        # given; stating it makes the intent explicit rather than incidental.
+        # The site theme genuinely changed, so every open desk session needs to
+        # hear about it — this is not a per-document update.
+        frappe.publish_realtime(
+            "swift_theme_updated", {}, room="all", after_commit=True
+        )
 
     def _release_user_overrides(self):
         """Make a changed site colour actually take effect for everyone.
