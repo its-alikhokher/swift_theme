@@ -4,6 +4,9 @@ A theming layer for Frappe v16. It colours the whole desk — navbar, sidebar,
 list, report, kanban, dashboards, forms, child tables, modals and the login
 page — from one palette, and stays out of Frappe's way while doing it.
 
+📖 **[Documentation](https://github.com/its-alikhokher/swift_theme/wiki)** —
+installation, every setting explained, and troubleshooting.
+
 ## Themes
 
 Twelve presets, six light and six dark, each a hand-tuned palette rather than
@@ -98,7 +101,9 @@ security problems privately — see [SECURITY.md](SECURITY.md). Everyone taking
 part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 [REQUIREMENT.md](REQUIREMENT.md) records what the app is meant to do, including
-the constraints that exist because something broke.
+the constraints that exist because something broke, and the
+[wiki](https://github.com/its-alikhokher/swift_theme/wiki) is the user-facing
+documentation.
 
 ## Licence
 
