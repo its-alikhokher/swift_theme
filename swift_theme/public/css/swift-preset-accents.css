@@ -286,3 +286,122 @@ html[data-swift-preset="winter-soldier"] .ce-header::after {
         repeating-linear-gradient(90deg,
             var(--swift-primary, var(--swift-accent)) 0 2px, transparent 2px 4px);
 }
+
+/* ==========================================================================
+   CARD HEADERS
+
+   The strip down the left of every card header. swift-desk.css draws it from
+   two custom properties so each preset can restate just the mark, not the
+   whole rule — and it is a background, not a border, precisely so it can be
+   a pattern rather than a line.
+
+   Each follows the same character as that preset's backdrop and card accent:
+   Iron Man's plating, Cap's shield bands, Strange's sparks, and so on. Three
+   places, one identity.
+   ========================================================================== */
+
+/* Iron Man — segmented armour plating */
+html[data-swift-preset="iron-man"] {
+    --swift-head-accent-size: 5px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-primary, var(--swift-accent)) 0 14px,
+        var(--swift-secondary, var(--swift-accent-hover)) 14px 18px);
+}
+
+/* Captain America — the shield's concentric bands */
+html[data-swift-preset="captain-america"] {
+    --swift-head-accent-size: 4px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-primary, var(--swift-accent)) 0 6px,
+        var(--swift-secondary, var(--swift-accent-hover)) 6px 12px);
+}
+
+/* Doctor Strange — sparks along the portal's rim */
+html[data-swift-preset="doctor-strange"] {
+    --swift-head-accent-size: 3px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-secondary, var(--swift-accent-hover)) 0 4px,
+        transparent 4px 9px);
+}
+
+/* Star-Lord — cassette-tape dashes */
+html[data-swift-preset="star-lord"] {
+    --swift-head-accent-size: 4px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-primary, var(--swift-accent)) 0 9px,
+        var(--swift-secondary, var(--swift-accent-hover)) 9px 12px,
+        transparent 12px 16px);
+}
+
+/* Vision — the mind stone's glow, fading out at both ends */
+html[data-swift-preset="vision"] {
+    --swift-head-accent-size: 6px 100%;
+    --swift-head-accent: linear-gradient(180deg,
+        transparent,
+        var(--swift-secondary, var(--swift-accent-hover)) 45%,
+        var(--swift-primary, var(--swift-accent)) 60%,
+        transparent);
+}
+
+/* Scarlet Witch — chaos, angled rather than straight */
+html[data-swift-preset="scarlet-witch"] {
+    --swift-head-accent-size: 5px 100%;
+    --swift-head-accent: repeating-linear-gradient(150deg,
+        var(--swift-primary, var(--swift-accent)) 0 5px,
+        var(--swift-secondary, var(--swift-accent-hover)) 5px 9px,
+        transparent 9px 13px);
+}
+
+/* Black Panther — the vibranium weave */
+html[data-swift-preset="black-panther"] {
+    --swift-head-accent-size: 5px 100%;
+    --swift-head-accent:
+        repeating-linear-gradient(45deg,
+            var(--swift-primary, var(--swift-accent)) 0 2px, transparent 2px 5px),
+        repeating-linear-gradient(-45deg,
+            var(--swift-secondary, var(--swift-accent-hover)) 0 2px, transparent 2px 5px);
+}
+
+/* Loki — Asgardian chevrons */
+html[data-swift-preset="loki"] {
+    --swift-head-accent-size: 5px 100%;
+    --swift-head-accent: repeating-linear-gradient(115deg,
+        var(--swift-primary, var(--swift-accent)) 0 4px,
+        var(--swift-secondary, var(--swift-accent-hover)) 4px 8px);
+}
+
+/* Hulk — a torn, uneven edge */
+html[data-swift-preset="hulk"] {
+    --swift-head-accent-size: 6px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-primary, var(--swift-accent)) 0 7px,
+        var(--swift-secondary, var(--swift-accent-hover)) 7px 10px,
+        var(--swift-primary, var(--swift-accent)) 10px 19px);
+}
+
+/* Thanos — the gauntlet's stones, set apart from one another */
+html[data-swift-preset="thanos"] {
+    --swift-head-accent-size: 5px 100%;
+    --swift-head-accent: repeating-radial-gradient(circle at 50% 6px,
+        var(--swift-secondary, var(--swift-accent-hover)) 0 3px,
+        transparent 3px 12px);
+}
+
+/* Venom — a tendril, thick at the top and trailing away */
+html[data-swift-preset="venom"] {
+    --swift-head-accent-size: 6px 100%;
+    --swift-head-accent: linear-gradient(180deg,
+        var(--swift-secondary, var(--swift-accent-hover)),
+        var(--swift-primary, var(--swift-accent)) 40%,
+        transparent 92%);
+}
+
+/* Winter Soldier — brushed metal striations */
+html[data-swift-preset="winter-soldier"] {
+    --swift-head-accent-size: 4px 100%;
+    --swift-head-accent: repeating-linear-gradient(180deg,
+        var(--swift-primary, var(--swift-accent)) 0 2px,
+        transparent 2px 3px,
+        var(--swift-secondary, var(--swift-accent-hover)) 3px 4px,
+        transparent 4px 6px);
+}

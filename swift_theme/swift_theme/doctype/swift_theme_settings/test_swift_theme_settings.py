@@ -1518,10 +1518,53 @@ class TestSwiftThemeStyling(IntegrationTestCase):
                 match = re.search(r"(^|;)\s*background\s*:\s*([^;]+)", declarations)
                 if not match:
                     continue
+                value = match.group(2)
+
+                # A gradient sized to a narrow strip and layered over the card
+                # colour is an accent, not a wash — that is how the per-preset
+                # header mark is drawn. What this is guarding against is a
+                # gradient with no size, which fills the element edge to edge.
+                strip = re.search(r"/\s*(?:var\([^)]*\)|[\d.]+(?:px|em|rem))\s", value)
+                if strip and "var(--card-bg)" in value:
+                    continue
+
                 self.assertNotIn(
-                    "gradient", match.group(2),
+                    "gradient", value,
                     f"{filename}: {target} washes the whole tile in a gradient "
-                    f"again -> {match.group(2)[:60]}")
+                    f"again -> {value[:60]}")
+
+    def test_widget_title_does_not_repeat_its_own_headers_accent(self):
+        """.widget-title is nested inside .widget-head, so decorating both
+        draws the accent twice.
+
+        That is exactly what shipped: a strip down the card's left edge and a
+        second one beside the title text, on every widget. The title is the
+        label — it carries type, not the card's chrome.
+        """
+        CHROME = ("border-left", "border-radius", "box-shadow")
+        offenders = []
+        for selector, declarations in css_rules("swift-desk.css"):
+            target = selector.split("{")[0]
+            if ".widget-title" not in target:
+                continue
+            # Only the title on its own. A more specific selector such as
+            # .widget-head .widget-title is describing it in context, which is
+            # a different thing from giving the bare element card chrome.
+            if ".widget-head" in target or ".number-widget-box" in target:
+                continue
+
+            for prop in CHROME:
+                if re.search(rf"(^|;)\s*{re.escape(prop)}\s*:", declarations):
+                    offenders.append(f"{target} sets {prop}")
+
+            bg = re.search(r"(^|;)\s*background\s*:\s*([^;]+)", declarations)
+            if bg and "gradient" in bg.group(2):
+                offenders.append(f"{target} paints a gradient behind the label")
+
+        self.assertEqual(
+            offenders, [],
+            "the title repeats the accent its own header already draws: "
+            f"{offenders}")
 
     def test_widget_group_head_is_segregated_from_a_widget_own_header(self):
         """A section label ("Assets", "Reports & Masters") groups several
@@ -1530,18 +1573,26 @@ class TestSwiftThemeStyling(IntegrationTestCase):
         Both used to be the exact same selector list, so a group label and an
         individual widget's own title bar were indistinguishable.
         """
-        css = read_css("swift-desk.css")
-        widget_head = css.split("html[data-swift-themed] .widget .widget-head,", 1)[1]
-        widget_head = widget_head.split("}", 1)[0]
-        self.assertNotIn(
-            ".widget-group-head", widget_head,
+        # Read the rules properly rather than string-splitting on one exact
+        # selector line — the earlier version keyed off a trailing comma and
+        # broke the moment the rule was legitimately reshaped, which says
+        # nothing about whether the two are still distinct.
+        shared = [
+            selector for selector, _ in css_rules("swift-desk.css")
+            if ".widget-group-head" in selector and ".widget-head" in selector
+        ]
+        self.assertEqual(
+            shared, [],
             "widget-group-head is back in the same rule as an individual "
-            "widget's own header — the two are meant to look different")
+            f"widget's own header — the two are meant to look different: {shared}")
 
-        group_head = css.split('html[data-swift-themed] .widget-group-head {', 1)
-        self.assertEqual(len(group_head), 2, "widget-group-head has no rule of its own")
-        self.assertIn(
-            "background: transparent", group_head[1].split("}", 1)[0],
+        own = [
+            declarations for selector, declarations in css_rules("swift-desk.css")
+            if ".widget-group-head" in selector
+        ]
+        self.assertTrue(own, "widget-group-head has no rule of its own")
+        self.assertTrue(
+            any("background: transparent" in d for d in own),
             "a section label should not be boxed like the cards it groups")
 
     # The two workspace elements that repeat often enough to carry a preset's

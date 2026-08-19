@@ -336,15 +336,36 @@ html[data-swift-themed] .dashboard-section .frappe-card {
    gradient again. It reads as the same surface as the rest of the card now,
    with the pair kept to a slim left accent, so a dashboard full of widgets
    looks like one calm design rather than a wall of colour repeated per tile. */
-html[data-swift-themed] .widget .widget-head,
-html[data-swift-themed] .widget-title {
-    background: var(--card-bg);
+/* The accent is a background strip rather than a border-left, because a
+   border can only ever be a plain line — a background can be shaped, which
+   is what lets each preset carry its own mark here (swift-preset-accents.css
+   overrides the two custom properties below). Drawn with background rather
+   than a ::before so .widget-head needs no `position`, which would change
+   where its own dropdown anchors. */
+html[data-swift-themed] .widget .widget-head {
+    background:
+        var(--swift-head-accent,
+            linear-gradient(180deg,
+                var(--swift-primary, var(--swift-accent)),
+                var(--swift-secondary, var(--swift-accent-hover))))
+            left top / var(--swift-head-accent-size, 3px 100%) no-repeat,
+        var(--card-bg);
     color: var(--heading-color);
     padding: 10px 16px 10px 13px;
     font-weight: 650;
     border-radius: var(--swift-radius, 12px) var(--swift-radius, 12px) 0 0;
     border-bottom: 1px solid var(--border-color);
-    border-left: 3px solid var(--swift-primary, var(--swift-accent));
+}
+
+/* .widget-title sits *inside* .widget-head, so styling both identically drew
+   the accent twice — once down the card's edge and again beside the title
+   text. It is the label, and only the label. */
+html[data-swift-themed] .widget-title {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--heading-color);
+    font-weight: 650;
 }
 
 /* A widget-group-head is not a widget's own header — it is the section
@@ -357,7 +378,6 @@ html[data-swift-themed] .widget-title {
 html[data-swift-themed] .widget-group-head {
     background: transparent;
     color: var(--heading-color);
-    padding: 4px 2px 10px;
     font-size: 1.05em;
     font-weight: 700;
     border-radius: 0;
@@ -366,6 +386,13 @@ html[data-swift-themed] .widget-group-head {
 
 html[data-swift-themed] .widget-group-title {
     color: var(--heading-color);
+}
+
+/* Frappe sets no spacing between a group's label and the cards under it, so
+   the two sat flush and the heading read as part of the first card rather
+   than as the thing naming the row. */
+html[data-swift-themed] .widget-group-body {
+    margin-top: 10px;
 }
 
 html[data-swift-themed] .widget .widget-head *,
