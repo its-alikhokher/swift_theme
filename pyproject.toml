@@ -1,12 +1,19 @@
 [project]
 name = "swift_theme"
 authors = [
-    { name = "MuleRun", email = "hello@mulerun.com"}
+    { name = "Ali Khokher", email = "iamaliraza777@gmail.com"}
 ]
-description = "Swift Theme - Fast, multi-scheme theme for Frappe v16 (Desk, Portal, Login)"
+description = "A theming layer for Frappe v16 — twelve presets, custom colours, and a themed login page."
 requires-python = ">=3.10"
 readme = "README.md"
+license = "MIT"
+license-files = ["license.txt"]
 dynamic = ["version"]
+
+# frappe is deliberately absent: bench installs and manages it, and listing it
+# here would make pip try to resolve it from PyPI. The supported range is
+# declared under [tool.bench.frappe-dependencies] instead, which is what bench
+# and the marketplace read.
 dependencies = []
 
 [build-system]
@@ -15,3 +22,6 @@ build-backend = "flit_core.buildapi"
 
 [tool.flit.module]
 name = "swift_theme"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"

@@ -333,6 +333,48 @@ class TestSwiftThemeSwitchPermission(IntegrationTestCase):
         finally:
             frappe.set_user(original)
 
+    def test_apply_theme_endpoint_refuses_a_plain_user_too(self):
+        """The other endpoint that writes swift_preset must gate it identically.
+
+        set_user_pref guarded the field and apply_theme did not, so the same
+        change refused through one whitelisted method went straight through the
+        other — the permission check was effectively optional for anyone
+        calling the API rather than using the switcher.
+        """
+        from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
+            apply_theme,
+        )
+
+        user = make_user([])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            with self.assertRaises(frappe.PermissionError):
+                apply_theme("Hulk")
+            # A fresh user's swift_preset is "" (the Custom Field's default),
+            # not None — so assert the write did not land rather than that the
+            # field is empty in some particular way.
+            self.assertNotEqual(
+                frappe.db.get_value("User", user, "swift_preset"), "Hulk",
+                "the preset was written despite the refusal")
+        finally:
+            frappe.set_user(original)
+
+    def test_apply_theme_still_works_for_someone_allowed(self):
+        """The guard must not lock out the people it is meant to admit."""
+        from swift_theme.swift_theme.doctype.swift_theme_settings.swift_theme_settings import (
+            apply_theme,
+        )
+
+        user = make_user(["System Manager"])
+        original = frappe.session.user
+        frappe.set_user(user)
+        try:
+            apply_theme("Hulk")
+            self.assertEqual(frappe.db.get_value("User", user, "swift_preset"), "Hulk")
+        finally:
+            frappe.set_user(original)
+
     def test_layout_prefs_stay_open_to_everyone(self):
         """Only colour is restricted; density and font are personal comfort."""
         user = make_user([])
@@ -1039,6 +1081,32 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
             self.assertEqual(
                 resolve_backdrop(None, data.get("backdrop")), data.get("backdrop"),
                 f"{name} does not get its own backdrop when Settings leaves it blank")
+
+    def test_hooks_do_not_point_at_assets_that_are_not_shipped(self):
+        """Every /assets path declared in hooks.py must resolve to a real file.
+
+        A stylesheet naming a file that does not exist is a 404 on every page
+        load, and that already happened once with an optional Inter font. The
+        same mistake in app_logo_url or an include list is a broken icon on the
+        marketplace listing, or a stylesheet that silently never loads.
+        """
+        app_path = frappe.get_app_path(APP)
+        declared = []
+        for hook in ("app_include_css", "app_include_js",
+                     "web_include_css", "web_include_js", "app_logo_url"):
+            value = frappe.get_hooks(hook) or []
+            declared.extend(value if isinstance(value, list) else [value])
+
+        missing = []
+        for path in declared:
+            if not isinstance(path, str) or not path.startswith("/assets/swift_theme/"):
+                continue
+            relative = path[len("/assets/swift_theme/"):]
+            if not os.path.exists(os.path.join(app_path, "public", relative)):
+                missing.append(path)
+
+        self.assertEqual(
+            missing, [], f"hooks.py points at files that do not ship: {missing}")
 
     def test_no_stylesheet_asks_for_an_asset_that_is_not_shipped(self):
         """A url to a file the app does not ship is a 404 on every page load.
@@ -2205,6 +2273,34 @@ class TestSwiftThemeClientContract(IntegrationTestCase):
 
 
 class TestSwiftThemeInstall(IntegrationTestCase):
+    def test_code_defaults_match_the_doctype_defaults(self):
+        """Two places answer "what is the default", and they must not drift.
+
+        On a fresh install tabSingles is empty, so get_single() answers from
+        the DocType's own `default` for every field — which means _seed_settings
+        finds nothing unset and writes nothing at all. The app still starts up
+        correctly, but only because the two agree: change SETTINGS_DEFAULTS
+        alone and a new site silently gets the DocType's value while the code
+        believes it seeded its own.
+        """
+        from swift_theme.install import SETTINGS_DEFAULTS
+
+        meta = frappe.get_meta("Swift Theme Settings")
+        mismatched = []
+        for fieldname, expected in SETTINGS_DEFAULTS.items():
+            field = meta.get_field(fieldname)
+            if not field:
+                mismatched.append(f"{fieldname}: no such field on the DocType")
+                continue
+            if str(field.default) != str(expected):
+                mismatched.append(
+                    f"{fieldname}: code says {expected!r}, DocType says {field.default!r}")
+
+        self.assertEqual(
+            mismatched, [],
+            "a fresh install would not get the default the code intends: "
+            f"{mismatched}")
+
     def test_seed_settings_is_idempotent(self):
         """after_migrate runs it on every migrate; it must not clobber choices."""
         from swift_theme.install import _seed_settings
@@ -2214,6 +2310,25 @@ class TestSwiftThemeInstall(IntegrationTestCase):
             settings = frappe.get_single("Swift Theme Settings")
             self.assertEqual(settings.active_preset, "Scarlet Witch")
             self.assertEqual(settings.enable_switcher, 0)
+
+    def test_user_fields_are_owned_by_this_apps_module(self):
+        """Uninstall has to leave the User doctype as it found it.
+
+        Frappe removes records whose `module` points at the app being removed
+        (installer._delete_linked_documents), and Custom Field has exactly such
+        a field — so ownership is the entire uninstall story here, and a field
+        created without it would be silently orphaned on someone else's site
+        with nothing left to clean it up.
+        """
+        from swift_theme.install import USER_FIELDS
+
+        for fieldname, *_ in USER_FIELDS:
+            module = frappe.db.get_value(
+                "Custom Field", {"dt": "User", "fieldname": fieldname}, "module")
+            self.assertEqual(
+                module, "Swift Theme",
+                f"User.{fieldname} is not owned by this app's module, so "
+                f"uninstalling would leave it behind")
 
     def test_user_preference_fields_exist(self):
         from swift_theme.install import USER_FIELDS
@@ -2398,6 +2513,13 @@ class TestSwiftThemeLoginPage(IntegrationTestCase):
                     context = body.splitlines()[line - 1]
                     # A copyright byline is fine; a credential is not.
                     if "opyright" in context:
+                        continue
+                    # Publisher metadata is fine too — the marketplace requires
+                    # a contact address, and it is the address on its own that
+                    # appears there. What this test exists to catch is the
+                    # address next to the password it was leaked with, which is
+                    # a different thing from an author field.
+                    if re.match(r"\s*(app_email|app_publisher|author\w*)\s*=", context):
                         continue
                     offenders.append(f"{path}:{line}")
         self.assertEqual(offenders, [], f"credentials found in: {offenders}")

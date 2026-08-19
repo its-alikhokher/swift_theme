@@ -2,10 +2,15 @@ from . import __version__ as app_version
 
 app_name = "swift_theme"
 app_title = "Swift Theme"
-app_publisher = "MuleRun"
-app_description = "Swift Theme v2 - Fast, deeply themable layer for Frappe v16 (respects Light/Dark/Auto)."
-app_email = "hello@mulerun.com"
+app_publisher = "Ali Khokher"
+app_description = "A theming layer for Frappe v16 — twelve presets, custom colours, and a themed login page."
+app_email = "iamaliraza777@gmail.com"
 app_license = "MIT"
+
+# Shown beside the app on the marketplace listing and in Frappe's app list.
+# Reuses the icon already shipped for the website favicon rather than adding a
+# second asset that would have to be kept in step with it.
+app_logo_url = "/assets/swift_theme/icons/favicon.svg"
 
 # ---- Desk assets ----
 app_include_css = [

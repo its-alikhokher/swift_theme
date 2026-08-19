@@ -70,3 +70,6 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+# WSL / Windows mark-of-the-web artifacts. Six of these had been committed
+# alongside real source files; they are not part of the app.
+*:Zone.Identifier

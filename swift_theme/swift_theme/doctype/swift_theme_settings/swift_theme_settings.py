@@ -523,12 +523,24 @@ def get_premium_themes():
 @frappe.whitelist()
 def apply_theme(theme_name):
     """Applies a specific premium theme for the current user session"""
+    from swift_theme.api.boot import can_switch_theme
+
     if theme_name not in PREMIUM_THEMES:
         frappe.throw(frappe._("Theme not found"))
 
     user = frappe.session.user
     if not user or user == "Guest":
         frappe.throw(frappe._("Login required"), frappe.PermissionError)
+
+    # The same gate api.boot.set_user_pref applies to swift_preset. Without it
+    # this endpoint was a way around that one: both write the same field, but
+    # only that one checked whether the caller is allowed to change the theme,
+    # so hiding the switcher stopped nothing for anyone calling the API.
+    if not can_switch_theme():
+        frappe.throw(
+            frappe._("You are not permitted to change the theme."),
+            frappe.PermissionError,
+        )
 
     selected_theme = PREMIUM_THEMES[theme_name]
     mode = selected_theme.get("mode", "light")
