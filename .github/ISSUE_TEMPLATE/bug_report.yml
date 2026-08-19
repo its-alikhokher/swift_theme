@@ -1,0 +1,89 @@
+name: Bug report
+description: Something in the theme looks wrong or does not work
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Theme bugs fail quietly — a rule that matches nothing, a variable that
+        falls back to a default. The details below are the ones that have
+        actually pinned down bugs in this app before.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+      placeholder: The sidebar icons are clipped when it is collapsed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Set the preset to Loki in Swift Theme Settings
+        2. Collapse the sidebar
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console output
+      description: |
+        Press F12 → Console and paste anything in red. This matters more than
+        it sounds: a single error early in boot.js stops the whole file, which
+        looks like "the preset does not apply" rather than like an error.
+      render: text
+
+  - type: input
+    id: preset
+    attributes:
+      label: Which theme is active
+      placeholder: Theme Preset — Iron Man / Custom Colors
+    validations:
+      required: true
+
+  - type: input
+    id: frappe-version
+    attributes:
+      label: Frappe version
+      description: "`bench version`"
+      placeholder: "16.31.0"
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Swift Theme version
+      placeholder: "2.0.0, or the commit you are on"
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Chrome 141, Firefox 145
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checked
+    attributes:
+      label: Before reporting
+      options:
+        - label: I did a hard reload (Ctrl+Shift+R) — stale cached CSS looks identical to a bug
+          required: true
+        - label: "`bench build --app swift_theme` and `bench --site … clear-cache` have been run"
+          required: false
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: For anything visual, a screenshot is worth more than a description.

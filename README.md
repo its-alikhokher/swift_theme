@@ -4,11 +4,7 @@ A theming layer for Frappe v16. It colours the whole desk — navbar, sidebar,
 list, report, kanban, dashboards, forms, child tables, modals and the login
 page — from one palette, and stays out of Frappe's way while doing it.
 
-## Colour Mode
-
-The site is coloured one of two ways. There is no third control.
-
-### Theme Preset
+## Themes
 
 Twelve presets, six light and six dark, each a hand-tuned palette rather than
 one hue tinting everything:
@@ -22,14 +18,21 @@ one hue tinting everything:
 | Vision · gold + magenta | Venom · monochrome |
 | Scarlet Witch · rose + deep red | Winter Soldier · steel blue |
 
-Each ships its own stylesheet under `public/css/themes/`, and only the selected
-one is ever loaded.
+Every palette is checked against a 4.5:1 contrast floor before it ships, and
+light and dark follow different rules — in dark, cards are lighter than the
+page, because elevation there comes from light rather than shadow.
+
+Each preset also brings its own **backdrop** behind the desk and its own accent
+shapes on card headers and number cards, so switching preset changes more than
+the hue. Two switches in Settings govern that: **Enable Backdrops** (on by
+default) and **Show Backdrop Through Panels**, which makes cards and the sidebar
+translucent so the background reads through the desk.
 
 ### Custom Colors
 
 Give it a primary and a secondary colour and it works out the rest — canvas,
-cards, the text for each surface, muted text, borders, accent states and the
-backdrop. Two more choices it cannot read off a hex code:
+cards, the text for each surface, muted text, borders and accent states. Two
+more choices it cannot read off a hex code:
 
 - **Custom Mode** — Light or Dark
 - **Colour Strength** — *Subtle* keeps cards neutral and puts the colour in the
@@ -38,98 +41,43 @@ backdrop. Two more choices it cannot read off a hex code:
 If you pick a colour where neither black nor white is quite legible on it, it is
 nudged a percent or two until one is.
 
-## How a palette is built
-
-A theme is a set of roles, not a colour with shades derived from it:
-
-| Role | |
-|---|---|
-| `canvas` | the page |
-| `surface` / `surface_alt` | cards, sidebar, table headers |
-| `on_canvas` / `on_surface` | text, chosen per surface |
-| `muted`, `border` | secondary text, hairlines |
-| `primary` / `secondary` / `on_primary` | the brand pair and text on it |
-
-Light and dark follow different rules, because one formula cannot serve both.
-In dark, `surface` must be **lighter** than `canvas` — elevation there comes
-from light, not shadow. Every palette is checked against that and against a
-4.5:1 contrast floor when the stylesheets are built; the generator refuses to
-write a file that fails either.
-
-## Backdrops
-
-The desk background can carry one of five treatments — **Aurora**, **Mesh**,
-**Grain**, **Facets**, **Silk** — or **None**. Each is built from the active
-theme's own two colours, so it works with every preset and with custom colours.
-
-**Each preset also has a backdrop of its own**, drawn for that character and
-built from that preset's two colours: Iron Man's arc-reactor rings, Captain
-America's shield bands, Doctor Strange's turning portal, Black Panther's
-vibranium weave, Venom's tendrils, Winter Soldier's brushed metal. Switching
-preset brings its backdrop with it, so the background says which theme you are
-looking at rather than being one of five treatments shared twelve ways.
-
-The five generic treatments above are what **Custom Colors** picks from, using
-the Backdrop field in Settings; a preset's own backdrop is not selectable there,
-because it belongs to that preset.
-
-Aurora and Silk drift slowly; Mesh, Grain and Facets are still by design. The
-motion is a `transform` on a fixed, non-interactive layer, so it is composited
-rather than repainted. It stops when the browser asks for reduced motion.
-
-Two switches in Settings govern all of this:
-
-- **Enable Backdrops** — on by default. Off gives a plain, flat background.
-- **Show Backdrop Through Panels** — off by default. On makes cards, the
-  sidebar and table headers translucent so the backdrop reads through the desk
-  instead of only appearing in the gaps. Menus, modals and the child-table
-  editor stay opaque, because they have to stay readable.
-
-The translucency is a colour change and nothing more — no `backdrop-filter`,
-which would make each panel a containing block for the `position: fixed`
-child-table editor.
-
-No image is shipped for any of this: it is CSS plus one inline SVG for the
-grain, so there is nothing extra to download.
-
 ## Switching theme
 
 Presets appear inside Frappe's own **Switch Theme** dialog, drawn as the same
-preview cards as Light / Dark / Automatic. Custom Colors is a card there too;
-its two pickers appear once it is chosen. Restricted to **Administrator** and
-**System Manager**, enforced on the server as well as hidden in the UI.
+preview cards as Light / Dark / Automatic. Restricted to **Administrator** and
+**System Manager**, enforced on the server rather than only hidden in the UI.
 
 **Enable Theme Switcher** governs all three places a theme can be changed — the
-navbar chip, that dialog, and the command palette — so turning it off closes
-every route rather than some of them.
+navbar chip, that dialog, and the command palette.
 
 Saving Swift Theme Settings applies immediately in every open desk session.
 
 ## Also included
 
-- **Sounds** on desk events, configurable per event. No audio ships, so events
-  with no file attached stay silent. With Sounds on, the theme answers alone —
-  Frappe's own audio steps aside, so a save makes one noise instead of two.
-  With Sounds off, Frappe's own sounds play exactly as they normally would.
 - **Login page** in three layouts (Split, Centered, Minimal), themed from the
-  active palette and rendered server-side so it paints correctly on first load.
-- **Density, shape, font scale and family**, per user.
-- **Focus / reading mode**, a command palette, and a hide-the-sidebar
-  toggle on Alt+B with a floating button to bring it back.
+  active palette and rendered server-side so it paints correctly on first load
+- **Density, shape, font scale and family**, per user
+- **Sounds** on desk events, configurable per event — no audio ships, so an
+  event with no file attached keeps Frappe's own sound
+- **Focus / reading mode**, a command palette, and a hide-the-sidebar toggle on
+  Alt+B
+
+No images are shipped for any of the theming: it is CSS plus one inline SVG,
+so there is nothing extra to download.
 
 ## Install
 
 ```bash
-bench get-app https://github.com/its-alikhokher/swift_theme
+bench get-app https://github.com/its-alikhokher/swift_theme --branch version-16
 bench --site your-site install-app swift_theme
 bench --site your-site migrate
 bench build --app swift_theme
 ```
 
-`bench migrate` needs redis running. Without it, it exits without doing the
-work and without saying so — treat a silent migrate as a failure.
+`bench migrate` needs redis running. Without it, it exits without doing the work
+and without saying so — treat a silent migrate as a failure.
 
-## Upgrading from an earlier release
+## Upgrading
 
 ```bash
 bench --site your-site migrate
@@ -137,69 +85,19 @@ bench build --app swift_theme
 bench --site your-site clear-cache
 ```
 
-Migrate carries the site across on its own — the old colour mode becomes
-**Theme Preset** or **Custom Colors**, an old gradient pair becomes the
-primary/secondary pair, retired fields are dropped, and every preset name is
-renamed to its closest new one, for the site and for each user who picked one.
-Nothing needs setting by hand.
+Migrate carries the site across on its own — nothing needs setting by hand. The
+presets were renamed along the way, so a site that was on *Midnight Pro* comes
+back as **Black Panther**; the full mapping is in
+`patches/v1_0/rename_presets_to_marvel.py`.
 
-Two things worth knowing if you are watching it run:
+## Contributing
 
-- Presets were renamed, so a site on *Midnight Pro* comes back as
-  **Black Panther**. The mapping is in
-  `patches/v1_0/rename_presets_to_marvel.py`.
-- Should a stored value no longer be offered by its field, it is reset to the
-  default and the reason is written to the Error Log rather than stopping the
-  migrate.
+[CONTRIBUTING.md](CONTRIBUTING.md) covers setup, the test suites, and the CSS
+rules that exist because breaking them broke something real. Please report
+security problems privately — see [SECURITY.md](SECURITY.md). Everyone taking
+part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-The upgrade can be rehearsed on a scratch site — rewind it to the old schema,
-migrate, and check the result field by field:
-
-```bash
-bench --site scratch.local execute swift_theme.scripts.verify_upgrade.rewind
-```
-
-Then `bench --site scratch.local migrate`, then:
-
-```bash
-bench --site scratch.local execute swift_theme.scripts.verify_upgrade.verify
-```
-
-`rewind` is destructive, so keep it off anything real.
-
-## Working on it
-
-The palette in
-`swift_theme/doctype/swift_theme_settings/swift_theme_settings.py` is the single
-source of truth. After editing it, rebuild the stylesheets:
-
-```bash
-python3 swift_theme/scripts/generate_theme_css.py
-```
-
-`themes/*.css` is generated — editing one by hand will be overwritten, and a
-test catches a stale file.
-
-### Tests
-
-```bash
-bench --site your-site set-config allow_tests true
-bench --site your-site run-tests --app swift_theme
-```
-
-Browser behaviour has its own coverage, because a Python suite cannot see
-"the server publishes an event and nothing listens" — which is a bug this app
-actually had:
-
-```bash
-node swift_theme/tests/boot_js_contract.js
-```
-
-The colour maths exists in both Python and JavaScript, since the Settings
-preview has to react without a round trip. A test runs both over eighty
-palettes and compares them value for value, so the two cannot drift.
-
-See [REQUIREMENT.md](REQUIREMENT.md) for what the app is meant to do, including
+[REQUIREMENT.md](REQUIREMENT.md) records what the app is meant to do, including
 the constraints that exist because something broke.
 
 ## Licence

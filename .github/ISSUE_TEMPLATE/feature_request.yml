@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest something the theme should do
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is awkward today
+      description: Describe the problem rather than the solution — it often has a simpler fix than the one that comes to mind first.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the theme
+      options:
+        - Presets and colours
+        - Backdrops
+        - Desk (list, report, form, kanban)
+        - Workspace and dashboards
+        - Sidebar or navbar
+        - Login page
+        - Sounds
+        - Settings
+        - Something else
+    validations:
+      required: true

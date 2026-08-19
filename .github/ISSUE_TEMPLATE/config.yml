@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/its-alikhokher/swift_theme/security/advisories/new
+    about: Please report security problems privately, not as a public issue.
+  - name: Frappe Framework issues
+    url: https://github.com/frappe/frappe/issues
+    about: For bugs in Frappe itself rather than in this theme.
