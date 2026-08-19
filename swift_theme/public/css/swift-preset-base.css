@@ -307,9 +307,7 @@ html[data-swift-themed] .body-sidebar .section-item > .item-anchor {
 
 /* Suffix badges */
 html[data-swift-themed] .sidebar-item-suffix {
-  background: color-mix(in oklab, var(--swift-accent) 22%, transparent);
   color: var(--swift-accent);
-  border: 1px solid color-mix(in oklab, var(--swift-accent) 45%, transparent);
 }
 
 /* Promotional banner — glassy accent card */

@@ -1523,6 +1523,244 @@ class TestSwiftThemeStyling(IntegrationTestCase):
                     f"{filename}: {target} washes the whole tile in a gradient "
                     f"again -> {match.group(2)[:60]}")
 
+    def test_widget_group_head_is_segregated_from_a_widget_own_header(self):
+        """A section label ("Assets", "Reports & Masters") groups several
+        widgets — it is not one of them, and must not be styled as one.
+
+        Both used to be the exact same selector list, so a group label and an
+        individual widget's own title bar were indistinguishable.
+        """
+        css = read_css("swift-desk.css")
+        widget_head = css.split("html[data-swift-themed] .widget .widget-head,", 1)[1]
+        widget_head = widget_head.split("}", 1)[0]
+        self.assertNotIn(
+            ".widget-group-head", widget_head,
+            "widget-group-head is back in the same rule as an individual "
+            "widget's own header — the two are meant to look different")
+
+        group_head = css.split('html[data-swift-themed] .widget-group-head {', 1)
+        self.assertEqual(len(group_head), 2, "widget-group-head has no rule of its own")
+        self.assertIn(
+            "background: transparent", group_head[1].split("}", 1)[0],
+            "a section label should not be boxed like the cards it groups")
+
+    # The two workspace elements that repeat often enough to carry a preset's
+    # identity: the KPI tile, and the heading that labels each band of cards.
+    PRESET_ACCENTED = (
+        ".number-card::before",
+        ".ce-header::after",
+    )
+
+    def test_every_preset_has_its_own_accent_shapes(self):
+        """Accent shapes are part of a preset's identity, like its backdrop.
+
+        Before this each was one shape recoloured twelve ways, which is why
+        switching preset only ever changed a hue — this checks every preset
+        gets a rule of its own for each accented element, not a colour copied
+        onto a shape they all share.
+        """
+        css = read_css("swift-preset-accents.css")
+        for element in self.PRESET_ACCENTED:
+            rules = {}
+            for name, data in PREMIUM_THEMES.items():
+                wanted = f'[data-swift-preset="{data["slug"]}"] {element}'
+                self.assertIn(
+                    wanted, css,
+                    f"{name} has no {element} rule of its own in "
+                    f"swift-preset-accents.css")
+                # Only the declarations. Splitting at the selector and stopping
+                # at "}" also swept up the *second* selector in a pair (the
+                # .number-widget-box one), which carries the preset's own slug —
+                # so every block was trivially unique and two presets could
+                # share an identical shape without this noticing.
+                block = css.split(wanted, 1)[1].split("{", 1)[1].split("}", 1)[0]
+                rules[name] = re.sub(r"\s+", " ", block).strip()
+
+            duplicates = {v for v in rules.values() if list(rules.values()).count(v) > 1}
+            self.assertEqual(
+                duplicates, set(),
+                f"these presets share the exact same {element} shape, colour "
+                "aside: " + str([n for n, v in rules.items() if v in duplicates]))
+
+    def test_widgets_never_gain_a_containing_block_on_hover(self):
+        """The bug that has bitten this theme twice, in test form.
+
+        transform, filter and backdrop-filter each make an element a
+        containing block and a stacking context for its descendants. Every
+        widget has a dropdown inside its header, so a hover lift on the card
+        traps that dropdown — exactly what happened to the notifications panel
+        when a sidebar row had `transform` on hover. Depth here is shadow and
+        border only.
+        """
+        TRAPPING = ("transform", "filter", "backdrop-filter", "-webkit-backdrop-filter")
+        WIDGETS = (".widget", ".number-card", ".number-widget-box",
+                   ".shortcut-widget-box", ".links-widget-box",
+                   ".quick-list-widget-box", ".onboarding-widget-box",
+                   ".dashboard-widget-box", ".custom-block-widget-box")
+
+        offenders = []
+        for filename in ("swift-desk.css", "swift-preset-accents.css"):
+            for selector, declarations in css_rules(filename):
+                target = selector.split("{")[0]
+                if not any(w in target for w in WIDGETS):
+                    continue
+                # ::before / ::after are the accent shapes — they are already
+                # inside the card and contain nothing, so they cannot trap it.
+                if "::before" in target or "::after" in target:
+                    continue
+                for prop in TRAPPING:
+                    if re.search(rf"(^|;)\s*{re.escape(prop)}\s*:", declarations):
+                        offenders.append(f"{filename}: {target} sets {prop}")
+
+        self.assertEqual(
+            offenders, [],
+            "these make a widget a containing block, trapping the dropdown "
+            f"inside its own header: {offenders}")
+
+    def test_every_workspace_element_type_is_styled(self):
+        """A workspace is built from more than cards.
+
+        Frappe registers eight widget types and renders three editor blocks
+        between them; several were left entirely unthemed, so a heading or a
+        "+ New Shortcut" placeholder kept Frappe's defaults while everything
+        around it followed the preset. The list is taken from Frappe's own
+        widget factory rather than written out by hand, so a type added
+        upstream shows up here rather than being silently missed.
+        """
+        factory = open(frappe.get_app_path(
+            "frappe", "public", "js", "frappe", "widgets", "widget_group.js")).read()
+        registered = set(re.findall(r"^\t(\w+): \w+Widget|^\t(\w+): CustomBlock",
+                                    factory, re.M))
+        registered = {a or b for a, b in registered}
+        self.assertTrue(registered, "could not read Frappe's widget factory")
+
+        css = read_css("swift-desk.css")
+        # widget_type -> the class Frappe's own widget puts on its wrapper.
+        wrapper = {
+            "shortcut": "shortcut-widget-box",
+            "links": "links-widget-box",
+            "onboarding": "onboarding-widget-box",
+            "number_card": "number-widget-box",
+            "quick_list": "quick-list-widget-box",
+            "custom_block": "custom-block-widget-box",
+            "chart": "dashboard-widget-box",
+        }
+        for widget_type in sorted(registered):
+            cls = wrapper.get(widget_type)
+            if not cls:
+                continue          # `base` has no wrapper class of its own
+            self.assertIn(
+                f".{cls}", css,
+                f"the {widget_type} widget (.{cls}) is registered by Frappe but "
+                f"nothing in swift-desk.css themes it")
+
+        # The editor blocks, which are not widgets and so are not in the factory.
+        for cls, what in (("ce-header", "workspace headings"),
+                          ("spacer", "workspace spacers"),
+                          ("new-widget", "the add-a-widget placeholders")):
+            self.assertIn(f".{cls}", css, f"{what} (.{cls}) are unthemed")
+
+    def test_preset_accents_are_loaded_after_the_shape_they_override(self):
+        """Ties on specificity resolve by source order, so this file has to
+        come after swift-desk.css, or the generic strip would always win."""
+        sheets = frappe.get_hooks("app_include_css") or []
+        self.assertIn("/assets/swift_theme/css/swift-preset-accents.css", sheets,
+                      "swift-preset-accents.css is not loaded at all")
+        self.assertLess(
+            sheets.index("/assets/swift_theme/css/swift-desk.css"),
+            sheets.index("/assets/swift_theme/css/swift-preset-accents.css"),
+            "loaded before swift-desk.css, so the generic accent bar would "
+            "always win the tie and no preset's own shape would ever show")
+
+    def test_workspace_widget_classes_are_real(self):
+        """Shortcut/links/quick-list styling must target classes Frappe
+        actually renders, not a guess at one.
+
+        Two of these were wrong the first time this was written — `.list-row`
+        for a quick-list row (the real class is `.quick-list-item`) and
+        `.action_area` for the widget's icon area (that is a JS property name;
+        the element itself is `.widget-control`) — and both failed silently:
+        the rule just never matched anything, with no error to notice.
+
+        Each check below is the exact literal Frappe uses to create the class
+        (an addClass call, a .find() selector, or the class= attribute in its
+        template), not a generic substring search — the naive version of this
+        test passed on `action_area` too, because that string legitimately
+        appears elsewhere in the same file as a JS property name.
+        """
+        widgets_dir = frappe.get_app_path("frappe", "public", "js", "frappe", "widgets")
+
+        def widget_src(filename):
+            with open(os.path.join(widgets_dir, filename), errors="ignore") as f:
+                return f.read()
+
+        css = read_css("swift-desk.css")
+
+        # (class, source-literal-that-proves-it's-real, its file, and the
+        # compound selector our own rule must use — not just the bare class,
+        # since e.g. .widget-control is also used by the pre-existing
+        # widget-head dropdown icon rule, so a bare presence check would stay
+        # green even if the shortcut-specific rule using it were swapped out
+        # for something else entirely).
+        real = [
+            ("shortcut-widget-box", 'addClass("shortcut-widget-box")', "shortcut_widget.js",
+             "html[data-swift-themed] .shortcut-widget-box {"),
+            ("links-widget-box", 'addClass("links-widget-box")', "links_widget.js",
+             ".links-widget-box .link-item"),
+            ("quick-list-widget-box", 'addClass("quick-list-widget-box")', "quick_list_widget.js",
+             ".quick-list-widget-box .quick-list-item"),
+            ("widget-control", '.find(".widget-control")', "base_widget.js",
+             ".shortcut-widget-box .widget-control"),
+            ("link-item", 'class="link-item', "links_widget.js",
+             ".links-widget-box .link-item"),
+            ("link-content", 'class="link-content', "links_widget.js",
+             ".links-widget-box .link-item:hover .link-content"),
+            ("quick-list-item", 'class="quick-list-item"', "quick_list_widget.js",
+             ".quick-list-widget-box .quick-list-item"),
+            ("widget-group-head", 'class="widget-group-head"', "widget_group.js",
+             "html[data-swift-themed] .widget-group-head {"),
+            ("widget-group-title", 'class="widget-group-title"', "widget_group.js",
+             "html[data-swift-themed] .widget-group-title {"),
+            ("onboarding-widget-box", 'addClass("onboarding-widget-box")', "onboarding_widget.js",
+             ".onboarding-widget-box .onboarding-step"),
+            ("onboarding-step", 'class="onboarding-step ${status}"', "onboarding_widget.js",
+             ".onboarding-widget-box .onboarding-step"),
+            ("step-text", 'class="step-text"', "onboarding_widget.js",
+             ".onboarding-step.active .step-text"),
+        ]
+        # The checks below validate a fixed list of known-good classes, which
+        # cannot notice a *new* invented one appearing beside them. So first
+        # sweep every widget-ish class we actually use and require Frappe to
+        # render it — that is what catches a fabricated name, rather than only
+        # a substituted one.
+        all_widget_src = "".join(
+            widget_src(n) for n in os.listdir(widgets_dir) if n.endswith(".js"))
+        WIDGET_PREFIXES = ("shortcut-", "links-", "quick-list-", "onboarding-",
+                           "widget-group-", "step-")
+        used_classes = {
+            c for c in re.findall(r"\.([a-z][a-z0-9-]+)", css)
+            if c.startswith(WIDGET_PREFIXES)
+        }
+        for cls in sorted(used_classes):
+            self.assertIn(
+                cls, all_widget_src,
+                f".{cls} is styled in swift-desk.css but no Frappe widget "
+                f"renders a class by that name — the rule matches nothing")
+
+        for cls, literal, filename, compound in real:
+            # Required, not just validated when present: a selector swapped
+            # for a different (even plausible) one leaves no trace of the
+            # original to check, so checking only what happens to be there
+            # would have let both original mistakes slip straight through.
+            self.assertIn(
+                compound, css,
+                f"{compound!r} is no longer in swift-desk.css — the "
+                f"shortcut/links/quick-list distinction has regressed")
+            self.assertIn(
+                literal, widget_src(filename),
+                f".{cls} is used in swift-desk.css but {filename} does not "
+                f"render a class by that name — the rule matches nothing")
+
     def test_gradients_use_both_of_the_users_colours(self):
         """A user picks a pair; both should be visible, not just the first.
 

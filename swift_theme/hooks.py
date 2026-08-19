@@ -16,6 +16,7 @@ app_include_css = [
     "/assets/swift_theme/css/swift-layout.css",
     "/assets/swift_theme/css/swift-density.css",
     "/assets/swift_theme/css/swift-desk.css",
+    "/assets/swift_theme/css/swift-preset-accents.css",
     "/assets/swift_theme/css/swift-glass.css",
     "/assets/swift_theme/css/swift-scrollbar.css",
     "/assets/swift_theme/css/swift-toast.css",

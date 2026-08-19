@@ -1,0 +1,288 @@
+/* Swift Theme — Preset accents
+
+   The number-card accent (a slim top bar, from swift-desk.css) was one shape
+   recoloured twelve ways — genuinely different colours, but the same strip
+   whichever preset was active, so a dashboard didn't say much about which
+   theme it belonged to beyond its hue. Backdrops already gave every preset a
+   drawn identity of its own; this gives the same identity to the one card
+   element that repeats across every dashboard.
+
+   Each block below overrides only what changes — the base ::before rule in
+   swift-desk.css still supplies `content` and `position: absolute`, since
+   CSS cascades per property, not per rule. Loaded after swift-desk.css (see
+   hooks.py) so these win ties on equal specificity through source order,
+   with no !important needed.
+
+   Colour still comes only from --swift-primary / --swift-secondary — the
+   shape is what carries the character, not a hardcoded hue. */
+
+/* Iron Man — an angled armour-plate cut, not a straight edge */
+html[data-swift-preset="iron-man"] .number-card::before,
+html[data-swift-preset="iron-man"] .number-widget-box::before {
+    height: 6px;
+    background: linear-gradient(100deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)));
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 88% 100%, 0 100%);
+}
+
+/* Captain America — the shield: a ringed disc, not a bar */
+html[data-swift-preset="captain-america"] .number-card::before,
+html[data-swift-preset="captain-america"] .number-widget-box::before {
+    inset: 10px 10px auto auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, var(--swift-primary, var(--swift-accent)) 0 30%, transparent 30%),
+        radial-gradient(circle, transparent 44%, var(--swift-secondary, var(--swift-accent-hover)) 44% 58%, transparent 58%),
+        radial-gradient(circle, transparent 72%, var(--swift-primary, var(--swift-accent)) 72% 86%, transparent 86%);
+}
+
+/* Doctor Strange — a sparking portal ring, echoing the backdrop */
+html[data-swift-preset="doctor-strange"] .number-card::before,
+html[data-swift-preset="doctor-strange"] .number-widget-box::before {
+    inset: 10px 10px auto auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+        var(--swift-secondary, var(--swift-accent-hover)) 0deg 8deg,
+        transparent 8deg 24deg);
+    -webkit-mask: radial-gradient(circle, transparent 62%, #000 62% 100%);
+    mask: radial-gradient(circle, transparent 62%, #000 62% 100%);
+}
+
+/* Star-Lord — a dashed cassette-tape stripe instead of a solid one */
+html[data-swift-preset="star-lord"] .number-card::before,
+html[data-swift-preset="star-lord"] .number-widget-box::before {
+    background: repeating-linear-gradient(90deg,
+        var(--swift-primary, var(--swift-accent)) 0 10px,
+        var(--swift-secondary, var(--swift-accent-hover)) 10px 14px,
+        transparent 14px 18px);
+}
+
+/* Vision — the mind stone's halo: a soft glow, not an edge */
+html[data-swift-preset="vision"] .number-card::before,
+html[data-swift-preset="vision"] .number-widget-box::before {
+    inset: -10px 0 auto 0;
+    height: 26px;
+    background: radial-gradient(50% 100% at 50% 0%,
+        color-mix(in oklab, var(--swift-secondary, var(--swift-accent-hover)) 55%, transparent),
+        transparent 72%);
+}
+
+/* Scarlet Witch — a chaos sliver cut into the corner, not a straight bar */
+html[data-swift-preset="scarlet-witch"] .number-card::before,
+html[data-swift-preset="scarlet-witch"] .number-widget-box::before {
+    inset: 0 0 auto auto;
+    width: 46px;
+    height: 46px;
+    background: conic-gradient(from 200deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)),
+        transparent 60%);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+/* Black Panther — a woven vibranium corner, not a plain strip */
+html[data-swift-preset="black-panther"] .number-card::before,
+html[data-swift-preset="black-panther"] .number-widget-box::before {
+    inset: 0 0 auto auto;
+    width: 34px;
+    height: 34px;
+    background:
+        repeating-linear-gradient(45deg,
+            var(--swift-primary, var(--swift-accent)) 0 3px, transparent 3px 8px),
+        repeating-linear-gradient(-45deg,
+            var(--swift-secondary, var(--swift-accent-hover)) 0 3px, transparent 3px 8px);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+/* Loki — the Asgardian chevrons that mark his backdrop too */
+html[data-swift-preset="loki"] .number-card::before,
+html[data-swift-preset="loki"] .number-widget-box::before {
+    background: repeating-linear-gradient(115deg,
+        var(--swift-primary, var(--swift-accent)) 0 6px,
+        var(--swift-secondary, var(--swift-accent-hover)) 6px 12px);
+}
+
+/* Hulk — a smashed, jagged edge rather than a clean line */
+html[data-swift-preset="hulk"] .number-card::before,
+html[data-swift-preset="hulk"] .number-widget-box::before {
+    height: 7px;
+    background: linear-gradient(100deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)));
+    clip-path: polygon(
+        0 0, 100% 0, 100% 55%,
+        88% 100%, 76% 45%, 64% 100%, 52% 45%, 40% 100%, 28% 45%, 16% 100%, 4% 45%, 0 100%);
+}
+
+/* Thanos — the gauntlet's socket: a ring with a gap, not a closed circle */
+html[data-swift-preset="thanos"] .number-card::before,
+html[data-swift-preset="thanos"] .number-widget-box::before {
+    inset: 10px 10px auto auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--swift-secondary, var(--swift-accent-hover)) 0deg 300deg,
+        transparent 300deg 360deg);
+    -webkit-mask: radial-gradient(circle, transparent 58%, #000 58% 100%);
+    mask: radial-gradient(circle, transparent 58%, #000 58% 100%);
+}
+
+/* Venom — a symbiote tendril dripping from the corner, not a straight bar */
+html[data-swift-preset="venom"] .number-card::before,
+html[data-swift-preset="venom"] .number-widget-box::before {
+    inset: -6px -6px auto auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 0 0 0 100%;
+    background: radial-gradient(circle at 100% 0%,
+        var(--swift-secondary, var(--swift-accent-hover)),
+        var(--swift-primary, var(--swift-accent)) 70%,
+        transparent 72%);
+}
+
+/* Winter Soldier — brushed metal striations with the red star as a single dot */
+html[data-swift-preset="winter-soldier"] .number-card::before,
+html[data-swift-preset="winter-soldier"] .number-widget-box::before {
+    background:
+        radial-gradient(circle at 16px 1.5px,
+            var(--swift-secondary, var(--swift-accent-hover)) 0 1.5px, transparent 1.5px),
+        repeating-linear-gradient(90deg,
+            var(--swift-primary, var(--swift-accent)) 0 2px, transparent 2px 4px);
+}
+
+/* ==========================================================================
+   WORKSPACE HEADINGS
+
+   The heading underline (swift-desk.css gives it a plain 42px bar) follows
+   the same shape language as that preset's number-card accent above, so the
+   two read as one identity rather than two unrelated decorations. Only what
+   differs is restated — width, shape, fill — everything else cascades.
+   ========================================================================== */
+
+/* Iron Man — the same angled armour cut */
+html[data-swift-preset="iron-man"] .ce-header::after {
+    width: 54px;
+    height: 5px;
+    clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+}
+
+/* Captain America — a shield disc, not an underline */
+html[data-swift-preset="captain-america"] .ce-header::after {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, var(--swift-primary, var(--swift-accent)) 0 34%, transparent 34%),
+        radial-gradient(circle, transparent 50%, var(--swift-secondary, var(--swift-accent-hover)) 50% 74%, transparent 74%);
+}
+
+/* Doctor Strange — the portal ring */
+html[data-swift-preset="doctor-strange"] .ce-header::after {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+        var(--swift-secondary, var(--swift-accent-hover)) 0deg 8deg,
+        transparent 8deg 24deg);
+    -webkit-mask: radial-gradient(circle, transparent 58%, #000 58% 100%);
+    mask: radial-gradient(circle, transparent 58%, #000 58% 100%);
+}
+
+/* Star-Lord — the dashed cassette stripe */
+html[data-swift-preset="star-lord"] .ce-header::after {
+    width: 56px;
+    background: repeating-linear-gradient(90deg,
+        var(--swift-primary, var(--swift-accent)) 0 8px,
+        var(--swift-secondary, var(--swift-accent-hover)) 8px 11px,
+        transparent 11px 15px);
+}
+
+/* Vision — a soft halo rather than a hard edge */
+html[data-swift-preset="vision"] .ce-header::after {
+    width: 72px;
+    height: 8px;
+    border-radius: 0;
+    background: radial-gradient(60% 100% at 0% 50%,
+        color-mix(in oklab, var(--swift-secondary, var(--swift-accent-hover)) 65%, transparent),
+        transparent 78%);
+}
+
+/* Scarlet Witch — a chaos sliver */
+html[data-swift-preset="scarlet-witch"] .ce-header::after {
+    width: 34px;
+    height: 9px;
+    border-radius: 0;
+    background: conic-gradient(from 200deg,
+        var(--swift-primary, var(--swift-accent)),
+        var(--swift-secondary, var(--swift-accent-hover)),
+        transparent 60%);
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+}
+
+/* Black Panther — the vibranium weave */
+html[data-swift-preset="black-panther"] .ce-header::after {
+    width: 48px;
+    height: 6px;
+    background:
+        repeating-linear-gradient(45deg,
+            var(--swift-primary, var(--swift-accent)) 0 2px, transparent 2px 6px),
+        repeating-linear-gradient(-45deg,
+            var(--swift-secondary, var(--swift-accent-hover)) 0 2px, transparent 2px 6px);
+}
+
+/* Loki — the Asgardian chevrons */
+html[data-swift-preset="loki"] .ce-header::after {
+    width: 50px;
+    background: repeating-linear-gradient(115deg,
+        var(--swift-primary, var(--swift-accent)) 0 5px,
+        var(--swift-secondary, var(--swift-accent-hover)) 5px 10px);
+}
+
+/* Hulk — the smashed edge */
+html[data-swift-preset="hulk"] .ce-header::after {
+    width: 52px;
+    height: 6px;
+    border-radius: 0;
+    clip-path: polygon(
+        0 0, 100% 0, 100% 50%,
+        86% 100%, 72% 45%, 58% 100%, 44% 45%, 30% 100%, 16% 45%, 0 100%);
+}
+
+/* Thanos — the gauntlet socket */
+html[data-swift-preset="thanos"] .ce-header::after {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--swift-secondary, var(--swift-accent-hover)) 0deg 300deg,
+        transparent 300deg 360deg);
+    -webkit-mask: radial-gradient(circle, transparent 54%, #000 54% 100%);
+    mask: radial-gradient(circle, transparent 54%, #000 54% 100%);
+}
+
+/* Venom — a dripping tendril */
+html[data-swift-preset="venom"] .ce-header::after {
+    width: 30px;
+    height: 10px;
+    border-radius: 0 0 100% 0;
+    background: radial-gradient(circle at 0% 0%,
+        var(--swift-secondary, var(--swift-accent-hover)),
+        var(--swift-primary, var(--swift-accent)) 70%,
+        transparent 72%);
+}
+
+/* Winter Soldier — brushed striations with the star */
+html[data-swift-preset="winter-soldier"] .ce-header::after {
+    width: 50px;
+    background:
+        radial-gradient(circle at 44px 1.5px,
+            var(--swift-secondary, var(--swift-accent-hover)) 0 1.5px, transparent 1.5px),
+        repeating-linear-gradient(90deg,
+            var(--swift-primary, var(--swift-accent)) 0 2px, transparent 2px 4px);
+}
