@@ -7,6 +7,8 @@ page — from one palette, and stays out of Frappe's way while doing it.
 📖 **[Documentation](https://github.com/its-alikhokher/swift_theme/wiki)** —
 installation, every setting explained, and troubleshooting.
 
+![The desk on Black Panther](images/01-desk-dark-black-panther.png)
+
 ## Themes
 
 Twelve presets, six light and six dark, each a hand-tuned palette rather than
@@ -67,6 +69,28 @@ Saving Swift Theme Settings applies immediately in every open desk session.
 
 No images are shipped for any of the theming: it is CSS plus one inline SVG,
 so there is nothing extra to download.
+
+## Screenshots
+
+The same workspace in a light palette — Captain America:
+
+![The desk on Captain America](images/02-desk-light-captain-america.png)
+
+All twelve presets sit inside Frappe's own Switch Theme dialog, drawn as the
+same preview cards as Light / Dark / Automatic:
+
+![The theme switcher](images/03-theme-switcher-twelve-presets.png)
+
+The login page, Split layout, themed from the same palette:
+
+![The login page](images/04-login-page-split-layout.png)
+
+Everything is configured from one place — the preset, the desk defaults every
+user inherits, and the login page:
+
+| | | |
+|---|---|---|
+| ![Choosing a preset](images/05-settings-choose-preset.png) | ![Desk defaults](images/06-settings-desk-defaults.png) | ![Login page settings](images/07-settings-login-page.png) |
 
 ## Requirements
 
