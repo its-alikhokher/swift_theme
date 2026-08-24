@@ -1,0 +1,7 @@
+/* Swift Theme — login page bundle.
+   www/login.html is a standalone template, so neither web_include_css nor the
+   desk bundle reaches it. It linked its stylesheet by raw /assets path, which
+   Frappe serves without a content hash — the same reason an upgrade never
+   reached the desk, applied to the first page anyone sees. */
+
+@import "./login";

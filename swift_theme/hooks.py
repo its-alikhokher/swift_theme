@@ -13,46 +13,23 @@ app_license = "MIT"
 app_logo_url = "/assets/swift_theme/icons/favicon.svg"
 
 # ---- Desk assets ----
+# Every desk stylesheet, bundled. See public/css/swift_theme.bundle.scss for
+# why: a raw /assets path gets no content hash, so browsers kept serving the
+# previous release's CSS and shipped fixes never reached anyone.
 app_include_css = [
-    "/assets/swift_theme/css/swift-fonts.css",
-    "/assets/swift_theme/css/swift-base.css",
-    "/assets/swift_theme/css/swift-preset-base.css",
-    "/assets/swift_theme/css/swift-backdrops.css",
-    "/assets/swift_theme/css/swift-layout.css",
-    "/assets/swift_theme/css/swift-density.css",
-    "/assets/swift_theme/css/swift-desk.css",
-    "/assets/swift_theme/css/swift-preset-accents.css",
-    "/assets/swift_theme/css/swift-glass.css",
-    "/assets/swift_theme/css/swift-scrollbar.css",
-    "/assets/swift_theme/css/swift-toast.css",
-    "/assets/swift_theme/css/swift-perf.css",
+    "swift_theme.bundle.css",
 ]
 app_include_js = [
-    "/assets/swift_theme/js/swift-boot.js",
-    "/assets/swift_theme/js/swift-mode-observer.js",
-    "/assets/swift_theme/js/swift-switcher.js",
-    "/assets/swift_theme/js/swift-theme-dialog.js",
-    "/assets/swift_theme/js/swift-palette.js",
-    "/assets/swift_theme/js/swift-sidebar.js",
-    "/assets/swift_theme/js/swift-focus.js",
-    "/assets/swift_theme/js/swift-perf.js",
-    "/assets/swift_theme/js/swift-sounds.js",
+    "swift_theme.bundle.js",
 ]
 
 # ---- Website / portal assets ----
+# The portal and login set, bundled for the same reason.
 web_include_css = [
-    "/assets/swift_theme/css/swift-fonts.css",
-    "/assets/swift_theme/css/swift-base.css",
-    "/assets/swift_theme/css/swift-preset-base.css",
-    "/assets/swift_theme/css/swift-backdrops.css",
-    "/assets/swift_theme/css/swift-glass.css",
-    "/assets/swift_theme/css/swift-website.css",
-    "/assets/swift_theme/css/swift-login.css",
-    "/assets/swift_theme/css/swift-scrollbar.css",
+    "swift_theme_web.bundle.css",
 ]
 web_include_js = [
-    "/assets/swift_theme/js/swift-boot.js",
-    "/assets/swift_theme/js/swift-website.js",
+    "swift_theme_web.bundle.js",
 ]
 
 # ---- Form scripts ----

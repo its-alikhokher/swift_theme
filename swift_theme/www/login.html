@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ _("Sign In") }}{% if brand_name %} · {{ brand_name }}{% endif %}</title>
-    <link rel="stylesheet" href="/assets/swift_theme/css/login.css">
+    {{ include_style("swift_login.bundle.css") }}
     <style>
         :root {
             --primary: {{ colors.get("primary") or "#0b84f3" }};
@@ -97,38 +97,42 @@
         </section>
 
         <!-- ---------- Brand side ---------- -->
+        {%- if login_show_brand_panel %}
         <aside class="login-brand">
             <div class="brand-glow" aria-hidden="true"></div>
             <div class="brand-mesh" aria-hidden="true"></div>
 
             <div class="brand-body">
-                <h2>{{ _("Streamline Your") }}<br>{{ _("Business Operations") }}</h2>
-                <p>{{ _("Unlock your ERP potential — build feature-rich dashboards, automate approvals and see every number in one place.") }}</p>
+                {%- if login_heading_lines %}
+                <h2>{% for line in login_heading_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h2>
+                {%- endif %}
+                {%- if login_description %}
+                <p>{{ login_description }}</p>
+                {%- endif %}
 
+                {%- if login_points %}
                 <ul class="brand-points">
+                    {%- for point in login_points %}
                     <li>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        <span>{{ _("Role-based access control") }}</span>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                        <span>{{ point }}</span>
                     </li>
-                    <li>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        <span>{{ _("Encrypted sessions and audit trails") }}</span>
-                    </li>
-                    <li>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                        <span>{{ _("Single sign-on ready") }}</span>
-                    </li>
+                    {%- endfor %}
                 </ul>
+                {%- endif %}
 
+                {%- if login_stat_value or login_stat_label %}
                 <div class="brand-proof">
-                    <strong>300+</strong>
-                    <span>{{ _("implementations delivered. Be our next success story.") }}</span>
+                    {%- if login_stat_value %}<strong>{{ login_stat_value }}</strong>{% endif %}
+                    {%- if login_stat_label %}<span>{{ login_stat_label }}</span>{% endif %}
                 </div>
+                {%- endif %}
             </div>
         </aside>
+        {%- endif %}
 
     </main>
 
-    <script src="/assets/swift_theme/js/login.js"></script>
+    {{ include_script("swift_login.bundle.js") }}
 </body>
 </html>

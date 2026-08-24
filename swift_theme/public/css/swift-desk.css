@@ -28,110 +28,8 @@ html:not([data-swift-themed]) body {
     }
 }
 
-/* ============================================
-   SIDEBAR FIXES - No Dancing, Smooth Transitions
-   ============================================ */
-.layout-side-section {
-    transition: width var(--swift-sidebar-transition), transform var(--swift-sidebar-transition) !important;
-}
-
 .sidebar-inner, .standard-sidebar-section {
     transition: opacity var(--swift-sidebar-transition) !important;
-}
-
-/* Sidebar variants live in swift-layout.css under [data-swift-sidebar-variant].
-   The lowercase [data-swift-sidebar] rules that used to sit here were never
-   set by any script, and collided with the "off" value below on the same
-   attribute. The generic :hover width override that lived here forced every
-   sidebar to jump to 240px on hover — that was the "sidebar dance". */
-
-/* ---- Hidden sidebar (Alt+B / palette toggle) ---- */
-html[data-swift-sidebar="off"] .layout-side-section,
-html[data-swift-sidebar="off"] .body-sidebar-container {
-    display: none !important;
-}
-
-html[data-swift-sidebar="off"] .layout-main-section-wrapper,
-html[data-swift-sidebar="off"] .layout-main-section {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 1 1 100% !important;
-}
-
-/* Floating button to bring the sidebar back */
-.swift-sidebar-restore {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1030;
-    width: 22px;
-    height: 52px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-    background: var(--card-bg, var(--fg-color, #fff));
-    color: var(--text-muted, #64748b);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-    cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
-}
-
-.swift-sidebar-restore:hover {
-    color: var(--swift-accent, #4f46e5);
-    width: 26px;
-}
-
-/* ---- Pin button on sidebar items ---- */
-/* Sidebar items — smooth hover, no jump.
-   These used --accent-color, which nothing defines, so every theme got the
-   same hardcoded blue here. */
-.standard-sidebar-item, .desk-sidebar-item {
-    transition: background 0.15s ease, color 0.15s ease;
-    border-radius: 8px;
-    margin: 2px 8px;
-}
-
-/* Collapsed, the rail is only as wide as an icon, and 8px of margin either
-   side pushed the icon out of it — which is why the collapsed sidebar showed
-   clipped glyphs instead of icons. */
-.body-sidebar-container:not(.expanded) .standard-sidebar-item,
-.body-sidebar-container:not(.expanded) .desk-sidebar-item {
-    margin: 2px 4px;
-}
-
-/* No transform on hover. It nudged the row 3px and, in doing so, made the row
-   a containing block and a stacking context for its own descendants — and the
-   notifications dropdown lives inside one of these rows, so it opened clipped
-   and mispositioned. Colour is enough of a hover cue. */
-html[data-swift-themed] .standard-sidebar-item:hover,
-html[data-swift-themed] .desk-sidebar-item:hover {
-    background: var(--swift-accent-soft) !important;
-    color: var(--swift-accent) !important;
-}
-
-html[data-swift-themed] .standard-sidebar-item.selected,
-html[data-swift-themed] .desk-sidebar-item.selected,
-html[data-swift-themed] .sidebar-item.selected {
-    background: linear-gradient(100deg,
-        color-mix(in oklab, var(--swift-primary, var(--swift-accent)) 22%, transparent),
-        color-mix(in oklab, var(--swift-secondary, var(--swift-accent-hover)) 14%, transparent) 70%,
-        transparent) !important;
-    color: var(--swift-accent) !important;
-    font-weight: 600;
-    /* The rail picks up both colours so the pair reads as one identity */
-    box-shadow: inset 3px 0 0 0 var(--swift-primary, var(--swift-accent));
-}
-
-html[data-swift-themed] .standard-sidebar-item.selected a,
-html[data-swift-themed] .desk-sidebar-item.selected a,
-html[data-swift-themed] .standard-sidebar-item.selected .sidebar-item-label {
-    color: var(--swift-accent) !important;
 }
 
 /* ============================================
@@ -267,56 +165,139 @@ html[data-swift-themed] .dt-scrollable::-webkit-scrollbar-thumb {
     background: var(--swift-accent-soft);
 }
 
-/* ---------------- Kanban ---------------- */
-html[data-swift-themed] .kanban-board {
-    background: var(--bg-color);
-    padding: 16px;
-    border-radius: var(--swift-radius, 12px);
+/* ---------------- Kanban ----------------
+
+   The board container is `.kanban`. The rules here used to target
+   `.kanban-board`, which Frappe does not render — so none of them applied and
+   the board kept its stock look however the theme was set.
+
+   Frappe writes the column's status colour as an *inline* background
+   (`style="background-color: var(--bg-orange)"` in kanban_column.html), which
+   floods the whole column in a pastel from its own palette — that is what made
+   one column peach and the next green regardless of the theme. Inline styles
+   outrank a stylesheet, so !important is the only way to reach it. The status
+   colour is not lost: the `.indicator-pill` dot in each column header already
+   carries it, which is what that dot is for. */
+html[data-swift-themed] .kanban {
+    /* Transparent, so the preset's backdrop shows behind the board rather
+       than a flat slab sitting on top of it. */
+    background: transparent;
+    gap: 12px;
+    padding: 4px;
 }
 
-html[data-swift-themed] .kanban-column {
-    background: var(--card-bg);
+html[data-swift-themed] .kanban .kanban-column {
+    /* The same per-preset mark the card headers carry, from the two custom
+       properties swift-preset-accents.css defines — Iron Man's armour
+       plating, Loki's chevrons, and so on. Reusing those tokens means a
+       column belongs to its preset without a single extra rule per preset,
+       and a new preset picks this up for free. */
+    background:
+        var(--swift-head-accent,
+            linear-gradient(180deg,
+                var(--swift-primary, var(--swift-accent)),
+                var(--swift-secondary, var(--swift-accent-hover))))
+            left top / var(--swift-head-accent-size, 3px 100%) no-repeat,
+        var(--card-bg) !important;
     border: 1px solid var(--border-color);
     border-radius: var(--swift-radius, 12px);
-    box-shadow: var(--swift-shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
-    margin: 8px;
-    overflow: hidden;
+    padding: 12px 12px 12px 18px;
+    box-shadow: var(--swift-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.06));
 }
 
-html[data-swift-themed] .kanban-column-title {
-    background: linear-gradient(100deg,
-        var(--swift-primary, var(--swift-accent)),
-        var(--swift-secondary, var(--swift-accent-hover)) 65%,
-        transparent);
-    color: var(--swift-accent-fg);
-    padding: 11px 15px;
+/* The header is a label, not a banner — it used to carry the full two-colour
+   gradient, which put a coloured pill around every column title and around
+   the "+ Add Column" link, since both share this class. */
+html[data-swift-themed] .kanban .kanban-column-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+html[data-swift-themed] .kanban .kanban-column-title {
+    background: none;
+    color: var(--heading-color);
     font-weight: 650;
+    padding: 0;
 }
 
-html[data-swift-themed] .kanban-card {
-    background: var(--subtle-fg);
+/* The "+ Add" affordance sits at the top of every column, so it repeats as
+   many times as there are columns — it reads as an outline waiting to be
+   filled rather than as another card. */
+html[data-swift-themed] .kanban .add-card {
+    background-color: transparent;
+    border: 1px dashed color-mix(in oklab, var(--swift-accent) 40%, var(--border-color));
+    color: var(--text-muted);
+    border-radius: var(--swift-radius-sm, 8px);
+    height: auto;
+    padding: 6px 0;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+html[data-swift-themed] .kanban .add-card:hover {
+    background-color: var(--swift-accent-soft);
+    border-color: var(--swift-accent);
+    color: var(--swift-accent);
+}
+
+/* Frappe gives every card a min-height of 100px, so a card with nothing but a
+   title — which is most of them — was mostly empty space, and the meta row was
+   pushed to the far bottom by the space-between. Let the card be as tall as
+   what is in it. */
+html[data-swift-themed] .kanban .kanban-cards .kanban-card {
+    background: var(--card-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    border-radius: 9px;
-    padding: 12px;
-    margin: 8px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border-radius: var(--swift-radius-sm, 8px);
+    min-height: 0;
+    margin-top: 8px;
+    box-shadow: none;
+    /* Colour and shadow only — a transform would make the card a containing
+       block for anything it positions, which is the trap documented against
+       the widgets below. */
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-html[data-swift-themed] .kanban-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--swift-shadow-md, 0 6px 16px rgba(0, 0, 0, 0.14));
+html[data-swift-themed] .kanban .kanban-cards .kanban-card:hover {
     border-color: var(--swift-accent);
+    box-shadow:
+        0 1px 2px color-mix(in oklab, var(--swift-primary, var(--swift-accent)) 12%, transparent),
+        0 8px 20px -14px color-mix(in oklab, var(--swift-primary, var(--swift-accent)) 40%, transparent);
 }
 
-html[data-swift-themed] .kanban-card-doc {
+html[data-swift-themed] .kanban .kanban-card-body {
+    padding: 10px 12px;
+}
+
+html[data-swift-themed] .kanban .kanban-card-title {
+    color: var(--heading-color);
     font-weight: 600;
-    color: var(--text-color);
 }
 
-html[data-swift-themed] .kanban-card.dragging {
-    opacity: 0.55;
-    transform: rotate(2deg);
+html[data-swift-themed] .kanban .kanban-card-doc {
+    color: var(--text-muted);
+}
+
+/* An empty doc line or meta row still reserved its margin, which is where the
+   gap under each title came from. */
+html[data-swift-themed] .kanban .kanban-title-area:has(.kanban-card-doc:empty) {
+    margin-bottom: 0;
+}
+
+html[data-swift-themed] .kanban .kanban-card-meta:empty {
+    display: none;
+}
+
+html[data-swift-themed] .kanban .kanban-card-meta .like-action.liked .icon use {
+    stroke: var(--swift-accent);
+    fill: var(--swift-accent);
+}
+
+/* The placeholder left behind while a card is being dragged. */
+html[data-swift-themed] .kanban .sortable-ghost > .kanban-card:not(.add-card) {
+    background: var(--swift-accent-soft) !important;
+    border-style: dashed;
+    border-color: var(--swift-accent);
 }
 
 /* ---------------- Dashboards ---------------- */
@@ -629,30 +610,6 @@ html[data-swift-themed] .widget.spacer {
     box-shadow: none;
 }
 
-/* ========================================================================
-   POLISH
-
-   The pieces above decide what each thing *is*; this decides how finished it
-   looks. Deliberately no `transform` anywhere in here — a hover lift would
-   make the widget a containing block and a stacking context for its own
-   descendants, and each of these has a dropdown inside its header. That is
-   the exact bug that once trapped the notifications panel inside a sidebar
-   row (see the note above .standard-sidebar-item:hover), so depth is done
-   with shadow and border alone.
-   ======================================================================== */
-
-/* A KPI figure is the one number a person actually reads on a dashboard, and
-   it was rendering in the body font at body spacing. Tabular figures stop the
-   digits shifting as values update, and negative tracking keeps a large number
-   from looking loose. */
-html[data-swift-themed] .number-card .number,
-html[data-swift-themed] .number-widget-box .number {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum" 1, "lnum" 1;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-}
-
 /* The label under it is metadata, not prose — it reads better small, spaced
    and quiet, so the figure stays the thing your eye lands on. */
 html[data-swift-themed] .number-card .card-label,
@@ -807,6 +764,56 @@ html[data-swift-themed] .widget .link-item a:hover {
     background: var(--swift-accent-soft);
 }
 
+/* ---------------- Breadcrumbs and page head ----------------
+
+   Breadcrumbs were the last part of the desk still wearing Frappe's own
+   colours. They read --ink-gray-4/5/7 for their text, separators and hover,
+   and no preset defines any of those — so the trail above every page stayed
+   the same grey whichever theme was active, which is the same silent failure
+   the list and report views used to have.
+
+   Themed directly rather than by redefining the ink-gray scale: those belong
+   to Frappe and are used in places this app has no business recolouring. */
+html[data-swift-themed] .page-head {
+    background: transparent;
+}
+
+html[data-swift-themed] .navbar-breadcrumbs > li > a {
+    color: var(--text-muted);
+    transition: color 0.15s ease;
+}
+
+html[data-swift-themed] .navbar-breadcrumbs > li > a:hover {
+    color: var(--swift-accent);
+}
+
+/* The mark between items. Frappe uses a slash; a chevron points the way the
+   trail runs, which is what makes it read as a path rather than a list.
+
+   :first-child is excluded deliberately. Frappe blanks the mark before the
+   opening crumb with `li:first-child a:before`, and that selector scores a
+   class and two types — less than this one — so setting content here without
+   the exclusion would put a stray chevron in front of the module name.
+
+   Quieter than the labels either side of it, so the trail reads as words
+   rather than as punctuation. */
+html[data-swift-themed] .navbar-breadcrumbs > li:not(:first-child) > a:before {
+    content: "\203A";
+    color: color-mix(in oklab, var(--text-muted) 55%, transparent);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Where you actually are, as opposed to how you got here. */
+html[data-swift-themed] .navbar-breadcrumbs > li:last-child > a {
+    color: var(--heading-color);
+    font-weight: 600;
+}
+
+html[data-swift-themed] .navbar-breadcrumbs > li:last-child > a:hover {
+    color: var(--swift-accent);
+}
+
 /* ---------------- Navbar ---------------- */
 html[data-swift-themed] .navbar {
     background: var(--navbar-bg, var(--card-bg)) !important;
@@ -896,20 +903,10 @@ html[data-swift-anim="off"] body::before {
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
-    .layout-side-section {
-        position: fixed;
-        z-index: 1000;
-        transform: translateX(-100%);
-    }
-    
-    .layout-side-section.show {
-        transform: translateX(0);
-    }
-    
-    .kanban-board {
+    .kanban {
         padding: 8px;
     }
-    
+
     .kanban-column {
         min-width: 280px;
     }

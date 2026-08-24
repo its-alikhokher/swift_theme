@@ -60,7 +60,7 @@ GUEST_KEYS = {
     "theme_css", "primary", "secondary", "is_dark", "roles",
     "backdrop", "backdrop_pinned", "enable_backdrops", "show_backdrop_through",
     "density", "radius", "font_scale", "font_family",
-    "navbar_variant", "sidebar_variant",
+    "navbar_variant", "sidebar_variant", "sidebar_brand_fill",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
     "login_layout", "login_bg_image", "login_tagline", "login_show_signup",
     "presets",
@@ -119,6 +119,7 @@ def get_effective_prefs():
         "font_family": u.get("swift_font_family") or s.get("default_font_family") or "Inter",
         "navbar_variant":  s.get("navbar_variant")  or "Solid",
         "sidebar_variant": s.get("sidebar_variant") or "Attached",
+        "sidebar_brand_fill": int(s.get("sidebar_brand_fill") or 0),
 
         # features
         "enable_switcher":         int(s.get("enable_switcher") or 0),
@@ -146,9 +147,6 @@ def get_effective_prefs():
         "auto_dark_start": str(s.get("auto_dark_start") or "19:00:00"),
         "auto_dark_end":   str(s.get("auto_dark_end") or "07:00:00"),
 
-        # custom injection
-        "custom_css": s.get("custom_css") or "",
-        "custom_js":  s.get("custom_js") or "",
 
         # print
         "print_font_family": s.get("print_font_family") or "Inter",

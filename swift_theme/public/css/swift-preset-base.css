@@ -37,12 +37,6 @@ html[data-swift-themed] body::before {
      as Mesh or Grain inherited a drift it never asked for. */
 }
 
-/* Sidebar hairline glow line at accent color — high-end SaaS touch */
-html[data-swift-themed] .layout-side-section {
-  box-shadow: inset -1px 0 0 0 var(--border-color),
-              1px 0 24px -8px color-mix(in oklab, var(--swift-accent) 25%, transparent);
-}
-
 /* Page title gets a subtle accent gradient — premium magazine feel */
 html[data-swift-themed] .page-title h1,
 html[data-swift-themed] .page-head .title-text {
@@ -52,28 +46,6 @@ html[data-swift-themed] .page-head .title-text {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent !important;
-}
-
-/* Active sidebar item — soft gradient pill */
-html[data-swift-themed] .sidebar-item.selected,
-html[data-swift-themed] .desk-sidebar-item.selected {
-  background: linear-gradient(135deg,
-    var(--swift-accent-soft),
-    color-mix(in oklab, var(--swift-accent) 6%, transparent)) !important;
-  color: var(--swift-accent) !important;
-  box-shadow: inset 2px 0 0 0 var(--swift-accent);
-}
-
-/* Glassy navbar for premium themes */
-html[data-swift-themed] .navbar {
-  background: var(--navbar-bg) !important;
-  border-bottom: 1px solid var(--border-color);
-}
-
-/* Sidebar tint */
-html[data-swift-themed] .layout-side-section {
-  background: var(--sidebar-bg);
-  border-right: 1px solid var(--border-color);
 }
 
 /* Cards / form sections — refined surfaces with hairline border */
@@ -268,46 +240,6 @@ html[data-swift-themed] .kanban-column {
 html[data-swift-themed] .kanban-card {
   background: var(--card-bg);
   border: 1px solid color-mix(in oklab, var(--border-color) 70%, var(--swift-accent) 30%);
-}
-
-/* ========================================================================
-   Full-theme scoped: Body Sidebar premium (v16 verified classes)
-   ======================================================================== */
-html[data-swift-themed] .body-sidebar-container,
-html[data-swift-themed] .body-sidebar {
-  background: color-mix(in oklab, var(--fg-color) 82%, transparent) !important;
-  border-right: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
-  box-shadow: inset -1px 0 0 rgba(255,255,255,0.02),
-              4px 0 24px -14px color-mix(in oklab, var(--swift-accent) 60%, transparent);
-}
-
-/* Active item — theme-strength gradient pill */
-html[data-swift-themed] .active-sidebar,
-html[data-swift-themed] .standard-sidebar-item.active-sidebar,
-html[data-swift-themed] .item-anchor.active {
-  background: linear-gradient(90deg,
-    color-mix(in oklab, var(--swift-accent) 26%, transparent),
-    color-mix(in oklab, var(--swift-accent) 6%, transparent) 70%,
-    transparent
-  ) !important;
-  box-shadow:
-    inset 3px 0 0 var(--swift-accent),
-    0 0 24px -8px color-mix(in oklab, var(--swift-accent) 60%, transparent) !important;
-  color: var(--swift-accent) !important;
-}
-
-/* Section headings (like "Modules", "Domains") — subtle accent tint */
-html[data-swift-themed] .body-sidebar .section-item > .item-anchor {
-  color: color-mix(in oklab, var(--text-muted) 60%, var(--swift-accent) 40%);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-/* Suffix badges */
-html[data-swift-themed] .sidebar-item-suffix {
-  color: var(--swift-accent);
 }
 
 /* Promotional banner — glassy accent card */

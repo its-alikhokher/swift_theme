@@ -65,6 +65,28 @@ def get_context(context):
     context["login_bg_image"] = settings.login_bg_image or ""
     context["show_signup"] = bool(settings.login_show_signup) and not context["disable_signup"]
 
+    # Everything printed on the brand panel comes from Settings. It used to be
+    # written into the template, so the one thing a site most wants to change
+    # about its login page was the one thing it could not.
+    #
+    # Falling back to the DocType's own default rather than to a literal here:
+    # a site that clears a field wants it empty, and a site that has never
+    # touched it gets what the field ships with, from one place.
+    def setting(fieldname):
+        value = settings.get(fieldname)
+        return value if value is not None else ""
+
+    def lines(fieldname):
+        return [line.strip() for line in (setting(fieldname) or "").splitlines()
+                if line.strip()]
+
+    context["login_show_brand_panel"] = bool(settings.login_show_brand_panel)
+    context["login_heading_lines"] = lines("login_heading")
+    context["login_description"] = setting("login_description")
+    context["login_points"] = lines("login_points")
+    context["login_stat_value"] = setting("login_stat_value")
+    context["login_stat_label"] = setting("login_stat_label")
+
     # Computed here rather than in the template — the Jinja sandbox does not
     # reliably expose frappe.utils.
     context["current_year"] = now_datetime().year

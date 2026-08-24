@@ -1,47 +1,52 @@
-/* Swift Theme — Layout variants (Navbar + Sidebar) */
+/* Swift Theme — Top bar and sidebar variants
 
-/* -------- Navbar variants -------- */
+   Both settings used to point at elements the v16 desk does not render, so
+   neither did anything where a user would look for it:
+
+   * Navbar Variant styled `.navbar`. The v16 desk has no such element — the
+     only `.navbar` in Frappe is the website/portal header and a decorative
+     swatch inside the theme-switcher dialog. The desk's top bar is
+     `.page-head`, which is what these rules take now. The portal header is
+     kept alongside it, since that one is real.
+
+   * Sidebar Variant styled `.layout-side-section`, which is the per-page
+     filter panel inside a list or form — not the navigation sidebar people
+     mean by "the sidebar". That is `.body-sidebar`.
+
+   Frappe already gives the top bar `background: var(--bg-color)` and a bottom
+   border, so "Solid" is what the desk does untouched: these variants change
+   it, they do not create it from nothing.
+   ========================================================================= */
+
+/* -------- Top bar -------- */
+html[data-swift-navbar="Solid"] .page-head {
+  background: var(--fg-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Translucent, so whatever scrolls under it stays faintly visible. Only the
+   colour is softened — no backdrop-filter, which would make the bar a
+   containing block for anything positioned inside it. */
+html[data-swift-navbar="Glass"] .page-head {
+  background: color-mix(in oklab, var(--fg-color) 72%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
+}
+
+html[data-swift-navbar="Transparent"] .page-head {
+  background: transparent;
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
+}
+
+/* The portal header is a real .navbar, and the same three choices suit it. */
 html[data-swift-navbar="Solid"] .navbar {
   background: var(--fg-color) !important;
   border-bottom: 1px solid var(--border-color);
 }
 html[data-swift-navbar="Glass"] .navbar {
-  background: color-mix(in oklab, var(--fg-color) 65%, transparent) !important;
+  background: color-mix(in oklab, var(--fg-color) 72%, transparent) !important;
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
 }
 html[data-swift-navbar="Transparent"] .navbar {
   background: transparent !important;
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
-}
-
-/* -------- Sidebar variants -------- */
-html[data-swift-sidebar-variant="Attached"] .layout-side-section {
-  background: var(--fg-color);
-  border-right: 1px solid var(--border-color);
-  margin: 0;
-  border-radius: 0;
-}
-html[data-swift-sidebar-variant="Floating"] .layout-side-section {
-  background: var(--card-bg);
-  margin: 12px 0 12px 12px;
-  border-radius: var(--swift-radius);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--swift-shadow-md);
-}
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section {
-  max-width: 56px;
-  overflow: hidden;
-}
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .sidebar-label,
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .standard-sidebar-section-title,
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section .desk-sidebar-item .sidebar-item-label {
-  display: none !important;
-}
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover {
-  max-width: 240px;
-}
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .sidebar-label,
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .desk-sidebar-item .sidebar-item-label,
-html[data-swift-sidebar-variant="Icon-only"] .layout-side-section:hover .standard-sidebar-section-title {
-  display: block !important;
 }

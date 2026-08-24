@@ -1,0 +1,27 @@
+/* Swift Theme — desk bundle.
+   =========================================================================
+   Every desk stylesheet, in the one order that makes the cascade come out
+   right. Order is load-bearing: several of these files deliberately settle
+   ties by coming later, so an import moved here changes what wins on screen.
+
+   This exists for cache busting, not tidiness. Frappe only runs a path
+   through assets.json — and so only gives it a content hash — when the name
+   contains ".bundle." and the path is not already under /assets. Listing the
+   files raw in app_include_css meant every one was served from a URL that
+   never changed, so browsers and nginx held the old copy across upgrades and
+   a shipped fix simply did not arrive.
+   ========================================================================= */
+
+@import "./swift-fonts";
+@import "./swift-base";
+@import "./swift-preset-base";
+@import "./swift-backdrops";
+@import "./swift-layout";
+@import "./swift-density";
+@import "./swift-desk";
+@import "./swift-sidebar";
+@import "./swift-preset-accents";
+@import "./swift-glass";
+@import "./swift-scrollbar";
+@import "./swift-toast";
+@import "./swift-perf";

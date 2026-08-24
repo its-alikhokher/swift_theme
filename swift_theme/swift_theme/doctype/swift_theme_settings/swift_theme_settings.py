@@ -289,7 +289,6 @@ class SwiftThemeSettings(Document):
 
         self._validate_volume()
         self._validate_sound_events()
-        self._guard_custom_code()
 
     def _validate_volume(self):
         if self.volume_level is None:
@@ -310,30 +309,6 @@ class SwiftThemeSettings(Document):
                     )
                 )
             seen.add(row.event_key)
-
-    def _guard_custom_code(self):
-        """Custom JS runs on every desk page for every user.
-
-        That is effectively a site-wide script injection point, so restrict
-        edits to Administrator rather than any System Manager.
-        """
-        if self.is_new() or frappe.session.user == "Administrator":
-            return
-        if frappe.flags.in_install or frappe.flags.in_migrate or frappe.flags.in_patch:
-            return
-
-        before = self.get_doc_before_save()
-        if before is None:
-            return
-
-        for field in ("custom_js", "custom_css"):
-            if (before.get(field) or "") != (self.get(field) or ""):
-                frappe.throw(
-                    frappe._("Only Administrator can change {0}.").format(
-                        frappe.bold(self.meta.get_label(field))
-                    ),
-                    frappe.PermissionError,
-                )
 
     COLOR_FIELDS = ("color_mode", "active_preset", "primary_color", "secondary_color")
 

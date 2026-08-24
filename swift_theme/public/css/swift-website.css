@@ -1,29 +1,35 @@
-/* Swift Theme — Public website + portal */
+/* Swift Theme — portal.
 
-html[data-swift-accent] .website-navbar,
-html[data-swift-accent] nav.navbar {
+   Every rule here was gated on html[data-swift-accent], which nothing has ever
+   set: not the boot script, not the portal template, not the login page. The
+   whole file was inert, so the portal took the fonts and the backdrop and none
+   of the colour. The attribute that actually marks "this theme is on" — and
+   which the boot script sets on the portal as well as the desk — is
+   data-swift-themed, so that is the gate now. */
+html[data-swift-themed] .website-navbar,
+html[data-swift-themed] nav.navbar {
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--swift-shadow-sm);
 }
 
-html[data-swift-accent] .btn.btn-primary,
-html[data-swift-accent] .btn.btn-primary-light {
+html[data-swift-themed] .btn.btn-primary,
+html[data-swift-themed] .btn.btn-primary-light {
   background: var(--swift-accent);
   color: var(--swift-accent-fg);
   border-radius: var(--swift-radius-sm);
   border-color: var(--swift-accent);
   font-weight: 500;
 }
-html[data-swift-accent] .btn.btn-primary:hover {
+html[data-swift-themed] .btn.btn-primary:hover {
   background: var(--swift-accent-hover);
   border-color: var(--swift-accent-hover);
 }
 
-html[data-swift-accent] .card {
+html[data-swift-themed] .card {
   border-radius: var(--swift-radius);
   border: 1px solid var(--border-color);
   box-shadow: var(--swift-shadow-sm);
 }
 
-html[data-swift-accent] a { color: var(--swift-accent); }
-html[data-swift-accent] a:hover { color: var(--swift-accent-hover); }
+html[data-swift-themed] a { color: var(--swift-accent); }
+html[data-swift-themed] a:hover { color: var(--swift-accent-hover); }
