@@ -3,73 +3,59 @@
    Frappe Light/Dark mode via existing CSS variables. */
 
 /* Shared */
-body[data-swift-login] {
+/* No background here: swift-backdrops.css forces the body transparent with
+   !important so the desk backdrop can show through, and this page is themed
+   too. Each layout paints its own shell instead. */
+body.swift-login {
   min-height: 100vh;
-  background: var(--bg-color);
   color: var(--text-color);
 }
 
-body[data-swift-login] .for-login,
-body[data-swift-login] .for-signup,
-body[data-swift-login] .for-forgot,
-body[data-swift-login] .login-content {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--swift-radius-lg);
-  box-shadow: var(--swift-shadow-lg);
-  padding: 36px !important;
+/* The section is a wrapper, not a card. Frappe already draws the card inside
+   it as .page-card, so painting both gave two stacked panels — one behind the
+   other, which is exactly what it looked like.
+
+   The three layouts each style .page-card themselves, so all this needs to do
+   is make sure the wrapper stays out of the way. */
+body.swift-login .for-login,
+body.swift-login .for-signup,
+body.swift-login .for-forgot,
+body.swift-login .for-reset-password,
+body.swift-login .for-email-login,
+body.swift-login .for-login-with-email-link {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
-body[data-swift-login] .page-card-head h4,
-body[data-swift-login] .login-content h4 {
+body.swift-login .page-card-head h4,
+body.swift-login .login-content h4 {
   color: var(--text-color);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-/* Custom tagline */
-.swift-login-tagline {
-  color: var(--text-muted);
-  font-size: 14px;
-  margin-top: 6px;
-  margin-bottom: 20px;
-}
-
-/* Custom brand row */
-.swift-login-brand {
-  display: flex; 
-  align-items: center; 
-  gap: 12px;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.swift-login-brand img { 
-  height: 36px; 
-  width: auto;
-}
-
-.swift-login-brand .name {
-  font-weight: 700;
-  color: var(--text-color);
-  font-size: 20px;
-}
+/* The small brand row these styled was drawn by a script that injected it into
+   Frappe's card. That script is gone — the page renders its brand from
+   Settings now — but the class name is the one the panel beside the form uses,
+   so these were quietly restyling that panel: a border under it, a bottom
+   margin, and a 36px cap on any image inside it. */
 
 /* Form elements */
-body[data-swift-login] .form-control {
+body.swift-login .form-control {
   border-radius: var(--swift-radius-md);
   border: 1px solid var(--border-color);
   padding: 10px 14px;
   font-size: 14px;
 }
 
-body[data-swift-login] .form-control:focus {
+body.swift-login .form-control:focus {
   border-color: var(--swift-accent);
   box-shadow: 0 0 0 2px var(--swift-accent-soft);
 }
 
-body[data-swift-login] .btn-primary {
+body.swift-login .btn-primary {
   background: var(--swift-accent);
   border-color: var(--swift-accent);
   font-weight: 600;
@@ -77,101 +63,607 @@ body[data-swift-login] .btn-primary {
   border-radius: var(--swift-radius-md);
 }
 
-body[data-swift-login] .btn-primary:hover {
+body.swift-login .btn-primary:hover {
   opacity: 0.9;
 }
 
-body[data-swift-login] .forgot-password-message,
-body[data-swift-login] .back-to-login {
+body.swift-login .forgot-password-message {
   margin-top: 12px;
   text-align: center;
 }
 
-body[data-swift-login] .forgot-password-message a,
-body[data-swift-login] .back-to-login a {
+body.swift-login .forgot-password-message a {
   color: var(--text-muted);
   font-size: 13px;
   text-decoration: none;
 }
 
-body[data-swift-login] .forgot-password-message a:hover,
-body[data-swift-login] .back-to-login a:hover {
+body.swift-login .forgot-password-message a:hover {
   color: var(--swift-accent);
 }
 
-body[data-swift-login] .or-separator {
-  color: var(--text-muted);
-  font-size: 13px;
-  margin: 16px 0;
-}
-
-body[data-swift-login] .social-logins .btn {
+body.swift-login .social-logins .btn {
   margin-top: 8px;
 }
 
-body[data-swift-login] .signup-section {
-  margin-top: 20px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
+/* ==========================================================================
+   Layout: Split — a white form panel, curving into a brand-coloured panel
+   ==========================================================================
+   The form sits on white at the left; the right is the brand panel, whose
+   words all come from Settings. The white panel's inner edge is rounded and
+   laid over the brand one, so the two read as a single card rather than two
+   halves butted together.
+
+   The panel takes its colour from the preset rather than a fixed palette:
+   every preset should look like itself here, not like whichever one the
+   design was drawn against.
+   ========================================================================== */
+body.swift-login-Split .navbar { display: none !important; }
+
+@media (min-width: 900px) {
+  body.swift-login-Split .swift-login-forms {
+    position: relative;
+    z-index: 1;
+    background: var(--swift-surface, #fff);
+    /* Curves into the panel beside it, and overlaps far enough that the
+       curve has something to sit on. */
+    border-radius: 0 44px 44px 0;
+    margin-right: -44px;
+    padding: 6vh 5vw;
+    box-shadow: 26px 0 60px -34px rgba(2, 12, 27, 0.45);
+  }
 }
 
-body[data-swift-login] .signup-section a {
-  color: var(--swift-accent);
+body.swift-login-Split .swift-login-brand {
+  /* Layered: a soft brand wash, a faceted pattern, then the base gradient.
+     The facets are drawn with gradients rather than shipped as an image —
+     they scale to any panel size and cost no request. */
+  background:
+    radial-gradient(120% 90% at 12% 8%,
+      color-mix(in oklab, var(--swift-accent) 55%, transparent), transparent 62%),
+    linear-gradient(118deg, rgba(255, 255, 255, 0.055) 0 34%, transparent 34.3%),
+    linear-gradient(202deg, rgba(255, 255, 255, 0.045) 0 46%, transparent 46.3%),
+    linear-gradient(324deg, rgba(255, 255, 255, 0.04) 0 40%, transparent 40.3%),
+    linear-gradient(58deg, rgba(0, 0, 0, 0.10) 0 28%, transparent 28.3%),
+    linear-gradient(155deg,
+      color-mix(in oklab, var(--swift-accent) 88%, #08131c) 0%,
+      color-mix(in oklab, var(--swift-accent) 62%, #08131c) 52%,
+      color-mix(in oklab, var(--swift-accent) 40%, #08131c) 100%);
+  padding: 8vh 6vw 8vh 9vw;
+}
+
+/* The panel's own glow would fight the facets; the gradient stack above
+   already carries the light. */
+body.swift-login-Split .swift-login-brand::before {
+  display: none;
+}
+
+/* ---- The form on the white side ---- */
+body.swift-login-Split .page-card,
+body.swift-login-Split .login-content {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+body.swift-login-Split .page-card-head {
+  display: block;
+  margin-bottom: 26px;
+}
+
+body.swift-login-Split .page-card-head-text h4 {
+  font-size: 28px;
   font-weight: 600;
-  text-decoration: none;
+  color: var(--swift-on-surface, var(--text-color));
 }
 
-/* ---------- Layout: Split (image left, form right) ---------- */
-body[data-swift-login="Split"] .container.for-login,
-body[data-swift-login="Split"] .container.for-signup,
-body[data-swift-login="Split"] .container.for-forgot,
-body[data-swift-login="Split"] .container.login-content {
-  max-width: 460px !important;
-  margin: 6vh 6vw 6vh auto !important;
+body.swift-login-Split .page-card-subtitle {
+  display: none;      /* the panel beside it already says this */
 }
 
-body[data-swift-login="Split"]::before {
-  content: "";
-  position: fixed; inset: 0 55% 0 0;
+body.swift-login-Split .app-logo {
+  max-height: 40px;
+  width: auto;
+  margin-bottom: 18px;
+}
+
+body.swift-login-Split .form-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 7px;
+  color: var(--swift-on-surface, var(--text-color));
+}
+
+body.swift-login-Split .page-card .page-card-body input[type="text"],
+body.swift-login-Split .page-card .page-card-body input[type="email"],
+body.swift-login-Split .page-card .page-card-body input[type="password"] {
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: color-mix(in oklab, var(--swift-accent) 8%, var(--swift-surface, #fff));
+  font-size: 15px;
+}
+
+body.swift-login-Split .page-card .page-card-body input:focus {
+  border-color: color-mix(in oklab, var(--swift-accent) 45%, transparent);
+  background: var(--swift-surface, #fff);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--swift-accent) 14%, transparent);
+}
+
+body.swift-login-Split .page-card .page-card-actions .btn-login,
+body.swift-login-Split .page-card .page-card-actions .btn-signup,
+body.swift-login-Split .page-card .page-card-actions .btn-forgot {
+  height: 54px;
+  border-radius: 999px;
+  border: none;
+  background: color-mix(in oklab, var(--swift-accent) 92%, #08131c) !important;
+  color: var(--swift-accent-fg) !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+body.swift-login-Split .btn-login:hover,
+body.swift-login-Split .btn-signup:hover,
+body.swift-login-Split .btn-forgot:hover {
+  background: var(--swift-accent) !important;
+}
+
+body.swift-login-Split .forgot-password-message {
+  text-align: left;
+  margin: 14px 0 4px;
+}
+
+/* ==========================================================================
+   Layout: Centered — a frosted card over a full-bleed photograph
+   ==========================================================================
+   This is a treatment of Frappe's own login page, not a replacement for it.
+   Everything here targets Frappe's markup, so every route it offers keeps
+   working: sign-in, sign-up, forgot password, the email link, the social
+   providers, LDAP and two-factor. The app used to ship its own login page
+   instead, and every one of those had to be re-implemented — which is how it
+   ended up linking to /signup, a route that does not exist, and dropping the
+   providers entirely.
+
+   The photograph is `login_bg_image` from Settings, put on the body as
+   --swift-login-bg by swift-website.js. The gradient underneath is what shows
+   when no image is chosen, and while a large one is still arriving.
+
+   backdrop-filter makes an element a containing block for `position: fixed`
+   descendants. Nothing on the login page is fixed, so it is safe here — it
+   would not be on the desk, which is why this is scoped to the login body.
+   ========================================================================== */
+/* Painted on the shell, not on <body>.
+   swift-backdrops.css forces `html[data-swift-themed] body { background:
+   transparent !important }` so the desk's own backdrop can show through, and
+   the login page is themed too — so a backdrop set on the body here was
+   overruled by this app's own stylesheet and the whole layout came out white,
+   including its white-on-photograph text.
+
+   The scrim is deliberately heavy. The image is whatever a site uploaded, and
+   sites upload light ones — a logo, most often — so the text has to stay
+   readable over the worst case rather than only over a dark photograph. */
+body.swift-login-Centered .swift-login-shell {
   background:
-    linear-gradient(135deg, var(--swift-accent-soft), transparent 60%),
-    var(--swift-login-bg, radial-gradient(1200px 800px at 20% 30%, var(--swift-accent) 0%, transparent 50%));
-  background-size: cover;
-  background-position: center;
-  z-index: 0;
-  filter: saturate(1.05);
-}
-
-body[data-swift-login="Split"] .navbar { display: none !important; }
-body[data-swift-login="Split"] .page_content { position: relative; z-index: 1; }
-
-/* ---------- Layout: Centered (card in middle, subtle gradient) ---------- */
-body[data-swift-login="Centered"] {
-  background:
+    /* The scrim is light because the shipped photograph is already dark —
+       measured at 0.04 average, 0.18 in its brightest fifth — so the picture
+       can stay vivid instead of being flattened under a wash. A site that
+       uploads a paler one is still covered: the card carries its own floor. */
+    linear-gradient(180deg, rgba(8, 12, 22, 0.26), rgba(8, 12, 22, 0.38)),
+    var(--swift-login-bg, url("/assets/swift_theme/images/login-dusk.jpg"))
+      center / cover no-repeat fixed,
     radial-gradient(900px 500px at 10% 0%, var(--swift-accent-soft), transparent 60%),
     radial-gradient(900px 600px at 100% 100%, var(--swift-accent-soft), transparent 60%),
     var(--bg-color);
 }
 
-body[data-swift-login="Centered"] .for-login,
-body[data-swift-login="Centered"] .for-signup,
-body[data-swift-login="Centered"] .for-forgot,
-body[data-swift-login="Centered"] .login-content {
-  max-width: 420px;
-  margin: 10vh auto !important;
+/* No vertical margin. The shell is a flex column that already centres this,
+   so a 9vh margin on top of that only adds height — and on a short screen
+   that height is the difference between fitting and scrolling: at 504x544 it
+   was 98px of margin against 23px of overflow. */
+body.swift-login-Centered .for-login,
+body.swift-login-Centered .for-signup,
+body.swift-login-Centered .for-forgot,
+body.swift-login-Centered .for-reset-password,
+body.swift-login-Centered .for-email-login,
+body.swift-login-Centered .for-login-with-email-link {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto !important;
 }
 
-/* ---------- Layout: Minimal (no card, flat) ---------- */
-body[data-swift-login="Minimal"] .for-login,
-body[data-swift-login="Minimal"] .for-signup,
-body[data-swift-login="Minimal"] .for-forgot,
-body[data-swift-login="Minimal"] .login-content {
-  border: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
+/* An uploaded picture is an unknown quantity: the app cannot see it, and the
+   commonest mistake is putting a logo in this field, which is a white field.
+   So when the picture is not ours, the wash goes heavier and the card's own
+   floor goes darker — measured to clear 4.5:1 over a pale photograph. */
+body.swift-login-Centered.swift-login-custom-bg .swift-login-shell {
+  background:
+    linear-gradient(180deg, rgba(8, 12, 22, 0.55), rgba(8, 12, 22, 0.68)),
+    var(--swift-login-bg) center / cover no-repeat fixed,
+    var(--swift-canvas, var(--bg-color));
+}
+
+body.swift-login-Centered.swift-login-custom-bg .page-card,
+body.swift-login-Centered.swift-login-custom-bg .login-content {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10)),
+    rgba(12, 16, 28, 0.62) !important;
+}
+
+/* ---- The card ---- */
+body.swift-login-Centered .page-card,
+body.swift-login-Centered .login-content {
+  padding: 38px 36px 32px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  /* Frosted glass: a light film with a darker one under it. The light film is
+     what makes it read as glass — the picture stays visible through it — and
+     the darker film underneath is what keeps white text legible whatever the
+     picture happens to be. One alone cannot do both: light glass on a pale
+     photograph is unreadable, and dark glass is not glass. */
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)),
+    rgba(12, 16, 28, 0.35) !important;
+  backdrop-filter: blur(26px) saturate(1.25);
+  -webkit-backdrop-filter: blur(26px) saturate(1.25);
+  box-shadow: 0 34px 80px -30px rgba(2, 12, 27, 0.65);
+  color: #fff;
+}
+
+/* Every ink token has to be restated on glass: the palette is built for a
+   light card and its greys disappear against a photograph. */
+body.swift-login-Centered .page-card,
+body.swift-login-Centered .page-card h4,
+body.swift-login-Centered .page-card-head-text h4,
+body.swift-login-Centered .form-label,
+body.swift-login-Centered .page-card-subtitle {
+  color: #fff;
+}
+
+body.swift-login-Centered .page-card-head {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+body.swift-login-Centered .page-card-head-text h4 {
+  font-size: 24px;
+  font-weight: 650;
+}
+
+body.swift-login-Centered .page-card-subtitle {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body.swift-login-Centered .app-logo {
+  max-height: 46px;
+  width: auto;
+}
+
+/* ---- Fields ----
+   The field name lives in the placeholder here. Moved out of sight rather
+   than removed: a control with no label is unusable with a screen reader,
+   and this design does not need that trade. */
+body.swift-login-Centered .form-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Frappe styles these as
+   `.for-login .page-card .page-card-body input[type=text]`, which scores four
+   classes and a type — more than a rule on .form-control, and it loads after
+   this file, so a shorter selector here simply lost and the fields stayed
+   white boxes. Matching its depth and adding our own class is what wins,
+   rather than reaching for !important on every declaration. */
+body.swift-login-Centered .page-card .page-card-body input[type="text"],
+body.swift-login-Centered .page-card .page-card-body input[type="email"],
+body.swift-login-Centered .page-card .page-card-body input[type="password"] {
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 15px;
+}
+
+body.swift-login-Centered .page-card .page-card-body input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body.swift-login-Centered .page-card .page-card-body input[type="text"]:focus,
+body.swift-login-Centered .page-card .page-card-body input[type="email"]:focus,
+body.swift-login-Centered .page-card .page-card-body input[type="password"]:focus {
+  border-color: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+/* Frappe reserves 38px for its icons inside the control. The pill's curve
+   needs a little more, and the reveal control on the right the same. */
+body.swift-login-Centered .page-card .page-card-body .email-field input,
+body.swift-login-Centered .page-card .page-card-body .password-field input {
+  padding-left: 44px;
+}
+
+body.swift-login-Centered .page-card .page-card-body .password-field input {
+  padding-right: 48px;
+}
+
+/* Frappe puts its field icons inside the control. The pill's curve needs them
+   further in, or they sit on the rounded edge. */
+body.swift-login-Centered .field-icon,
+body.swift-login-Centered .toggle-password {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+body.swift-login-Centered .email-field .field-icon,
+body.swift-login-Centered .password-field .field-icon {
+  left: 16px;
+}
+
+body.swift-login-Centered .toggle-password {
+  right: 18px;
+}
+
+/* Frappe reserves room for the icon with padding; the pill needs its own. */
+body.swift-login-Centered .email-field .form-control,
+body.swift-login-Centered .password-field .form-control {
+  padding-left: 42px;
+}
+
+body.swift-login-Centered .password-field .form-control {
+  padding-right: 46px;
+}
+
+/* ---- The action ----
+   Keeps the theme's colour: this layout is a treatment, not a second palette.
+   Softened so it belongs on glass rather than sitting on top of it. */
+body.swift-login-Centered .page-card .page-card-actions .btn-login,
+body.swift-login-Centered .page-card .page-card-actions .btn-signup,
+body.swift-login-Centered .page-card .page-card-actions .btn-forgot {
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: color-mix(in oklab, var(--swift-accent) 74%, transparent) !important;
+  color: var(--swift-accent-fg) !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+body.swift-login-Centered .page-card .page-card-actions .btn-login:hover,
+body.swift-login-Centered .page-card .page-card-actions .btn-signup:hover,
+body.swift-login-Centered .page-card .page-card-actions .btn-forgot:hover {
+  background: color-mix(in oklab, var(--swift-accent) 90%, transparent) !important;
+}
+
+/* The secondary routes are links on this design, not a stack of buttons. */
+body.swift-login-Centered .page-card .page-card-actions .btn-login-option {
+  height: auto;
+  padding: 0;
+  border: none;
+  background: none !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+body.swift-login-Centered .btn-login-option:hover {
+  color: #fff !important;
+  text-decoration: underline;
+}
+
+/* Forgot on one side, the other ways in on the other. */
+body.swift-login-Centered .page-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body.swift-login-Centered .forgot-password-message {
+  margin-top: 10px;
+  text-align: left;
+}
+
+body.swift-login-Centered .forgot-password-message a,
+body.swift-login-Centered .sign-up-message a {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+body.swift-login-Centered .sign-up-message {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---- Providers, as the circular marks in the design ----
+   Frappe nests these: .social-logins > .social-login-buttons >
+   .login-button-wrapper > a.btn-login-option. The row has to be laid out on
+   the level that actually holds the buttons, and the wrapper has to stop
+   being a block, or each mark lands on its own line.
+
+   The "or login with" caption above them is injected by swift-website.js
+   rather than drawn with a ::before, so it goes through the translation
+   machinery like every other string on the page. */
+body.swift-login-Centered .social-logins {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+body.swift-login-Centered .swift-login-divider {
+  display: block;
+  text-align: center;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.86);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+body.swift-login-Centered .social-login-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+body.swift-login-Centered .login-button-wrapper {
+  display: contents;
+}
+
+body.swift-login-Centered .social-logins .btn-login-option {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff !important;
+  overflow: hidden;
+  /* The mark already names the provider. The text stays in the DOM for a
+     screen reader; only its box is collapsed. */
+  font-size: 0;
+}
+
+body.swift-login-Centered .social-logins .btn-login-option img,
+body.swift-login-Centered .social-logins .btn-login-option svg {
+  width: 22px;
+  height: 22px;
+  font-size: initial;
+}
+
+/* ==========================================================================
+   Layout: Minimal — the form and nothing else
+   ==========================================================================
+   No card, no panel, no picture: type on the page. What carries it is space
+   and a single line of brand colour, so it stays legible on any preset and
+   loads with nothing to fetch.
+   ========================================================================== */
+body.swift-login-Minimal .swift-login-shell {
+  background:
+    radial-gradient(1100px 520px at 50% -10%,
+      color-mix(in oklab, var(--swift-accent) 10%, transparent), transparent 70%),
+    var(--swift-canvas, var(--bg-color));
+}
+
+body.swift-login-Minimal .swift-login-forms {
+  padding: 12vh 24px;
+}
+
+body.swift-login-Minimal .page-card,
+body.swift-login-Minimal .login-content {
   max-width: 380px;
-  margin: 14vh auto !important;
+  margin: 0 auto;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+body.swift-login-Minimal .page-card-head {
+  display: block;
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+body.swift-login-Minimal .page-card-head-text h4 {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* The one piece of brand colour on the page, under the heading. */
+body.swift-login-Minimal .page-card-head-text h4::after {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 3px;
+  margin: 14px auto 0;
+  border-radius: 999px;
+  background: var(--swift-accent);
+}
+
+body.swift-login-Minimal .app-logo {
+  max-height: 38px;
+  width: auto;
+  margin-bottom: 16px;
+}
+
+/* Underlines rather than boxes: the field is a line to write on, which is as
+   little chrome as a form can have and still read as one. */
+body.swift-login-Minimal .page-card .page-card-body input[type="text"],
+body.swift-login-Minimal .page-card .page-card-body input[type="email"],
+body.swift-login-Minimal .page-card .page-card-body input[type="password"] {
+  height: 46px;
+  padding: 0 2px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  background: none;
+  font-size: 15px;
+}
+
+body.swift-login-Minimal .page-card .page-card-body input[type="text"]:focus,
+body.swift-login-Minimal .page-card .page-card-body input[type="email"]:focus,
+body.swift-login-Minimal .page-card .page-card-body input[type="password"]:focus {
+  border-bottom-color: var(--swift-accent);
+  border-bottom-width: 2px;
+  box-shadow: none;
+  outline: none;
+}
+
+body.swift-login-Minimal .form-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+/* Frappe puts its field icons inside the control, which a line has no room
+   for — they would sit on the text. */
+body.swift-login-Minimal .field-icon {
+  display: none;
+}
+
+body.swift-login-Minimal .email-field .form-control,
+body.swift-login-Minimal .password-field .form-control {
+  padding-left: 2px;
+}
+
+body.swift-login-Minimal .page-card .page-card-actions .btn-login,
+body.swift-login-Minimal .page-card .page-card-actions .btn-signup,
+body.swift-login-Minimal .page-card .page-card-actions .btn-forgot {
+  height: 50px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--swift-accent) !important;
+  color: var(--swift-accent-fg) !important;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+body.swift-login-Minimal .forgot-password-message,
+body.swift-login-Minimal .sign-up-message {
+  text-align: center;
+  font-size: 13px;
 }
 
 /* Splash */
@@ -194,3 +686,621 @@ body[data-swift-login="Minimal"] .login-content {
 }
 
 @keyframes swift-spin { to { transform: rotate(360deg); } }
+
+/* ==========================================================================
+   The shell around Frappe's login sections
+   ==========================================================================
+   www/login.html is Frappe's own template with its markup left alone, wrapped
+   in these two elements so the form can sit beside a brand panel. Frappe's
+   login.js binds to what is inside .swift-login-forms and never looks at the
+   wrapper, so the layout can change without touching behaviour.
+   ========================================================================== */
+body.swift-login .swift-login-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+body.swift-login .swift-login-forms {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6vh 24px;
+}
+
+/* The panel beside the form. Every word in it comes from Settings; this only
+   decides how those words look. */
+body.swift-login .swift-login-brand {
+  position: relative;
+  display: none;              /* only the Split layout shows it */
+  align-items: center;
+  padding: 72px 8% 72px 7%;
+  overflow: hidden;
+  color: #fff;
+  /* The panel's own paint belongs to the layout rules below: this one
+     re-declared it and, being later at equal specificity, beat them. */
+}
+
+/* A wash of the brand colour in one corner, so the panel has a light source
+   rather than reading as a flat slab. */
+body.swift-login .swift-login-brand::before {
+  content: "";
+  position: absolute;
+  top: -22%;
+  left: -12%;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in oklab, var(--swift-accent) 52%, transparent) 0%, transparent 68%);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+body.swift-login .swift-brand-body {
+  position: relative;
+  z-index: 1;
+  max-width: 34rem;
+}
+
+body.swift-login .swift-brand-body h2 {
+  font-size: clamp(2.2rem, 3.6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #fff;
+}
+
+body.swift-login .swift-brand-body > p {
+  margin-top: 20px;
+  max-width: 46ch;
+  font-size: clamp(0.95rem, 1.15vw, 1.08rem);
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+body.swift-login .swift-brand-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 34px 0 0;
+  padding: 0;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.swift-login .swift-brand-points li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+body.swift-login .swift-brand-points svg {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+body.swift-login .swift-brand-proof {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+body.swift-login .swift-brand-proof strong {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+body.swift-login .swift-brand-proof span {
+  font-size: 13.8px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---------- Split: form on the left, panel on the right ---------- */
+@media (min-width: 900px) {
+  body.swift-login-Split .swift-login-shell {
+    grid-template-columns: minmax(380px, 0.62fr) 1.38fr;
+  }
+
+  body.swift-login-Split .swift-login-brand {
+    display: flex;
+  }
+}
+
+/* The centred and minimal layouts are the form alone, so the panel has no
+   place in them however it is configured. */
+body.swift-login-Centered .swift-login-brand,
+body.swift-login-Minimal .swift-login-brand {
+  display: none;
+}
+
+/* ==========================================================================
+   Fitting the screen — every screen
+   ==========================================================================
+   The page must not scroll. Three things were making it:
+
+   * Frappe's own login stylesheet gives .page-content-wrapper 60px of top
+     padding and a min-height of calc(100vh - 220px). Our shell then asks for
+     a full viewport inside that, so the page came out taller than the screen
+     by exactly that padding.
+
+   * main.container caps the width and adds gutters, which a full-bleed split
+     layout cannot live inside.
+
+   * 100vh on a phone means the viewport with the browser chrome hidden, so a
+     "full height" page is always taller than what you can actually see. dvh
+     is that visible height, and it follows the chrome as it slides away.
+   ========================================================================== */
+body.swift-login .page-content-wrapper {
+  min-height: 0;
+  padding-top: 0;
+}
+
+body.swift-login main.container,
+body.swift-login .page-content-wrapper > .container {
+  max-width: none;
+  padding: 0;
+}
+
+body.swift-login .swift-login-shell {
+  min-height: 100vh;          /* for anything without dvh */
+  min-height: 100dvh;
+}
+
+/* Frappe turns the card into a full-screen sheet on small screens, which
+   fights a layout that is already the full screen. */
+@media (max-width: 575.98px) {
+  body.swift-login .page-card,
+  body.swift-login .login-content {
+    min-height: 0;
+    padding: 0;
+  }
+
+  body.swift-login .swift-login-forms {
+    padding: 32px 22px;
+  }
+}
+
+/* ---- Tablet and below: the brand panel goes ----
+   Below the split's breakpoint the form already has the full width, and a
+   panel stacked under it is a second screenful — which is a scrollbar. */
+@media (max-width: 899.98px) {
+  body.swift-login .swift-login-brand {
+    display: none;
+  }
+
+  body.swift-login .swift-login-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A fixed background is expensive to composite on touch devices and is
+   ignored outright by iOS Safari, which leaves it stretched and misplaced. */
+@media (max-width: 899.98px), (hover: none) {
+  body.swift-login-Centered .swift-login-shell {
+    background-attachment: scroll;
+  }
+}
+
+/* ---- Short screens: laptops at 768px and landscape phones ----
+   The generous vertical rhythm is the first thing to give when there is no
+   room for it, before anything starts overflowing. */
+@media (max-height: 720px) {
+  body.swift-login .swift-login-forms {
+    padding-top: 4vh;
+    padding-bottom: 4vh;
+  }
+
+  body.swift-login-Centered .page-card,
+  body.swift-login-Centered .login-content {
+    padding: 26px 30px 22px;
+  }
+
+  body.swift-login-Centered .page-card-head,
+  body.swift-login-Split .page-card-head {
+    margin-bottom: 16px;
+  }
+
+  body.swift-login .form-control {
+    height: 46px;
+  }
+
+  body.swift-login .btn-login,
+  body.swift-login .btn-signup,
+  body.swift-login .btn-forgot {
+    height: 46px;
+  }
+}
+
+/* ---- Shorter still: the form has to be reachable, so let it scroll ----
+   A page that never scrolls is only right while everything fits. Below this
+   the sign-in button would be off the bottom of the screen, and unreachable
+   beats scrolled. */
+@media (max-height: 560px) {
+  body.swift-login .swift-login-shell {
+    min-height: 0;
+  }
+
+  body.swift-login .swift-login-forms {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  /* At this height the card's own padding and the rhythm inside it are what
+     is left to give. Measured at 464px of usable height, where the page ran
+     over by five pixels. */
+  body.swift-login-Centered .page-card,
+  body.swift-login-Centered .login-content {
+    padding: 20px 28px 18px;
+  }
+
+  body.swift-login-Centered .page-card .page-card-head {
+    margin-bottom: 10px;
+    gap: 4px;
+  }
+
+  body.swift-login-Centered .page-card .page-card-head img.app-logo {
+    max-height: 24px;
+  }
+
+  body.swift-login-Centered .page-card form,
+  body.swift-login-Centered .page-card .page-card-body {
+    gap: 8px;
+  }
+
+  body.swift-login .page-card .page-card-body input[type="text"],
+  body.swift-login .page-card .page-card-body input[type="email"],
+  body.swift-login .page-card .page-card-body input[type="password"],
+  body.swift-login-Centered .page-card .page-card-actions .btn-login,
+  body.swift-login-Centered .page-card .page-card-actions .btn-signup,
+  body.swift-login-Centered .page-card .page-card-actions .btn-forgot {
+    height: 42px;
+  }
+}
+
+/* The split panel's curve is a desktop detail: stacked, there is nothing on
+   the other side of it to curve into. */
+@media (max-width: 899.98px) {
+  body.swift-login-Split .swift-login-forms {
+    border-radius: 0;
+    margin-right: 0;
+    box-shadow: none;
+  }
+}
+
+
+/* ==========================================================================
+   Centred layout — fit and rhythm
+   ==========================================================================
+   Measured from a rendered page rather than reasoned about, which is how the
+   half-width fields and the strip above the fold were found at all.
+   ========================================================================== */
+
+/* Frappe's field wrapper is full width but the input inside it is not told to
+   be, so each field came out as wide as its own content — two different
+   widths, both short of the card. */
+body.swift-login .page-card .page-card-body input[type="text"],
+body.swift-login .page-card .page-card-body input[type="email"],
+body.swift-login .page-card .page-card-body input[type="password"] {
+  width: 100%;
+}
+
+body.swift-login .page-card .page-card-body .email-field,
+body.swift-login .page-card .page-card-body .password-field {
+  width: 100%;
+}
+
+/* The strip above the fold: the wrapper still carried Frappe's page padding
+   on the top edge, so the shell started a few pixels down and the same few
+   pixels went off the bottom. */
+body.swift-login .page-content-wrapper,
+body.swift-login main.container,
+body.swift-login .page_content {
+  margin: 0;
+  padding: 0;
+}
+
+body.swift-login .swift-login-shell {
+  margin: 0;
+}
+
+/* ---- Rhythm inside the card ----
+   The gap between the greeting and the first field was doing nothing but
+   making the card tall, which is the first thing to cost a short screen. */
+body.swift-login-Centered .page-card .page-card-head {
+  margin-bottom: 18px;
+}
+
+body.swift-login-Centered .page-card form {
+  gap: 12px;
+}
+
+body.swift-login-Centered .page-card .page-card-body {
+  gap: 12px;
+}
+
+body.swift-login-Centered .page-card .page-card-actions {
+  margin-top: 4px;
+  gap: 10px;
+}
+
+/* Frappe puts "Forgot password?" inside the password field's group, above the
+   button and hard right. The design has it under the action, beside the other
+   ways in — one row of quiet links rather than one floating above the button. */
+body.swift-login-Centered .page-card .page-card-body .forgot-password-message {
+  order: 99;
+  width: 100%;
+  margin: 2px 0 0;
+  text-align: left;
+  font-size: 13px;
+}
+
+body.swift-login-Centered .page-card .page-card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Frappe's icons sit inside the control. On a pill they need to come in off
+   the curve, and they have to be light enough to see on dark glass. */
+body.swift-login-Centered .page-card .page-card-body .field-icon,
+body.swift-login-Centered .page-card .page-card-body .toggle-password {
+  color: rgba(255, 255, 255, 0.72);
+  stroke: rgba(255, 255, 255, 0.72);
+  left: auto;
+}
+
+body.swift-login-Centered .page-card .page-card-body .email-field .field-icon,
+body.swift-login-Centered .page-card .page-card-body .password-field .field-icon {
+  left: 18px;
+}
+
+body.swift-login-Centered .page-card .page-card-body .toggle-password {
+  right: 18px;
+}
+
+/* width:100% plus padding overflows unless the padding is counted inside the
+   box — the fields ran past the card's right edge, and by different amounts,
+   because the password field carries more padding for its reveal control. */
+body.swift-login .page-card .page-card-body input[type="text"],
+body.swift-login .page-card .page-card-body input[type="email"],
+body.swift-login .page-card .page-card-body input[type="password"] {
+  box-sizing: border-box;
+}
+
+/* The strip along the top edge: the page's own body margin, showing above a
+   shell that starts at the top of the viewport. */
+body.swift-login {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ---- Small phones ----
+   At 360x640 the card came out 23px taller than the visible viewport and
+   overflowed sideways as well. Everything here is the same design with less
+   air in it, rather than a different one.  */
+@media (max-width: 420px) {
+  body.swift-login .swift-login-forms {
+    padding: 16px 14px;
+  }
+
+  body.swift-login-Centered .for-login,
+  body.swift-login-Centered .for-signup,
+  body.swift-login-Centered .for-forgot,
+  body.swift-login-Centered .for-reset-password,
+  body.swift-login-Centered .for-email-login,
+  body.swift-login-Centered .for-login-with-email-link {
+    margin: 0 auto !important;
+    max-width: 100%;
+  }
+
+  body.swift-login-Centered .page-card,
+  body.swift-login-Centered .login-content {
+    padding: 24px 20px 20px;
+    border-radius: 20px;
+  }
+
+  body.swift-login-Centered .page-card .page-card-head {
+    margin-bottom: 12px;
+    gap: 6px;
+  }
+
+  body.swift-login-Centered .page-card .page-card-head img.app-logo {
+    max-height: 26px;
+  }
+
+  body.swift-login .page-card .page-card-body input[type="text"],
+  body.swift-login .page-card .page-card-body input[type="email"],
+  body.swift-login .page-card .page-card-body input[type="password"] {
+    height: 46px;
+  }
+
+  body.swift-login-Centered .page-card .page-card-actions .btn-login,
+  body.swift-login-Centered .page-card .page-card-actions .btn-signup,
+  body.swift-login-Centered .page-card .page-card-actions .btn-forgot {
+    height: 46px;
+  }
+}
+
+/* Nothing on this page is meant to be wider than the screen, so anything that
+   manages it is a bug rather than content — clip it and keep the page still. */
+body.swift-login,
+body.swift-login .swift-login-shell {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+/* ---- Split on a short screen ----
+   The panel's own rhythm is generous by design; at 1280x720 that made the page
+   26px taller than the viewport. Measured, not guessed. */
+@media (max-height: 760px) {
+  body.swift-login-Split .swift-login-brand {
+    padding-top: 5vh;
+    padding-bottom: 5vh;
+  }
+
+  body.swift-login .swift-brand-body h2 {
+    font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+  }
+
+  body.swift-login .swift-brand-points {
+    margin-top: 22px;
+    gap: 9px;
+  }
+
+  body.swift-login .swift-brand-proof {
+    margin-top: 26px;
+    padding-top: 18px;
+  }
+
+  body.swift-login-Split .swift-login-forms {
+    padding-top: 4vh;
+    padding-bottom: 4vh;
+  }
+}
+
+/* ==========================================================================
+   Input states
+   ==========================================================================
+   The fields were styled for one state — empty and idle. Everything Frappe's
+   own script can actually do to them was left to Frappe's stylesheet, which is
+   built for a white card: light error chips, pale red text, and no disabled
+   treatment at all. On glass over a photograph none of that reads.
+   ========================================================================== */
+
+/* ---- Autofill ----
+   Chrome paints an autofilled field with its own pale blue and enforces it
+   through a UA rule that ordinary background declarations cannot reach. A
+   glass field turns into a solid light box the moment a saved password is
+   offered — the one moment most people meet this page. An inset shadow the
+   full height of the control is the one thing that paints over it. */
+body.swift-login .page-card .page-card-body input:-webkit-autofill,
+body.swift-login .page-card .page-card-body input:-webkit-autofill:hover,
+body.swift-login .page-card .page-card-body input:-webkit-autofill:focus {
+  -webkit-text-fill-color: currentColor;
+  caret-color: currentColor;
+  /* Long enough that the fade Chrome runs on autofill never arrives. */
+  transition: background-color 100000s ease-in-out 0s;
+}
+
+body.swift-login-Centered .page-card .page-card-body input:-webkit-autofill,
+body.swift-login-Centered .page-card .page-card-body input:-webkit-autofill:hover,
+body.swift-login-Centered .page-card .page-card-body input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 60px rgba(38, 44, 60, 0.92) inset;
+  -webkit-text-fill-color: #fff;
+}
+
+body.swift-login-Split .page-card .page-card-body input:-webkit-autofill,
+body.swift-login-Split .page-card .page-card-body input:-webkit-autofill:hover,
+body.swift-login-Split .page-card .page-card-body input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 60px
+    color-mix(in oklab, var(--swift-accent) 8%, var(--swift-surface, #fff)) inset;
+  -webkit-text-fill-color: var(--swift-on-surface, var(--text-color));
+}
+
+/* ---- The caret and the selection ----
+   Both default to the theme's ink, which on a dark field is invisible. */
+body.swift-login-Centered .page-card .page-card-body input {
+  caret-color: #fff;
+}
+
+body.swift-login-Centered .page-card .page-card-body input::selection {
+  background: color-mix(in oklab, var(--swift-accent) 55%, transparent);
+  color: #fff;
+}
+
+/* ---- Focus ----
+   A 12%-white ring is invisible against a photograph that is bright in
+   places. The accent is the page's own colour and reads on any of them. */
+body.swift-login-Centered .page-card .page-card-body input[type="text"]:focus,
+body.swift-login-Centered .page-card .page-card-body input[type="email"]:focus,
+body.swift-login-Centered .page-card .page-card-body input[type="password"]:focus {
+  border-color: color-mix(in oklab, var(--swift-accent) 85%, #fff);
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--swift-accent) 38%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Invalid ----
+   Frappe marks the group, not the field, so the border has to be reached
+   through the group. Its own red is an outline token meant for white cards. */
+body.swift-login .page-card .page-card-body .form-group.invalid input[type="text"],
+body.swift-login .page-card .page-card-body .form-group.invalid input[type="email"],
+body.swift-login .page-card .page-card-body .form-group.invalid input[type="password"] {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.22);
+}
+
+/* ---- The messages ----
+   Given a surface of their own rather than left as bare text: over a
+   photograph the card's own brightness varies, and a red word on glass cannot
+   be guaranteed to clear the contrast floor wherever the picture is pale.
+   A chip carries its own background, so it always can. */
+body.swift-login-Centered .page-card .page-card-body .field-error,
+body.swift-login-Centered .page-card .page-card-body .login-error-banner {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 107, 107, 0.38);
+  border-radius: 10px;
+  background: rgba(58, 12, 20, 0.88);
+  color: #ffd9dd;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+body.swift-login-Centered .page-card .page-card-body .login-error-banner svg {
+  stroke: #ffb4b4;
+  flex: 0 0 auto;
+}
+
+/* ---- Disabled ----
+   Frappe disables the secondary actions while a field is empty and while a
+   link is being sent. Unstyled, they look exactly like the live ones. */
+body.swift-login .page-card .page-card-actions .btn:disabled,
+body.swift-login .page-card .page-card-actions .btn-login-option:disabled,
+body.swift-login .page-card .page-card-body input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: saturate(0.6);
+}
+
+/* ---- The reveal control ----
+   A button with no feedback reads as decoration. */
+body.swift-login .page-card .page-card-body .toggle-password {
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+body.swift-login-Centered .page-card .page-card-body .toggle-password:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+body.swift-login-Split .page-card .page-card-body .toggle-password:hover {
+  color: var(--swift-accent);
+  background: color-mix(in oklab, var(--swift-accent) 12%, transparent);
+}
+
+/* ---- Hover on the field itself ----
+   Small, but it is what tells you the pill is a control and not a label. */
+body.swift-login-Centered .page-card .page-card-body input[type="text"]:hover:not(:focus),
+body.swift-login-Centered .page-card .page-card-body input[type="email"]:hover:not(:focus),
+body.swift-login-Centered .page-card .page-card-body input[type="password"]:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+body.swift-login-Split .page-card .page-card-body input:hover:not(:focus) {
+  background: color-mix(in oklab, var(--swift-accent) 12%, var(--swift-surface, #fff));
+}

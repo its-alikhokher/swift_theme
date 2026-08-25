@@ -38,6 +38,10 @@ OLD_STATE = {
     # executing again, so the patch has to clear them.
     "custom_css": "body { background: red }",
     "custom_js": "console.log('injected')",
+    # Retired: the theme's own sign-up switch. It never worked — Frappe governs
+    # sign-up in Website Settings and this was ANDed with it — so it has to be
+    # cleared rather than left looking like a control.
+    "login_show_signup": "1",
 }
 
 OLD_USER_PRESET = "Emerald Luxury"
@@ -141,6 +145,19 @@ def verify():
          rows.get("show_backdrop_through")),
         ("full role set delivered", len(prefs["roles"]) == 11, len(prefs["roles"])),
         ("no duplicated single rows", all(c == 1 for c in counts), "one row per field"),
+        # The brand panel's words used to live in the template. They are
+        # Settings now, and adding fields does not backfill them: an existing
+        # Single returns nothing for a field it has never stored, so without
+        # the patch an upgrade would blank the panel that was on the page
+        # yesterday.
+        ("login panel copy seeded",
+         rows.get("login_show_brand_panel") == "1"
+         and bool(rows.get("login_heading"))
+         and bool(rows.get("login_stat_value")),
+         f"panel on, heading {'set' if rows.get('login_heading') else 'EMPTY'}"),
+        ("sign-up switch removed",
+         "login_show_signup" not in rows,
+         "gone"),
         ("custom code purged",
          "custom_css" not in rows and "custom_js" not in rows
          and not frappe.db.exists(

@@ -1,138 +1,316 @@
-<!DOCTYPE html>
-<html lang="en" data-swift-login-layout="{{ login_layout }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ _("Sign In") }}{% if brand_name %} · {{ brand_name }}{% endif %}</title>
-    {{ include_style("swift_login.bundle.css") }}
-    <style>
-        :root {
-            --primary: {{ colors.get("primary") or "#0b84f3" }};
-            --secondary: {{ colors.get("secondary") or "#0056b3" }};
-            --panel-1: {{ colors.get("bg_body") or "#0f172a" }};
-            --panel-2: {{ colors.get("bg_card") or "#1e293b" }};
-        }
-        {% if login_bg_image %}
-        .login-brand { --brand-image: url('{{ login_bg_image }}'); }
-        {% endif %}
-    </style>
-</head>
-<body class="{{ 'dark-mode' if is_dark_mode else 'light-mode' }}"
-      data-csrf-token="{{ csrf_token }}"
-      data-redirect-to="{{ redirect_to }}"
-      data-sounds-enabled="{{ 1 if theme.get('enable_sounds') else 0 }}">
+{#
+   Swift Theme — login page.
 
-    <main class="login-shell">
+   This is Frappe's own login template, copied so the design can change without
+   the behaviour changing with it. Every section, macro, id and class below is
+   Frappe's, unaltered, because Frappe's own login.js binds to exactly these —
+   and that script is included at the bottom rather than replaced. Sign-in,
+   sign-up, forgot password, the email link, the social providers, LDAP and
+   two-factor all work because they are Frappe's code, not a re-implementation.
 
-        <!-- ---------- Form side ---------- -->
-        <section class="login-form-side">
-            <div class="login-form-inner">
+   What this file changes is presentation only:
+     * the stylesheet, layered on top of Frappe's own login bundle
+     * a shell around the sections, so the form can sit beside a brand panel
+     * that brand panel, whose every word comes from Swift Theme Settings
 
-                <div class="login-brandmark">
-                    {% if brand_logo %}
-                    <img src="{{ brand_logo }}" alt="{{ brand_name }}">
-                    {% else %}
-                    <span class="login-brandmark-dot"></span>
-                    {% endif %}
-                    <span>{{ brand_name or "Swift Theme" }}</span>
-                </div>
+   An earlier version wrote its own markup and its own script, and drifted
+   immediately: sign-up linked to /signup, which is not a route; the providers,
+   LDAP and the email link were missing outright; and signed-in users were sent
+   to /app, the v15 desk. Keeping Frappe's markup is what stops that happening
+   again, so keep this in step with frappe/www/login.html — a test checks that
+   every section is still here and that the script is still Frappe's.
+#}
+{% extends "templates/web.html" %}
+{% block navbar %}
+{% if show_language_picker %}
+    {{ super() }}
+{% endif %}
+{% endblock %}
+{% macro email_login_body() -%}
+{% if not disable_user_pass_login or (ldap_settings and ldap_settings.enabled) %}
+<div class="page-card-body">
+	<div class="login-error-banner">
+		<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<use href="#es-line-alert-triangle"></use>
+		</svg>
+		<span></span>
+	</div>
+	<div class="form-group">
+		<label class="form-label" for="login_email">{{ login_label or _("Email")}}</label>
+		<div class="email-field">
+			<input type="text" id="login_email" class="form-control"
+				placeholder="{% if login_name_placeholder %}{{ login_name_placeholder  }}{% else %}{{ _('jane@example.com') }}{% endif %}"
+				required autofocus autocomplete="username">
 
-                <h1>{{ _("Sign In") }}</h1>
-                <p class="login-sub">{{ login_tagline or _("Welcome back. Please enter your details.") }}</p>
+			<svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+				xmlns="http://www.w3.org/2000/svg">
+				<use class="es-lock" href="#es-line-email"></use>
+			</svg>
+		</div>
+		<p class="field-error"></p>
+	</div>
 
-                <form id="login-form" class="login-form" method="POST" action="/api/method/login" novalidate>
-                    <div class="alert-error" id="login-error" role="alert" aria-live="polite" hidden></div>
+	<div class="form-group">
+		<label class="form-label" for="login_password">{{ _("Password") }}</label>
+		<div class="password-field">
+			<input type="password" id="login_password" class="form-control" placeholder="•••••"
+				autocomplete="current-password" required>
 
-                    <div class="field">
-                        <label for="usr">{{ _("User Name") }}<span class="req">*</span></label>
-                        <input type="text" id="usr" name="usr"
-                               placeholder="{{ _('Enter your username or email') }}"
-                               autocomplete="username" autocapitalize="off"
-                               spellcheck="false" autofocus required>
-                    </div>
+			<svg class="field-icon password-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+				xmlns="http://www.w3.org/2000/svg">
+					<use class="es-lock" href="#es-line-lock"></use>
+			</svg>
+			<svg toggle="#login_password" class="toggle-password" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<use href="#es-line-preview"></use>
+				</svg>
+		</div>
+		<p class="field-error"></p>
+		{% if not disable_user_pass_login %}
+		<p class="forgot-password-message">
+			<a href="#forgot">{{ _("Forgot password?") }}</a>
+		</p>
+		{% endif %}
+	</div>
+</div>
+{% endif %}
+<div class="page-card-actions">
+	{% if not disable_user_pass_login %}
+	<button class="btn btn-sm btn-default btn-block btn-login" type="submit">
+		{{ _("Continue") }}</button>
+	{% endif %}
+	{% if ldap_settings and ldap_settings.enabled %}
+	<button class="btn btn-sm {{ "btn-primary" if disable_user_pass_login else "btn-default" }} btn-block btn-login btn-ldap-login">
+		{{ _("Login with LDAP") }}</button>
+	{% endif %}
+	{% if login_with_email_link %}
+	<a href="#login-with-email-link"
+		class="btn btn-block btn-default btn-sm btn-login-option btn-login-with-email-link">
+		{{ _("Login with Email Link") }}</a>
+	{% endif %}
+	{% if social_login %}
+	<div class="social-logins text-center">
+		<div class="social-login-buttons">
+			{% for provider in provider_logins %}
+			<div class="login-button-wrapper">
+				<a href="{{ provider.auth_url }}"
+					class="btn btn-block btn-default btn-sm btn-login-option btn-{{ provider.name }}">
+					{% if provider.icon %}
+						{{ provider.icon }}
+					{% endif %}
+					{{ _("Login with {0}").format(provider.provider_name) }}</a>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% endmacro %}
 
-                    <div class="field">
-                        <label for="pwd">{{ _("Password") }}<span class="req">*</span></label>
-                        <div class="field-control">
-                            <input type="password" id="pwd" name="pwd"
-                                   placeholder="{{ _('Enter your password') }}"
-                                   autocomplete="current-password" required>
-                            <button type="button" class="reveal" id="toggle-pwd"
-                                    aria-label="{{ _('Show password') }}" aria-pressed="false">
-                                <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                                    <path d="M1.5 12S5 5.5 12 5.5 22.5 12 22.5 12 19 18.5 12 18.5 1.5 12 1.5 12Z"/>
-                                    <circle cx="12" cy="12" r="3.2"/>
-                                </svg>
-                                <svg class="eye-shut" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round" hidden>
-                                    <path d="M3 3l18 18"/>
-                                    <path d="M10.6 6.1A9.9 9.9 0 0 1 12 6c7 0 10.5 6 10.5 6a17 17 0 0 1-3.4 4"/>
-                                    <path d="M6.6 7.6A16.6 16.6 0 0 0 1.5 12S5 18 12 18a10 10 0 0 0 4-.8"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+{% block head_include %}
+{# Frappe's own login styles first: its markup is built for them. The theme
+   layers on top from web_include_css, which this page already loads by
+   extending templates/web.html — no second bundle needed. #}
+{{ include_style('login.bundle.css') }}
+<style>
+    /* The palette, resolved server-side. Every rule in the login stylesheet
+       that reads var(--swift-accent) depends on these; without them those
+       declarations are invalid and drop, and the page renders unstyled. */
+    :root {
+        {{ theme_variables }}
+    }
+    {%- if login_bg_image %}
+    body.swift-login { --swift-login-bg: url('{{ login_bg_image }}'); }
+    {%- endif %}
+</style>
+{% endblock %}
 
-                    <div class="field-row">
-                        <label class="remember">
-                            <input type="checkbox" id="remember_me" name="remember_me" value="1">
-                            <span>{{ _("Remember me") }}</span>
-                        </label>
-                        <a class="link-quiet" href="/update-password?new=1">{{ _("Forgot Password?") }}</a>
-                    </div>
+{# The subtitle under the title is Login Tagline from Swift Theme Settings.
+   Frappe's own wording is the fallback, so a site that sets nothing reads
+   exactly as it did before. #}
+{% macro logo_section(title=null, subtitle=null) %}
+<div class="page-card-head">
+	<img class="app-logo" src="{{ logo }}">
+	<div class="page-card-head-text">
+		{% if title %}
+		<h4>{{ _(title) }}</h4>
+		{% else %}
+		<h4>{{ _('Sign In') }}</h4>
+		{% endif %}
+		{% if subtitle %}
+		<p class="page-card-subtitle">{{ _(subtitle) }}</p>
+		{% endif %}
+	</div>
+</div>
+{% endmacro %}
 
-                    <button type="submit" class="btn-signin">
-                        <span class="btn-label">{{ _("Sign In") }}</span>
-                        <span class="btn-spinner" aria-hidden="true"></span>
-                    </button>
+{% block page_content %}
 
-                    {% if show_signup %}
-                    <p class="signup-link">{{ _("Don't have an account?") }} <a href="/signup">{{ _("Sign up") }}</a></p>
-                    {% endif %}
-                </form>
+<!-- {{ for_test }} -->
+<div class="swift-login-shell">
+<div class="swift-login-forms">
+	<noscript>
+		<div class="text-center my-5">
+			<h4>{{ _("Javascript is disabled on your browser") }}</h4>
+			<p class="text-muted">
+				{{ _("You need to enable JavaScript for your app to work.") }}<br>{{ _("To enable it follow the instructions in the following link: {0}").format("<a href='https://enable-javascript.com/'>enable-javascript.com</a></p>") }}
+		</div>
+	</noscript>
+	<section class='for-login'>
+		<div class="login-content page-card">
+			{{ logo_section(_('Sign In'), login_tagline or _('Welcome! Please sign in to continue.')) }}
+			<form class="form-signin form-login" role="form" novalidate>
+				{{ email_login_body() }}
+			</form>
+			{%- if not disable_signup and not disable_user_pass_login -%}
+			<div class="text-center sign-up-message">
+				{{ _("Don't have an account?") }}
+				<a href="#signup">{{ _("Sign up") }}</a>
+			</div>
+			{%- endif -%}
+		</div>
+	</section>
 
-                <p class="login-foot">&copy; {{ current_year }} {{ brand_name or "Swift Theme" }}</p>
-            </div>
-        </section>
+	{%- if social_login -%}
+	<section class='for-email-login'>
+		<div class="login-content page-card">
+			{{ logo_section(_('Sign In'), login_tagline or _('Welcome! Please sign in to continue.')) }}
+			<form class="form-signin form-login" role="form" novalidate>
+			{{ email_login_body() }}
+			</form>
+			{%- if not disable_signup and not disable_user_pass_login -%}
+			<div class="text-center sign-up-message">
+				{{ _("Don't have an account?") }}
+				<a href="#signup">{{ _("Sign up") }}</a>
+			</div>
+			{%- endif -%}
+		</div>
+	</section>
+	{%- endif -%}
+	<section class='for-signup {{ "signup-disabled" if disable_signup else "" }}'>
+		<div class="login-content page-card">
+			{{ logo_section(_('Sign Up'), _("Let's setup your account.")) }}
+			{%- if not disable_signup -%}
+			{{ signup_form_template }}
+			{%- else -%}
+			<div class="signup-disabled-message">
+				<span class='indicator gray'>{{_("Signup Disabled")}}</span>
+				<p class="text-muted text-normal sign-up-message mt-1 mb-8">{{_("Signups have been disabled for this website.")}}</p>
+				<div><a href='/' class='btn btn-primary btn-md'>{{ _("Home") }}</a></div>
+			</div>
+			{%- endif -%}
+		</div>
+	</section>
 
-        <!-- ---------- Brand side ---------- -->
-        {%- if login_show_brand_panel %}
-        <aside class="login-brand">
-            <div class="brand-glow" aria-hidden="true"></div>
-            <div class="brand-mesh" aria-hidden="true"></div>
+	<section class='for-forgot'>
+		<div class="login-content page-card">
+			{{ logo_section(_('Forgot Password?'), _("Please enter your email, we'll send you password reset link")) }}
+			<form class="form-signin form-forgot hide" role="form" novalidate>
+				<div class="page-card-body">
+					<div class="form-group">
+						<label class="form-label" for="forgot_email">{{ _("Email") }}</label>
+						<div class="email-field">
+							<input type="email" id="forgot_email" class="form-control"
+								placeholder="{{ _('jane@example.com') }}" required autofocus autocomplete="username">
+							<svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<use class="es-lock" href="#es-line-email"></use>
+							</svg>
+						</div>
+						<p class="field-error"></p>
+					</div>
+				</div>
+				<div class="page-card-actions">
+					<button class="btn btn-sm btn-primary btn-block btn-signup btn-forgot"
+						type="submit" disabled>{{ _("Send Link") }}</button>
+				</div>
+			</form>
+			<div class="text-center sign-up-message">
+				<a href="#login">{{ _("Back to sign in") }}</a>
+			</div>
+		</div>
+	</section>
 
-            <div class="brand-body">
-                {%- if login_heading_lines %}
-                <h2>{% for line in login_heading_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h2>
-                {%- endif %}
-                {%- if login_description %}
-                <p>{{ login_description }}</p>
-                {%- endif %}
+	<section class='for-login-with-email-link'>
+		<div class="login-content page-card">
+			{{ logo_section(_('Sign In'), login_tagline or _('Welcome! Please sign in to continue.')) }}
+			<form class="form-signin form-login-with-email-link hide" role="form" novalidate>
+				<div class="page-card-body">
+					<div class="login-success-banner">
+						<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<use href="#es-line-alert-circle"></use>
+						</svg>
+						<span>{{ _("Please check your email.") }}</span>
+					</div>
+					<div class="form-group">
+						<label class="form-label" for="login_with_email_link_email">{{ _("Email") }}</label>
+						<div class="email-field">
+							<input type="email" id="login_with_email_link_email" class="form-control"
+								placeholder="{{ _('jane@example.com') }}" required autofocus autocomplete="username">
+							<svg class="field-icon email-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<use class="es-lock" href="#es-line-email"></use>
+							</svg>
+						</div>
+						<p class="field-error"></p>
+					</div>
+				</div>
+				<div class="page-card-actions">
+					<p class="resend-link">
+						{{ _("Didn't receive the link?") }} <a href="#" class="btn-resend-link">{{ _("Resend") }}</a>
+					</p>
+					<button class="btn btn-sm btn-primary btn-block btn-login btn-login-with-email-link"
+						type="submit">{{ _("Send login link") }}</button>
+					<a href="#login" class="btn btn-sm btn-default btn-block btn-login-option">
+						{{ _("Login with password") }}</a>
+				</div>
+			</form>
+			{%- if not disable_signup -%}
+			<div class="text-center sign-up-message">
+				{{ _("Don't have an account?") }}
+				<a href="#signup">{{ _("Sign up") }}</a>
+			</div>
+			{%- endif -%}
+		</div>
+	</section>
+</div>
 
-                {%- if login_points %}
-                <ul class="brand-points">
-                    {%- for point in login_points %}
-                    <li>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                        <span>{{ point }}</span>
-                    </li>
-                    {%- endfor %}
-                </ul>
-                {%- endif %}
-
-                {%- if login_stat_value or login_stat_label %}
-                <div class="brand-proof">
-                    {%- if login_stat_value %}<strong>{{ login_stat_value }}</strong>{% endif %}
-                    {%- if login_stat_label %}<span>{{ login_stat_label }}</span>{% endif %}
-                </div>
-                {%- endif %}
-            </div>
-        </aside>
+{%- if login_show_brand_panel %}
+{# Every word here comes from Swift Theme Settings. It used to be written into
+   the template, so the one thing a site most wants to change about its login
+   page was the one thing it could not. #}
+<aside class="swift-login-brand">
+    <div class="swift-brand-body">
+        {%- if login_heading_lines %}
+        <h2>{% for line in login_heading_lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h2>
         {%- endif %}
+        {%- if login_description %}
+        <p>{{ login_description }}</p>
+        {%- endif %}
+        {%- if login_points %}
+        <ul class="swift-brand-points">
+            {%- for point in login_points %}
+            <li>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>{{ point }}</span>
+            </li>
+            {%- endfor %}
+        </ul>
+        {%- endif %}
+        {%- if login_stat_value or login_stat_label %}
+        <div class="swift-brand-proof">
+            {%- if login_stat_value %}<strong>{{ login_stat_value }}</strong>{% endif %}
+            {%- if login_stat_label %}<span>{{ login_stat_label }}</span>{% endif %}
+        </div>
+        {%- endif %}
+    </div>
+</aside>
+{%- endif %}
+</div>
+{% endblock %}
 
-    </main>
+{% block script %}
+<script>{% include "templates/includes/login/login.js" %}</script>
+{% endblock %}
 
-    {{ include_script("swift_login.bundle.js") }}
-</body>
-</html>
+{% block sidebar %}{% endblock %}

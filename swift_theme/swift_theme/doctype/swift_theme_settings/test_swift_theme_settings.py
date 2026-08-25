@@ -54,7 +54,7 @@ REQUIRED_SETTINGS_FIELDS = [
     "enable_perf_mode", "enable_styled_scrollbar", "enable_toast_theming",
     "enable_print_theming", "print_font_family",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
-    "login_layout", "login_bg_image", "login_tagline", "login_show_signup",
+    "login_layout", "login_bg_image", "login_tagline",
     "enable_auto_dark", "auto_dark_start", "auto_dark_end",
     "enable_sounds", "volume_level", "sound_events",
 ]
@@ -95,18 +95,6 @@ def bundle_contents(bundle):
     # sass one or every stylesheet is counted twice, once without its suffix.
     return [f"{m}.css" for m in re.findall(r'@import\s+"\./([^"]+)"', body)] + \
         re.findall(r'(?<!@)\bimport\s+"\./([^"]+)"', body)
-
-
-def login_page_assets():
-    """What www/login.html pulls in. It is a standalone template — no base
-    layout — so neither web_include_css nor the desk bundle reaches it."""
-    with open(frappe.get_app_path(APP, "www", "login.html")) as handle:
-        body = handle.read()
-    names = []
-    for bundle in re.findall(r'include_(?:style|script)\("([^"]+)"\)', body):
-        names.append(bundle)
-        names += bundle_contents(bundle.replace(".bundle.css", ".bundle.scss"))
-    return names
 
 
 def loaded_assets(hook):
@@ -326,6 +314,25 @@ class TestSwiftThemeAccessControl(IntegrationTestCase):
         with as_guest():
             with self.assertRaises(frappe.ValidationError):
                 set_user_pref("swift_accent", "rose")
+
+    def test_the_signup_switch_is_gone_from_the_schema_too(self):
+        """Removing the code is not removing the field.
+
+        The switch was taken out of the controller, the template and the
+        payload, and a patch was written to clear what sites had stored — but
+        it stayed in the DocType. So every migrate wrote it straight back from
+        the meta, and the patch deleted a row that reappeared moments later.
+        Nothing failed; the setting simply would not die.
+        """
+        self.assertFalse(
+            frappe.get_meta("Swift Theme Settings").has_field("login_show_signup"),
+            "login_show_signup is still a field, so a save writes it back "
+            "however many times the patch deletes it")
+
+        with open(SETTINGS_JSON) as handle:
+            self.assertNotIn(
+                "login_show_signup", handle.read(),
+                "the field is still declared in the DocType JSON")
 
     def test_custom_code_injection_is_gone_completely(self):
         """Removed feature, removed remains.
@@ -1174,7 +1181,6 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
         for hook in ("app_include_css", "web_include_css"):
             hooked.update(loaded_assets(hook))
 
-        hooked.update(login_page_assets())
         # swift-print.css is pulled in by the print block, which builds its own
         # document and shares nothing with the desk or the portal.
         ELSEWHERE = {"swift-print.css"}
@@ -1203,7 +1209,6 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
         written = set()
         js_dir = frappe.get_app_path(APP, "public", "js")
         sources = [os.path.join(js_dir, n) for n in os.listdir(js_dir) if n.endswith(".js")]
-        sources += [frappe.get_app_path(APP, "www", "login.html")]
         for path in sources:
             with open(path) as handle:
                 body = handle.read()
@@ -1358,7 +1363,6 @@ class TestSwiftThemeBackdrops(IntegrationTestCase):
 
         # These are loaded by Frappe itself, not by our bundles: doctype_js and
         # the form scripts it names.
-        hooked.update(login_page_assets())
         ELSEWHERE = set()
         for scripts in (frappe.get_hooks("doctype_js") or {}).values():
             ELSEWHERE.update(s.rsplit("/", 1)[-1] for s in scripts)
@@ -2910,19 +2914,6 @@ class TestSwiftThemeStyling(IntegrationTestCase):
             frappe.get_meta("Swift Theme Settings").has_field("pin_behavior"),
             "the pin setting is still on the form with nothing reading it")
 
-    def test_login_layouts_are_styled(self):
-        css = read_css("login.css")
-        for option in settings_json_options("login_layout"):
-            self.assertIn(f'data-swift-login-layout="{option}"', css)
-
-
-class TestSwiftThemeClientContract(IntegrationTestCase):
-    """Guards on the shipped JS.
-
-    The defining bug of this app was a server event with no client listener —
-    invisible to any Python-only assertion.
-    """
-
     def test_desk_listens_for_the_settings_broadcast(self):
         """Without this listener, saving Settings needs a hard refresh."""
         js = read_js("swift-boot.js")
@@ -3217,68 +3208,485 @@ class TestSwiftThemeInstall(IntegrationTestCase):
 
 
 class TestSwiftThemeLoginPage(IntegrationTestCase):
+    """The page is Frappe's markup and Frappe's script. Only the design is ours.
+
+    An earlier version wrote its own form and its own login script, and it
+    drifted at once: sign-up linked to /signup, which is not a route; the social
+    providers, LDAP and the email-link sign-in were absent; and signed-in users
+    were sent to /app, the v15 desk. Every check here exists to keep that from
+    coming back.
+    """
+
     TEMPLATE = frappe.get_app_path(APP, "www", "login.html")
+    FRAPPE_TEMPLATE = os.path.join(frappe.get_app_path("frappe"), "www", "login.html")
 
-    def render(self):
-        from frappe.website.serve import get_response_content
+    def template(self):
+        with open(self.TEMPLATE) as handle:
+            return handle.read()
 
-        with as_guest():
-            return get_response_content("login")
+    def test_every_section_frappe_renders_is_still_here(self):
+        """Frappe's login.js binds by section, so a missing one is a dead route.
 
-    def test_login_page_renders_for_guests(self):
-        self.assertNotIn("Server Error", self.render())
+        Nothing errors when one is dropped — the link simply goes nowhere,
+        which is how the sign-up link came to point at a 404 for so long.
+        """
+        ours = self.template()
+        with open(self.FRAPPE_TEMPLATE) as handle:
+            theirs = handle.read()
 
-    def test_login_template_has_no_hardcoded_credentials(self):
-        """The shipped page carried a real email and password in value=""."""
-        with open(self.TEMPLATE) as f:
-            template = f.read()
-        for field in ('id="usr"', 'id="pwd"'):
-            block = template.split(field, 1)[1].split(">", 1)[0]
-            self.assertNotIn("value=", block, f"{field} must not ship a value")
+        sections = set(re.findall(r"<section class='(for-[\w-]+)", theirs))
+        self.assertTrue(sections, "could not read Frappe's login sections")
 
-    def test_login_form_posts_to_the_real_auth_endpoint(self):
-        """It used to fake a setTimeout and show an alert instead."""
-        self.assertIn('action="/api/method/login"', self.render())
+        missing = sorted(s for s in sections if s not in ours)
+        self.assertEqual(
+            missing, [],
+            f"Frappe's login script drives these and they are not on the page, "
+            f"so those routes are dead: {missing}")
 
-    def test_login_page_is_themed_server_side(self):
-        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
-            html = self.render()
-        primary = theme_colors("Black Panther")["primary"]
-        self.assertIn(f"--primary: {primary}", html)
+    def test_the_login_script_is_frappes_and_ours_is_gone(self):
+        """The behaviour has to be Frappe's, not a copy of it."""
+        ours = self.template()
+        self.assertIn(
+            'include "templates/includes/login/login.js"', ours,
+            "the page does not include Frappe's login script, so none of its "
+            "sign-in, sign-up or reset behaviour is wired up")
 
-    def test_login_page_marks_dark_presets(self):
-        with settings_patched(color_mode="Theme Preset", active_preset="Black Panther"):
-            self.assertIn("dark-mode", self.render())
+        self.assertFalse(
+            os.path.exists(os.path.join(JS_DIR, "login.js")),
+            "a second login script ships alongside Frappe's; two scripts "
+            "binding the same form is how the two drifted apart before")
 
-    def test_login_layout_reaches_the_markup(self):
-        for layout in settings_json_options("login_layout"):
-            with settings_patched(login_layout=layout):
-                html = self.render()
-            self.assertIn(f'data-swift-login-layout="{layout}"', html)
+        # The form must post through Frappe, not through a fetch of our own.
+        for name in os.listdir(JS_DIR):
+            if not name.endswith(".js"):
+                continue
+            with open(os.path.join(JS_DIR, name)) as handle:
+                body = handle.read()
+            self.assertNotIn(
+                '"/api/method/login"', body,
+                f"{name} performs its own login instead of leaving it to "
+                f"Frappe's script")
 
-    def test_login_page_exposes_a_csrf_slot(self):
-        self.assertIn("data-csrf-token", self.render())
+    def test_the_layout_is_rendered_by_the_server_not_added_afterwards(self):
+        """The layout decides the whole shape, so it cannot arrive late.
 
-    def test_login_page_sanitises_the_redirect_target(self):
-        """Echoing redirect-to unchecked would make this an open redirect."""
-        from frappe.www.login import sanitize_redirect
+        Applied by a script after first paint, the page visibly rearranges
+        itself as it loads.
+        """
+        with open(frappe.get_app_path(APP, "www", "login.py")) as handle:
+            controller = handle.read()
+        self.assertIn(
+            'context["body_class"]', controller,
+            "the layout is not put on the body server-side, so the page "
+            "changes shape after it has painted")
 
-        source = open(frappe.get_app_path(APP, "www", "login.py")).read()
-        self.assertIn("sanitize_redirect", source)
-        self.assertTrue(callable(sanitize_redirect))
+    def test_every_login_layout_is_styled(self):
+        """Each option the Select offers has to change something."""
+        options = [o.strip() for o in
+                   frappe.get_meta("Swift Theme Settings")
+                   .get_field("login_layout").options.split("\n") if o.strip()]
+        self.assertTrue(options, "login_layout offers nothing")
 
-    def test_login_javascript_performs_a_real_login(self):
-        js = read_js("login.js")
-        self.assertNotIn("alert(", js)
-        self.assertNotIn("Login functionality would connect", js)
-        self.assertIn("/api/method/login", js)
-        self.assertIn("X-Frappe-CSRF-Token", js)
+        css = read_css("swift-login.css")
+        for layout in options:
+            self.assertIn(
+                f"swift-login-{layout}", css,
+                f"choosing the {layout} layout changes nothing on screen")
 
-    def test_login_javascript_reads_the_documented_sound_contract(self):
-        """JS once read sound_file/volume_level while the API sent sound/volume."""
-        js = read_js("login.js")
-        self.assertIn("sound_file", js)
-        self.assertNotIn("volume_level", js, "volume arrives pre-scaled as `volume`")
+    def test_the_design_targets_markup_that_actually_exists(self):
+        """Styling Frappe's markup means its class names are the contract.
+
+        A selector matching nothing is silent — the page just looks unstyled.
+        """
+        sources = [self.template(), self.FRAPPE_TEMPLATE]
+        blob = self.template()
+        for extra in (self.FRAPPE_TEMPLATE,
+                      os.path.join(frappe.get_app_path("frappe"),
+                                   "templates/includes/login/login.js"),
+                      os.path.join(frappe.get_app_path("frappe"),
+                                   "templates/web.html"),
+                      os.path.join(frappe.get_app_path("frappe"),
+                                   "templates/base.html")):
+            if os.path.exists(extra):
+                with open(extra) as handle:
+                    blob += handle.read()
+        with open(os.path.join(JS_DIR, "swift-website.js")) as handle:
+            blob += handle.read()
+
+        # The per-layout class is built rather than written — "swift-login-" +
+        # the chosen layout — so the whole name appears in no file. Each option
+        # the field offers is a name the page can really carry.
+        for option in (frappe.get_meta("Swift Theme Settings")
+                       .get_field("login_layout").options or "").split("\n"):
+            if option.strip():
+                blob += f"\nswift-login-{option.strip()}\n"
+
+        targets = set()
+        for selector, _declarations in css_rules("swift-login.css"):
+            if "swift-login" not in selector:
+                continue
+            for part in selector.split(","):
+                leaf = part.strip().split()[-1] if part.strip() else ""
+                targets.update(re.findall(r"\.([\w-]+)", leaf))
+
+        missing = sorted(name for name in targets if name not in blob)
+        self.assertEqual(
+            missing, [],
+            f"the login stylesheet targets classes nothing renders, so those "
+            f"rules can never match: {missing}")
+
+    def test_the_brand_panel_reads_every_word_from_settings(self):
+        """It used to be written into the template, so it could not be changed."""
+        ours = self.template()
+        for fieldname in ("login_heading_lines", "login_description",
+                          "login_points", "login_stat_value", "login_stat_label",
+                          "login_show_brand_panel"):
+            self.assertIn(
+                fieldname, ours,
+                f"the brand panel ignores {fieldname}, so that part of it "
+                f"cannot be changed from Settings")
+
+        # And nothing may be left hard-coded beside them.
+        panel = re.search(r"<aside class=\"swift-login-brand\".*?</aside>",
+                          ours, re.S)
+        self.assertIsNotNone(panel, "the brand panel markup is gone")
+        self.assertNotIn(
+            "_(\"", panel.group(0),
+            "the brand panel still prints a string of its own instead of the "
+            "one configured in Settings")
+
+    def test_a_backdrop_ships_so_a_fresh_install_is_not_blank(self):
+        """The centred layout is built around a picture, so one has to be there.
+
+        Without a default it lands on a flat colour until somebody uploads an
+        image, which is the one layout where that reads as unfinished. Drawn
+        rather than photographed: it costs a few kilobytes, scales to any
+        screen, and carries no licence with it.
+        """
+        images = frappe.get_app_path(APP, "public", "images")
+        self.assertTrue(
+            os.path.isdir(images), "no images ship with the app")
+
+        css = read_css("swift-login.css")
+        referenced = re.findall(r'url\("?/assets/swift_theme/images/([^")]+)"?\)', css)
+        self.assertTrue(
+            referenced,
+            "no default backdrop is applied, so the centred layout starts blank")
+
+        for name in referenced:
+            self.assertTrue(
+                os.path.exists(os.path.join(images, name)),
+                f"the stylesheet points at images/{name}, which does not ship — "
+                f"every login page would request a 404")
+
+        # It has to be overridable, or the setting is decoration.
+        self.assertRegex(
+            css, r"var\(--swift-login-bg,\s*url\(",
+            "the backdrop is applied unconditionally, so uploading a Login "
+            "Background Image would change nothing")
+
+    def test_the_login_panels_follow_the_preset(self):
+        """Each preset should look like itself here, not like one fixed brand.
+
+        The designs these were drawn from are one company's colours; hard-coding
+        them would give every site that company's login page.
+        """
+        offenders = []
+        for selector, declarations in css_rules("swift-login.css"):
+            if "swift-login" not in selector:
+                continue
+            # Error states are exempt on purpose. Red means "this went wrong"
+            # in every theme, and tying it to the brand would make the errors
+            # invisible on exactly the preset that most needs them to stand
+            # out — a red one.
+            if re.search(r"invalid|error|danger", selector):
+                continue
+            for prop in ("background", "background-color", "border-color"):
+                for match in re.finditer(
+                        rf"(?:^|;)\s*{prop}\s*:\s*([^;]+)", declarations):
+                    value = match.group(1)
+                    # Neutrals are structure, not brand: white cards, dark
+                    # scrims and translucent glass are the same on every theme.
+                    for literal in re.findall(r"#[0-9a-fA-F]{3,8}", value):
+                        rgb = literal.lstrip("#")
+                        if len(rgb) == 3:
+                            rgb = "".join(c * 2 for c in rgb)
+                        r, g, b = (int(rgb[i:i + 2], 16) for i in (0, 2, 4))
+                        spread = max(r, g, b) - min(r, g, b)
+                        if spread > 40:      # a colour, not a grey or near-grey
+                            offenders.append(f"{selector[:60]} -> {literal}")
+        self.assertEqual(
+            offenders, [],
+            f"these paint a fixed brand colour instead of the preset's: "
+            f"{offenders}")
+
+    def test_the_centred_card_stays_readable_over_either_backdrop(self):
+        """Two backdrops, two guarantees, and both have to hold.
+
+        The shipped photograph is known to be dark — measured at 0.04 average —
+        so it can be shown vividly under a light card. An uploaded one is an
+        unknown quantity, and the commonest mistake is a logo, which is a white
+        field, so that path uses a heavier wash and a darker card. The page
+        tells the two apart with a class, and each has to clear 4.5:1 on its
+        own worst case.
+        """
+        def linear(channel):
+            channel /= 255
+            return channel / 12.92 if channel <= 0.04045 else \
+                ((channel + 0.055) / 1.055) ** 2.4
+
+        def layers(selector_test):
+            """The card's paint and the shell's wash, for one of the two paths."""
+            card = shell = None
+            for selector, declarations in css_rules("swift-login.css"):
+                if "swift-login-Centered" not in selector:
+                    continue
+                if not selector_test(selector):
+                    continue
+                leaves = {part.strip().split()[-1] for part in selector.split(",")
+                          if part.strip()}
+                found = re.findall(
+                    r"rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)",
+                    declarations)
+                if not found:
+                    continue
+                if leaves & {".page-card", ".login-content"}:
+                    card = max(found, key=lambda c: float(c[3]))
+                elif leaves & {".swift-login-shell"}:
+                    shell = max(found, key=lambda c: float(c[3]))
+            return card, shell
+
+        CASES = (
+            # name, matches the custom-bg path, worst backdrop it must survive
+            ("the shipped photograph",
+             lambda sel: "custom-bg" not in sel, 0.20),
+            ("an uploaded picture",
+             lambda sel: "custom-bg" in sel, 1.0),
+        )
+
+        for name, matcher, worst in CASES:
+            with self.subTest(backdrop=name):
+                card, shell = layers(matcher)
+                self.assertIsNotNone(card, f"{name}: the card has no paint")
+                self.assertIsNotNone(shell, f"{name}: the shell has no wash")
+
+                def luminance(colour):
+                    return (0.2126 * linear(float(colour[0]))
+                            + 0.7152 * linear(float(colour[1]))
+                            + 0.0722 * linear(float(colour[2])))
+
+                behind = worst * (1 - float(shell[3])) \
+                    + luminance(shell) * float(shell[3])
+                on_card = behind * (1 - float(card[3])) \
+                    + luminance(card) * float(card[3])
+                contrast = 1.05 / (on_card + 0.05)
+
+                self.assertGreaterEqual(
+                    round(contrast, 2), 4.5,
+                    f"over {name} at its worst, the card leaves white text at "
+                    f"{contrast:.2f}:1 — below the readable floor")
+
+    def test_the_login_backdrop_is_not_painted_on_the_body(self):
+        """This app forces the body transparent, so a backdrop there is lost.
+
+        swift-backdrops.css carries
+        `html[data-swift-themed] body { background: transparent !important }`
+        so the desk's own backdrop can show through the chrome. The login page
+        is themed too, so a backdrop set on <body> was overruled by this app's
+        own stylesheet — the whole layout came out white, taking its
+        white-on-photograph text with it. It has to go on an element of ours.
+        """
+        for selector, declarations in css_rules("swift-login.css"):
+            if not re.search(r"background(-image)?\s*:", declarations):
+                continue
+            for part in selector.split(","):
+                part = part.strip()
+                # A rule that ends at the body itself, rather than reaching
+                # into something inside it.
+                if re.fullmatch(r"body(\.[\w-]+)*", part):
+                    self.fail(
+                        f"{part} paints a background on the body, which "
+                        f"swift-backdrops.css overrides with !important — it "
+                        f"will never be seen")
+
+    def test_the_login_wrapper_is_not_a_second_card(self):
+        """Frappe already draws the card. Painting the wrapper too stacks them.
+
+        .for-login is the section around .page-card, so giving both a surface,
+        a border and a shadow put one panel behind the other.
+        """
+        for selector, declarations in css_rules("swift-login.css"):
+            if "for-login" not in selector or "page-card" in selector:
+                continue
+            painted = re.search(r"(?:^|;)\s*background\s*:([^;]+)", declarations)
+            if painted and painted.group(1).strip() not in ("none", "transparent"):
+                self.fail(
+                    f"{selector[:70]} gives the section its own surface, so it "
+                    f"renders as a second card behind Frappe's own")
+
+    def test_autofilled_fields_do_not_turn_into_pale_boxes(self):
+        """Chrome paints an autofilled field with its own colour, by UA rule.
+
+        An ordinary background declaration cannot reach it: the field turns
+        solid pale blue the moment a saved password is offered, which on a
+        glass card over a photograph is the design coming apart at exactly the
+        moment most people meet the page. Only an inset shadow tall enough to
+        cover the control paints over it.
+        """
+        css = read_css("swift-login.css")
+        self.assertIn(
+            ":-webkit-autofill", css,
+            "nothing handles autofill, so a saved password turns the field "
+            "into Chrome's pale blue box")
+
+        rules = [(sel, dec) for sel, dec in css_rules("swift-login.css")
+                 if ":-webkit-autofill" in sel]
+        painted = [dec for _sel, dec in rules if "-webkit-box-shadow" in dec]
+        self.assertTrue(
+            painted,
+            "autofill is mentioned but never painted over — only an inset "
+            "-webkit-box-shadow can override Chrome's own fill")
+
+        self.assertTrue(
+            any("-webkit-text-fill-color" in dec for _sel, dec in rules),
+            "the fill is covered but the text colour is not, so autofilled "
+            "text keeps Chrome's dark ink on whatever is painted behind it")
+
+    def test_every_state_frappes_script_can_produce_is_styled(self):
+        """The fields were styled empty and idle. They are rarely either.
+
+        Frappe's login script marks a group invalid, writes into .field-error,
+        shows .login-error-banner and disables the secondary actions. All of
+        that is styled by Frappe for a white card, so on glass it arrives as
+        pale red on pale red, or as a disabled button that looks live.
+        """
+        css = read_css("swift-login.css")
+        for state, what in (
+            (".form-group.invalid", "a field marked invalid"),
+            (".field-error", "the message under a field"),
+            (".login-error-banner", "the banner above the form"),
+            (":disabled", "a disabled action"),
+            (":focus", "the focused field"),
+        ):
+            self.assertIn(
+                state, css,
+                f"{what} is left to Frappe's own styling, which is built for a "
+                f"white card")
+
+        # The messages need a surface of their own: the card is translucent, so
+        # how bright it is depends on the picture behind it, and bare red text
+        # cannot be guaranteed to clear the floor wherever that is pale.
+        for selector, declarations in css_rules("swift-login.css"):
+            if ".field-error" not in selector and ".login-error-banner" not in selector:
+                continue
+            if "svg" in selector:
+                continue
+            if "swift-login-Centered" not in selector:
+                continue
+            self.assertRegex(
+                declarations, r"background\s*:",
+                f"{selector[:60]} leaves the error as bare text on glass")
+
+    def test_the_login_page_fits_the_screen_it_is_on(self):
+        """The page must not scroll, on any screen, and must not trap anyone.
+
+        Frappe's own login stylesheet gives .page-content-wrapper 60px of top
+        padding and a min-height, so a full-viewport shell inside it comes out
+        taller than the screen by exactly that much — a scrollbar on every
+        login. And 100vh on a phone is the viewport with the browser chrome
+        hidden, which is taller than what you can see.
+        """
+        css = read_css("swift-login.css")
+
+        self.assertRegex(
+            css, r"\.page-content-wrapper\s*\{[^}]*padding-top:\s*0",
+            "Frappe's 60px of wrapper padding is still there, so the page is "
+            "taller than the screen and scrolls")
+
+        self.assertIn(
+            "100dvh", css,
+            "the shell is sized in vh only, which on a phone is taller than "
+            "the visible viewport")
+
+        # A page that never scrolls is only right while everything fits. On a
+        # short screen the button has to stay reachable.
+        self.assertRegex(
+            css, r"@media\s*\(max-height:",
+            "nothing adapts to a short screen, so on a landscape phone the "
+            "sign-in button sits below the fold with no way to reach it")
+
+        # The panel beside the form is a second screenful once stacked.
+        narrow = re.search(
+            r"@media\s*\(max-width:\s*899\.98px\)\s*\{(.*?)\n\}", css, re.S)
+        self.assertIsNotNone(
+            narrow, "nothing responds at the tablet breakpoint")
+        self.assertIn(
+            "swift-login-brand", narrow.group(1),
+            "the brand panel is still shown on narrow screens, where it "
+            "stacks under the form and becomes a second screenful")
+
+    def test_the_tagline_setting_is_what_the_page_prints(self):
+        """The line under the title is Login Tagline, not Frappe's wording.
+
+        Frappe hard-codes "Welcome! Please sign in to continue." there. The
+        setting existed and was simply never read, so changing it did nothing.
+        """
+        with open(self.TEMPLATE) as handle:
+            template = handle.read()
+
+        # The call contains nested parentheses — _('Sign In') — so a lazy
+        # "up to the first )" stops inside the first argument.
+        headings = re.findall(r"logo_section\((.*?)\)\s*\}\}", template)
+        self.assertTrue(headings, "the page has no heading section at all")
+
+        sign_in = [h for h in headings if "Sign In" in h]
+        self.assertTrue(sign_in, "the sign-in heading is gone")
+        for call in sign_in:
+            self.assertIn(
+                "login_tagline", call,
+                "the sign-in subtitle ignores Login Tagline, so the setting "
+                "changes nothing on the page")
+            self.assertIn(
+                "or _(", call,
+                "no fallback: a site that has set no tagline would get a blank "
+                "line where Frappe's own wording used to be")
+
+    def test_the_palette_reaches_the_login_page(self):
+        """Every themed rule on this page reads var(--swift-accent).
+
+        The variables come from the preset stylesheet, which is keyed on an
+        attribute of <html> — and this page does not own that tag. Without them
+        the button's fill, the borders and the surfaces are all invalid at
+        computed-value time and drop, and the page renders unstyled however
+        much CSS is aimed at it.
+        """
+        with open(self.TEMPLATE) as handle:
+            template = handle.read()
+        self.assertIn(
+            "theme_variables", template,
+            "the palette is never written into the page")
+
+        from swift_theme.www.login import ROLE_VARS
+        boot = read_js("swift-boot.js")
+        for role, names in ROLE_VARS.items():
+            for name in names:
+                self.assertIn(
+                    name, boot,
+                    f"{name} is written on the login page but the desk's own "
+                    f"script does not know it — the two have drifted")
+
+    def test_the_background_image_setting_reaches_the_page(self):
+        """Centered is built around the image; it used to be dropped there.
+
+        The image was only ever applied to the brand panel, which that layout
+        hides — so the one layout designed around a photograph never showed one.
+        """
+        self.assertIn(
+            "--swift-login-bg", self.template(),
+            "login_bg_image is stored but never reaches the page")
+        self.assertIn(
+            "var(--swift-login-bg", read_css("swift-login.css"),
+            "nothing paints the background image the setting provides")
 
     def test_no_credentials_are_committed_anywhere_in_the_app(self):
         """Guards against the leaked pair reappearing in any shipped file."""

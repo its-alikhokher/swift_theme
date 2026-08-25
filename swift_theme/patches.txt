@@ -10,3 +10,4 @@ swift_theme.patches.v1_0.enable_backdrops_by_default
 swift_theme.patches.v1_0.drop_sidebar_pinning
 swift_theme.patches.v1_0.drop_custom_code_fields
 swift_theme.patches.v1_0.seed_login_panel_copy
+swift_theme.patches.v1_0.drop_login_signup_setting

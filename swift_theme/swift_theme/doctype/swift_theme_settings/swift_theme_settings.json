@@ -1,4 +1,6 @@
 {
+ "actions": [],
+ "creation": "2026-08-24 14:36:40.314869",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -44,7 +46,6 @@
   "login_section",
   "login_layout",
   "login_tagline",
-  "login_show_signup",
   "login_bg_image",
   "login_panel_section",
   "login_show_brand_panel",
@@ -76,23 +77,23 @@
   },
   {
    "default": "Theme Preset",
+   "description": "Pick a ready-made preset, or set your own primary and secondary colours.",
    "fieldname": "color_mode",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Color Mode",
    "options": "Theme Preset\nCustom Colors",
-   "reqd": 1,
-   "description": "Pick a ready-made preset, or set your own primary and secondary colours."
+   "reqd": 1
   },
   {
+   "default": "Iron Man",
    "depends_on": "eval:doc.color_mode=='Theme Preset'",
+   "description": "Each preset ships its own stylesheet; only the selected one is loaded.",
    "fieldname": "active_preset",
    "fieldtype": "Select",
    "label": "Active Preset",
-   "options": "Iron Man\nCaptain America\nDoctor Strange\nStar-Lord\nVision\nScarlet Witch\nBlack Panther\nLoki\nHulk\nThanos\nVenom\nWinter Soldier",
    "mandatory_depends_on": "eval:doc.color_mode=='Theme Preset'",
-   "default": "Iron Man",
-   "description": "Each preset ships its own stylesheet; only the selected one is loaded."
+   "options": "Iron Man\nCaptain America\nDoctor Strange\nStar-Lord\nVision\nScarlet Witch\nBlack Panther\nLoki\nHulk\nThanos\nVenom\nWinter Soldier"
   },
   {
    "collapsible": 1,
@@ -103,19 +104,19 @@
   },
   {
    "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Buttons, links and highlights.",
    "fieldname": "primary_color",
    "fieldtype": "Color",
    "label": "Primary Color",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
-   "description": "Buttons, links and highlights."
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'"
   },
   {
    "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Gradients and hover states.",
    "fieldname": "secondary_color",
    "fieldtype": "Color",
    "label": "Secondary Color",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
-   "description": "Gradients and hover states."
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'"
   },
   {
    "default": "Dark",
@@ -136,12 +137,12 @@
    "options": "Subtle\nBold"
   },
   {
+   "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1",
    "description": "Applies to Custom Colors only. In Theme Preset mode each preset brings its own backdrop, so this is ignored.",
    "fieldname": "backdrop",
    "fieldtype": "Select",
    "label": "Backdrop",
-   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone",
-   "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1"
+   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone"
   },
   {
    "fieldname": "desk_tab",
@@ -346,12 +347,6 @@
    "label": "Login Tagline"
   },
   {
-   "default": "0",
-   "fieldname": "login_show_signup",
-   "fieldtype": "Check",
-   "label": "Show Sign Up Link"
-  },
-  {
    "fieldname": "login_bg_image",
    "fieldtype": "Attach Image",
    "label": "Login Background Image"
@@ -362,43 +357,43 @@
    "label": "Brand Panel"
   },
   {
+   "default": "1",
+   "description": "The panel beside the sign-in form. Turn it off for a plain, centred form.",
    "fieldname": "login_show_brand_panel",
    "fieldtype": "Check",
-   "label": "Show Brand Panel",
-   "default": "1",
-   "description": "The panel beside the sign-in form. Turn it off for a plain, centred form."
+   "label": "Show Brand Panel"
   },
   {
+   "default": "Streamline Your\nBusiness Operations",
+   "description": "One line per row. Each row becomes its own line in the heading.",
    "fieldname": "login_heading",
    "fieldtype": "Small Text",
-   "label": "Heading",
-   "default": "Streamline Your\nBusiness Operations",
-   "description": "One line per row. Each row becomes its own line in the heading."
+   "label": "Heading"
   },
   {
+   "default": "Unlock your ERP potential \u2014 build feature-rich dashboards, automate approvals and see every number in one place.",
    "fieldname": "login_description",
    "fieldtype": "Small Text",
-   "label": "Description",
-   "default": "Unlock your ERP potential \u2014 build feature-rich dashboards, automate approvals and see every number in one place."
+   "label": "Description"
   },
   {
+   "default": "Role-based access control\nEncrypted sessions and audit trails\nSingle sign-on ready",
+   "description": "One per line. Each gets a tick. Leave empty to show none.",
    "fieldname": "login_points",
    "fieldtype": "Small Text",
-   "label": "Bullet Points",
-   "default": "Role-based access control\nEncrypted sessions and audit trails\nSingle sign-on ready",
-   "description": "One per line. Each gets a tick. Leave empty to show none."
+   "label": "Bullet Points"
   },
   {
+   "default": "300+",
    "fieldname": "login_stat_value",
    "fieldtype": "Data",
-   "label": "Highlight Figure",
-   "default": "300+"
+   "label": "Highlight Figure"
   },
   {
+   "default": "implementations delivered. Be our next success story.",
    "fieldname": "login_stat_label",
    "fieldtype": "Data",
-   "label": "Highlight Caption",
-   "default": "implementations delivered. Be our next success story."
+   "label": "Highlight Caption"
   },
   {
    "fieldname": "extras_tab",
@@ -464,7 +459,8 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-13 18:00:00.000000",
+ "make_attachments_public": 1,
+ "modified": "2026-08-25 07:00:43.434834",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",
@@ -481,6 +477,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
