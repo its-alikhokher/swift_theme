@@ -19,6 +19,16 @@ html[data-swift-preset="venom"] {
   --swift-accent-soft:  rgba(209, 213, 219, 0.14);
   --swift-accent-tint:  #f3f4f6;
 
+  /* The brand sidebar paints a gradient from the primary down to a darkened
+     version of it, so the panel is two different colours and the text has to
+     be legible on both. on_primary is chosen against the primary alone, and on
+     two presets that left the lower half at 3.4:1 and 3.9:1 — present, styled
+     and unreadable. This is picked against the darker end and checked against
+     both, which is why it is a token of its own rather than a reuse. */
+  --swift-sidebar-fg:   #0b0d12;
+  --swift-sidebar-fill-start: #d1d5db;
+  --swift-sidebar-fill-end: #b0b3b8;
+
   /* Roles */
   --swift-canvas:       #08080a;
   --swift-surface:      #19191b;

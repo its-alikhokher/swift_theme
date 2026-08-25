@@ -33,6 +33,15 @@ OLD_STATE = {
     "volume_level": "50",
     "enable_switcher": "0",
     "enable_command_palette": "0",
+    # Retired: arbitrary CSS and JS on every desk page. An upgrading site has
+    # these stored, and a value left behind is a value some later read starts
+    # executing again, so the patch has to clear them.
+    "custom_css": "body { background: red }",
+    "custom_js": "console.log('injected')",
+    # Retired: the theme's own sign-up switch. It never worked — Frappe governs
+    # sign-up in Website Settings and this was ANDed with it — so it has to be
+    # cleared rather than left looking like a control.
+    "login_show_signup": "1",
 }
 
 OLD_USER_PRESET = "Emerald Luxury"
@@ -49,6 +58,26 @@ def rewind():
             "insert into tabSingles (doctype, field, value) values (%s, %s, %s)",
             (DOCTYPE, field, value),
         )
+
+    # Saving the Single rewrites tabSingles from the meta, so an orphaned row
+    # disappears on its own the moment anything saves the document — which is
+    # why the stored values alone cannot show whether the patch ran. A Property
+    # Setter is the half nothing else clears: a site that customised either
+    # field keeps a row pointing at a field that no longer exists, and Frappe
+    # applies it to the meta on every load. Plant one so the check has teeth.
+    for fieldname in ("custom_css", "custom_js"):
+        if not frappe.db.exists(
+            "Property Setter", {"doc_type": DOCTYPE, "field_name": fieldname}
+        ):
+            frappe.get_doc({
+                "doctype": "Property Setter",
+                "doctype_or_field": "DocField",
+                "doc_type": DOCTYPE,
+                "field_name": fieldname,
+                "property": "hidden",
+                "property_type": "Check",
+                "value": "0",
+            }).insert(ignore_permissions=True)
 
     frappe.db.set_value("User", "Administrator", "swift_preset", OLD_USER_PRESET)
     frappe.db.sql("delete from `tabPatch Log` where patch like %s", "%swift_theme%")
@@ -76,7 +105,7 @@ def verify():
     prefs = get_effective_prefs()
     user_preset = frappe.db.get_value("User", "Administrator", "swift_preset")
     retired = ("default_accent", "default_theme", "brand_hex_override",
-               "gradient_start", "gradient_end")
+               "gradient_start", "gradient_end", "custom_css", "custom_js")
     counts = [r[0] for r in frappe.db.sql(
         "select count(*) from tabSingles where doctype = %s group by field", DOCTYPE)]
 
@@ -116,6 +145,25 @@ def verify():
          rows.get("show_backdrop_through")),
         ("full role set delivered", len(prefs["roles"]) == 11, len(prefs["roles"])),
         ("no duplicated single rows", all(c == 1 for c in counts), "one row per field"),
+        # The brand panel's words used to live in the template. They are
+        # Settings now, and adding fields does not backfill them: an existing
+        # Single returns nothing for a field it has never stored, so without
+        # the patch an upgrade would blank the panel that was on the page
+        # yesterday.
+        ("login panel copy seeded",
+         rows.get("login_show_brand_panel") == "1"
+         and bool(rows.get("login_heading"))
+         and bool(rows.get("login_stat_value")),
+         f"panel on, heading {'set' if rows.get('login_heading') else 'EMPTY'}"),
+        ("sign-up switch removed",
+         "login_show_signup" not in rows,
+         "gone"),
+        ("custom code purged",
+         "custom_css" not in rows and "custom_js" not in rows
+         and not frappe.db.exists(
+             "Property Setter",
+             {"doc_type": DOCTYPE, "field_name": ("in", ("custom_css", "custom_js"))}),
+         "no stored CSS or JS"),
     ]
 
     width = max(len(name) for name, _, _ in checks)

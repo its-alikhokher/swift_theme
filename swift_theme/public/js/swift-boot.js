@@ -18,6 +18,7 @@
         font_scale:   "swift_font_scale",
         navbar:       "swift_navbar",
         sidebar:      "swift_sidebar_variant",
+        sidebarFill:  "swift_sidebar_fill",
         perf:         "swift_perf",
         anim:         "swift_anim",
         scrollbar:    "swift_scrollbar",
@@ -105,6 +106,7 @@
     applyAttr("font-scale",       get("font_scale")  || "");
     applyAttr("navbar",           get("navbar")      || "");
     applyAttr("sidebar-variant",  get("sidebar")     || "");
+    applyAttr("sidebar-fill",     get("sidebarFill") || "");
     if (get("perf")      !== "off") applyAttr("perf", "on");
     if (get("anim")      === "off") applyAttr("anim", "off");
     if (get("scrollbar") !== "off") applyAttr("scrollbar", "on");
@@ -344,6 +346,11 @@
             if ("font_scale" in p)      { applyAttr("font-scale", p.font_scale); set("font_scale", p.font_scale); }
             if ("navbar_variant" in p)  { applyAttr("navbar", p.navbar_variant); set("navbar", p.navbar_variant); }
             if ("sidebar_variant" in p) { applyAttr("sidebar-variant", p.sidebar_variant); set("sidebar", p.sidebar_variant); }
+            if ("sidebar_brand_fill" in p) {
+                var fill = p.sidebar_brand_fill ? "brand" : "";
+                applyAttr("sidebar-fill", fill);
+                set("sidebarFill", fill);
+            }
             if (p.enable_perf_mode === 0) { applyAttr("perf", null); set("perf", "off"); }
             if (p.enable_perf_mode === 1) { applyAttr("perf", "on"); set("perf", "on"); }
             if (p.enable_styled_scrollbar === 0) { applyAttr("scrollbar", null); set("scrollbar", "off"); }
@@ -459,6 +466,7 @@
                 font_scale: boot.font_scale,
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
+                sidebar_brand_fill: boot.sidebar_brand_fill,
                 roles: boot.roles,
                 backdrop: boot.backdrop,
                 show_backdrop_through: boot.show_backdrop_through,
@@ -474,10 +482,6 @@
             if (boot.auto_dark && !userForcedMode(boot)) {
                 applyAutoDark(boot.auto_dark_start, boot.auto_dark_end);
             }
-
-            // Custom CSS/JS injection
-            injectCSS(boot.custom_css || "");
-            if (boot.custom_js) injectJS(boot.custom_js);
 
             // Custom favicon
             if (boot.brand_favicon) {
@@ -545,23 +549,4 @@
     }
 
     // Replaces rather than skips, so edits to Custom CSS apply on save.
-    function injectCSS(css) {
-        var s = document.getElementById("swift-custom-css");
-        if (!s) {
-            if (!css) return;
-            s = document.createElement("style");
-            s.id = "swift-custom-css";
-            document.head.appendChild(s);
-        }
-        if (s.textContent !== css) s.textContent = css;
-    }
-    function injectJS(js) {
-        if (document.getElementById("swift-custom-js")) return;
-        try {
-            var s = document.createElement("script");
-            s.id = "swift-custom-js";
-            s.textContent = js;
-            document.body.appendChild(s);
-        } catch (e) {}
-    }
 })();

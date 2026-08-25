@@ -1,7 +1,10 @@
 {
+ "actions": [],
+ "creation": "2026-08-24 14:36:40.314869",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "colour_tab",
   "color_mode_section",
   "color_mode",
   "active_preset",
@@ -11,36 +14,47 @@
   "custom_mode",
   "custom_strength",
   "backdrop",
+  "desk_tab",
   "defaults_section",
   "default_density",
   "default_radius",
-  "defaults_col_break",
   "default_font_scale",
   "default_font_family",
+  "sidebar_section",
+  "navbar_variant",
+  "sidebar_variant",
+  "sidebar_brand_fill",
+  "features_tab",
   "features_section",
   "enable_switcher",
   "enable_command_palette",
   "enable_focus_mode",
   "enable_backdrops",
   "show_backdrop_through",
-  "features_col_break",
   "enable_perf_mode",
   "enable_styled_scrollbar",
   "enable_toast_theming",
   "enable_print_theming",
   "print_font_family",
+  "brand_tab",
   "brand_section",
   "brand_name",
   "brand_favicon",
-  "brand_col_break",
   "brand_logo",
   "brand_logo_dark",
+  "login_tab",
   "login_section",
   "login_layout",
   "login_tagline",
-  "login_show_signup",
-  "login_col_break",
   "login_bg_image",
+  "login_panel_section",
+  "login_show_brand_panel",
+  "login_heading",
+  "login_description",
+  "login_points",
+  "login_stat_value",
+  "login_stat_label",
+  "extras_tab",
   "auto_dark_section",
   "enable_auto_dark",
   "auto_dark_start",
@@ -48,15 +62,14 @@
   "sounds_section",
   "enable_sounds",
   "volume_level",
-  "sound_events",
-  "sidebar_section",
-  "navbar_variant",
-  "sidebar_variant",
-  "custom_code_section",
-  "custom_css",
-  "custom_js"
+  "sound_events"
  ],
  "fields": [
+  {
+   "fieldname": "colour_tab",
+   "fieldtype": "Tab Break",
+   "label": "Colour"
+  },
   {
    "fieldname": "color_mode_section",
    "fieldtype": "Section Break",
@@ -64,23 +77,23 @@
   },
   {
    "default": "Theme Preset",
+   "description": "Pick a ready-made preset, or set your own primary and secondary colours.",
    "fieldname": "color_mode",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Color Mode",
    "options": "Theme Preset\nCustom Colors",
-   "reqd": 1,
-   "description": "Pick a ready-made preset, or set your own primary and secondary colours."
+   "reqd": 1
   },
   {
+   "default": "Iron Man",
    "depends_on": "eval:doc.color_mode=='Theme Preset'",
+   "description": "Each preset ships its own stylesheet; only the selected one is loaded.",
    "fieldname": "active_preset",
    "fieldtype": "Select",
    "label": "Active Preset",
-   "options": "Iron Man\nCaptain America\nDoctor Strange\nStar-Lord\nVision\nScarlet Witch\nBlack Panther\nLoki\nHulk\nThanos\nVenom\nWinter Soldier",
    "mandatory_depends_on": "eval:doc.color_mode=='Theme Preset'",
-   "default": "Iron Man",
-   "description": "Each preset ships its own stylesheet; only the selected one is loaded."
+   "options": "Iron Man\nCaptain America\nDoctor Strange\nStar-Lord\nVision\nScarlet Witch\nBlack Panther\nLoki\nHulk\nThanos\nVenom\nWinter Soldier"
   },
   {
    "collapsible": 1,
@@ -91,19 +104,19 @@
   },
   {
    "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Buttons, links and highlights.",
    "fieldname": "primary_color",
    "fieldtype": "Color",
    "label": "Primary Color",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
-   "description": "Buttons, links and highlights."
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'"
   },
   {
    "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Gradients and hover states.",
    "fieldname": "secondary_color",
    "fieldtype": "Color",
    "label": "Secondary Color",
-   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'",
-   "description": "Gradients and hover states."
+   "mandatory_depends_on": "eval:doc.color_mode=='Custom Colors'"
   },
   {
    "default": "Dark",
@@ -124,12 +137,17 @@
    "options": "Subtle\nBold"
   },
   {
+   "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1",
    "description": "Applies to Custom Colors only. In Theme Preset mode each preset brings its own backdrop, so this is ignored.",
    "fieldname": "backdrop",
    "fieldtype": "Select",
    "label": "Backdrop",
-   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone",
-   "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1"
+   "options": "\nAurora\nMesh\nGrain\nFacets\nSilk\nNone"
+  },
+  {
+   "fieldname": "desk_tab",
+   "fieldtype": "Tab Break",
+   "label": "Desk"
   },
   {
    "collapsible": 1,
@@ -152,10 +170,6 @@
    "options": "\nSharp\nRounded\nPill"
   },
   {
-   "fieldname": "defaults_col_break",
-   "fieldtype": "Column Break"
-  },
-  {
    "default": "M",
    "fieldname": "default_font_scale",
    "fieldtype": "Select",
@@ -168,6 +182,39 @@
    "fieldtype": "Select",
    "label": "Default Font Family",
    "options": "\nInter\nPoppins\nManrope\nRoboto\nSystem"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sidebar_section",
+   "fieldtype": "Section Break",
+   "label": "Navigation"
+  },
+  {
+   "default": "Solid",
+   "fieldname": "navbar_variant",
+   "fieldtype": "Select",
+   "label": "Navbar Variant",
+   "options": "Solid\nGlass\nTransparent"
+  },
+  {
+   "default": "Floating",
+   "description": "Icon-only collapses the sidebar to icons and expands it on hover.",
+   "fieldname": "sidebar_variant",
+   "fieldtype": "Select",
+   "label": "Sidebar Variant",
+   "options": "Attached\nFloating\nIcon-only"
+  },
+  {
+   "default": "0",
+   "description": "Fill the sidebar with the theme's own colour instead of the neutral surface. Text and icons switch to the contrast colour that preset already computes.",
+   "fieldname": "sidebar_brand_fill",
+   "fieldtype": "Check",
+   "label": "Brand Colour Sidebar"
+  },
+  {
+   "fieldname": "features_tab",
+   "fieldtype": "Tab Break",
+   "label": "Features"
   },
   {
    "collapsible": 1,
@@ -212,10 +259,6 @@
    "label": "Show Backdrop Through Panels"
   },
   {
-   "fieldname": "features_col_break",
-   "fieldtype": "Column Break"
-  },
-  {
    "default": "1",
    "fieldname": "enable_perf_mode",
    "fieldtype": "Check",
@@ -248,6 +291,11 @@
    "options": "\nInter\nPoppins\nManrope\nRoboto\nSystem"
   },
   {
+   "fieldname": "brand_tab",
+   "fieldtype": "Tab Break",
+   "label": "Brand"
+  },
+  {
    "collapsible": 1,
    "fieldname": "brand_section",
    "fieldtype": "Section Break",
@@ -264,10 +312,6 @@
    "label": "Brand Favicon"
   },
   {
-   "fieldname": "brand_col_break",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "brand_logo",
    "fieldtype": "Attach Image",
    "label": "Brand Logo"
@@ -277,6 +321,11 @@
    "fieldname": "brand_logo_dark",
    "fieldtype": "Attach Image",
    "label": "Brand Logo (Dark)"
+  },
+  {
+   "fieldname": "login_tab",
+   "fieldtype": "Tab Break",
+   "label": "Login Page"
   },
   {
    "collapsible": 1,
@@ -298,19 +347,58 @@
    "label": "Login Tagline"
   },
   {
-   "default": "0",
-   "fieldname": "login_show_signup",
-   "fieldtype": "Check",
-   "label": "Show Sign Up Link"
-  },
-  {
-   "fieldname": "login_col_break",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "login_bg_image",
    "fieldtype": "Attach Image",
    "label": "Login Background Image"
+  },
+  {
+   "fieldname": "login_panel_section",
+   "fieldtype": "Section Break",
+   "label": "Brand Panel"
+  },
+  {
+   "default": "1",
+   "description": "The panel beside the sign-in form. Turn it off for a plain, centred form.",
+   "fieldname": "login_show_brand_panel",
+   "fieldtype": "Check",
+   "label": "Show Brand Panel"
+  },
+  {
+   "default": "Streamline Your\nBusiness Operations",
+   "description": "One line per row. Each row becomes its own line in the heading.",
+   "fieldname": "login_heading",
+   "fieldtype": "Small Text",
+   "label": "Heading"
+  },
+  {
+   "default": "Unlock your ERP potential \u2014 build feature-rich dashboards, automate approvals and see every number in one place.",
+   "fieldname": "login_description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "default": "Role-based access control\nEncrypted sessions and audit trails\nSingle sign-on ready",
+   "description": "One per line. Each gets a tick. Leave empty to show none.",
+   "fieldname": "login_points",
+   "fieldtype": "Small Text",
+   "label": "Bullet Points"
+  },
+  {
+   "default": "300+",
+   "fieldname": "login_stat_value",
+   "fieldtype": "Data",
+   "label": "Highlight Figure"
+  },
+  {
+   "default": "implementations delivered. Be our next success story.",
+   "fieldname": "login_stat_label",
+   "fieldtype": "Data",
+   "label": "Highlight Caption"
+  },
+  {
+   "fieldname": "extras_tab",
+   "fieldtype": "Tab Break",
+   "label": "Extras"
   },
   {
    "collapsible": 1,
@@ -366,54 +454,13 @@
    "fieldtype": "Table",
    "label": "Sound Events",
    "options": "Swift Theme Sound Event"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "sidebar_section",
-   "fieldtype": "Section Break",
-   "label": "Navigation"
-  },
-  {
-   "default": "Solid",
-   "fieldname": "navbar_variant",
-   "fieldtype": "Select",
-   "label": "Navbar Variant",
-   "options": "Solid\nGlass\nTransparent"
-  },
-  {
-   "default": "Floating",
-   "description": "Icon-only collapses the sidebar to icons and expands it on hover.",
-   "fieldname": "sidebar_variant",
-   "fieldtype": "Select",
-   "label": "Sidebar Variant",
-   "options": "Attached\nFloating\nIcon-only"
-  },
-  {
-   "collapsible": 1,
-   "collapsible_depends_on": "eval:doc.custom_css||doc.custom_js",
-   "fieldname": "custom_code_section",
-   "fieldtype": "Section Break",
-   "label": "Custom Code"
-  },
-  {
-   "description": "Injected into every desk page. Use with care.",
-   "fieldname": "custom_css",
-   "fieldtype": "Code",
-   "label": "Custom CSS",
-   "options": "CSS"
-  },
-  {
-   "description": "Injected into every desk page. Use with care.",
-   "fieldname": "custom_js",
-   "fieldtype": "Code",
-   "label": "Custom JS",
-   "options": "JS"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-08-13 18:00:00.000000",
+ "make_attachments_public": 1,
+ "modified": "2026-08-25 07:00:43.434834",
  "modified_by": "Administrator",
  "module": "Swift Theme",
  "name": "Swift Theme Settings",
@@ -430,6 +477,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

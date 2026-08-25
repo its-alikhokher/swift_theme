@@ -44,6 +44,7 @@ SETTINGS_DEFAULTS = {
     "default_font_family": "Inter",
     "navbar_variant": "Solid",
     "sidebar_variant": "Floating",
+    "sidebar_brand_fill": 0,
     "enable_switcher": 1,
     "enable_command_palette": 1,
     "enable_focus_mode": 1,
@@ -53,6 +54,22 @@ SETTINGS_DEFAULTS = {
     "enable_print_theming": 1,
     "print_font_family": "Inter",
     "login_layout": "Split",
+    # The brand panel beside the sign-in form. Seeded so a fresh install shows
+    # the same page the template used to hard-code; the patch does the same for
+    # sites that already existed. Editable from Settings either way.
+    "login_show_brand_panel": 1,
+    "login_heading": "Streamline Your\nBusiness Operations",
+    "login_description": (
+        "Unlock your ERP potential — build feature-rich dashboards, "
+        "automate approvals and see every number in one place."
+    ),
+    "login_points": (
+        "Role-based access control\n"
+        "Encrypted sessions and audit trails\n"
+        "Single sign-on ready"
+    ),
+    "login_stat_value": "300+",
+    "login_stat_label": "implementations delivered. Be our next success story.",
     "enable_auto_dark": 0,
     "auto_dark_start": "19:00:00",
     "auto_dark_end": "07:00:00",

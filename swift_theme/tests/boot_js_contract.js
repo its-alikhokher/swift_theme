@@ -246,6 +246,46 @@ themeLink()._fire("error"); // e.g. a 404 on the built asset
 check("a failed fetch still releases the bridge rather than hanging forever",
     v("--bg-color") === undefined, v("--bg-color"));
 
+console.log("\n== 4d. The brand sidebar has to survive the whole trip ==");
+// It was wired at both ends and still did nothing: applyPrefs handled the key,
+// but applyAll — which is what runs after Settings is saved — built its payload
+// from an explicit list that did not include it, so the value never arrived.
+// A source-level check saw the handler and passed; only running it catches this.
+API.applyPrefs({ sidebar_brand_fill: 1 });
+check("brand sidebar: attribute set when the setting is on",
+    html.getAttribute("data-swift-sidebar-fill") === "brand",
+    html.getAttribute("data-swift-sidebar-fill"));
+check("brand sidebar: remembered for the next load",
+    store.swift_sidebar_fill === "brand", store.swift_sidebar_fill);
+
+API.applyPrefs({ sidebar_brand_fill: 0 });
+check("brand sidebar: attribute cleared when the setting is off",
+    html.getAttribute("data-swift-sidebar-fill") === null,
+    html.getAttribute("data-swift-sidebar-fill"));
+
+/* The bug was not in applyPrefs at all — it was in applyAll, which is the
+   function reload() feeds and which builds its payload from an explicit list
+   of keys. Calling applyPrefs directly (as the checks above do) skips it
+   entirely, so this drives reload() itself: a frappe.call stub that resolves
+   synchronously with what the server would have sent. */
+const frappeStub = {
+    boot: { swift_theme: {} },
+    call: () => ({
+        then: (fn) => {
+            fn({ message: { sidebar_brand_fill: 1, preset: "", primary: "" } });
+            return { catch: () => {} };
+        },
+    }),
+};
+// boot.js reads bare `frappe`, so it has to exist on the context itself and
+// not only on window.
+sandbox.frappe = frappeStub;
+sandbox.window.frappe = frappeStub;
+API.reload();
+check("brand sidebar: survives the path a save actually takes",
+    html.getAttribute("data-swift-sidebar-fill") === "brand",
+    html.getAttribute("data-swift-sidebar-fill"));
+
 console.log("\n== 5. Other preferences still applied ==");
 API.applyPrefs({ density: "Compact", radius: "Pill" });
 check("density attribute", html.getAttribute("data-swift-density") === "Compact");
@@ -275,10 +315,21 @@ console.log("\n" + "=".repeat(46));
             show_alert: () => {},
         };
         const ctx = { window: { frappe }, frappe, console, setTimeout, Date, Audio: function () {} };
+        // Pointed at the bundle, this context loads every desk module, not just
+        // the sounds one, and those touch the document and storage on load.
+        ctx.document = document;
+        ctx.window.document = document;
+        ctx.localStorage = sandbox.localStorage;
+        ctx.window.localStorage = sandbox.localStorage;
+        ctx.CustomEvent = sandbox.CustomEvent;
         ctx.globalThis = ctx;
         vm.createContext(ctx);
-        vm.runInContext(
-            fs.readFileSync(bootPath.replace("swift-boot.js", "swift-sounds.js"), "utf8"), ctx);
+        // The harness can be pointed at the built bundle instead of the source
+        // file, which is how the shipped artefact gets covered rather than only
+        // the tree it was built from. The bundle already carries the sounds
+        // module, so only a source run needs it loaded separately.
+        const soundsPath = bootPath.replace("swift-boot.js", "swift-sounds.js");
+        vm.runInContext(fs.readFileSync(soundsPath, "utf8"), ctx);
         ready.forEach((fn) => fn());
         frappe.utils.play_sound("click");
         return frappePlayed;

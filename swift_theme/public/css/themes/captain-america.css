@@ -19,6 +19,16 @@ html[data-swift-preset="captain-america"] {
   --swift-accent-soft:  rgba(29, 78, 216, 0.14);
   --swift-accent-tint:  #60a5fa;
 
+  /* The brand sidebar paints a gradient from the primary down to a darkened
+     version of it, so the panel is two different colours and the text has to
+     be legible on both. on_primary is chosen against the primary alone, and on
+     two presets that left the lower half at 3.4:1 and 3.9:1 — present, styled
+     and unreadable. This is picked against the darker end and checked against
+     both, which is why it is a token of its own rather than a reuse. */
+  --swift-sidebar-fg:   #ffffff;
+  --swift-sidebar-fill-start: #1d4ed8;
+  --swift-sidebar-fill-end: #1842b5;
+
   /* Roles */
   --swift-canvas:       #f2f5fa;
   --swift-surface:      #ffffff;
