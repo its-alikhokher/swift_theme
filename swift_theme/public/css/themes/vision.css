@@ -26,8 +26,13 @@ html[data-swift-preset="vision"] {
      and unreadable. This is picked against the darker end and checked against
      both, which is why it is a token of its own rather than a reuse. */
   --swift-sidebar-fg:   #ffffff;
-  --swift-sidebar-fill-start: #a16207;
-  --swift-sidebar-fill-end: #875206;
+  /* Darker than --swift-accent on purpose. The panel's hovered and active rows
+     are the accent lightened by 14%, and at #a16207 that left the white label
+     at 3.80:1 - the only preset of the twelve under the bar. Deepening just
+     the sidebar fill takes it to 4.66:1 and leaves the accent, which is used
+     on light surfaces, exactly where it was. */
+  --swift-sidebar-fill-start: #8a5306;
+  --swift-sidebar-fill-end: #6f4305;
 
   /* Roles */
   --swift-canvas:       #fbf7ee;

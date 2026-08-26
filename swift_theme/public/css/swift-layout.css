@@ -19,34 +19,36 @@
    ========================================================================= */
 
 /* -------- Top bar -------- */
-html[data-swift-navbar="Solid"] .page-head {
-  background: var(--fg-color);
+/* Every rule here carries [data-swift-themed] and !important on the paint, and
+   that is load-bearing rather than defensive. Two generic rules used to settle
+   this instead of the variant:
+
+     swift-desk.css    html[data-swift-themed] .page-head { background: transparent }
+     swift-sidebar.css html[data-swift-themed] .navbar    { background: ... !important }
+
+   Both match at the same specificity as a bare [data-swift-navbar] rule, and
+   both are imported after this file, so the later one won every tie. All three
+   variants resolved to exactly the same paint, and the setting did nothing at
+   all. The extra attribute puts these one class ahead, which settles it by
+   specificity rather than by import order. */
+html[data-swift-themed][data-swift-navbar="Solid"] .page-head {
+  background: var(--fg-color) !important;
   border-bottom: 1px solid var(--border-color);
 }
 
 /* Translucent, so whatever scrolls under it stays faintly visible. Only the
    colour is softened — no backdrop-filter, which would make the bar a
    containing block for anything positioned inside it. */
-html[data-swift-navbar="Glass"] .page-head {
-  background: color-mix(in oklab, var(--fg-color) 72%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
-}
-
-html[data-swift-navbar="Transparent"] .page-head {
-  background: transparent;
-  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
-}
-
-/* The portal header is a real .navbar, and the same three choices suit it. */
-html[data-swift-navbar="Solid"] .navbar {
-  background: var(--fg-color) !important;
-  border-bottom: 1px solid var(--border-color);
-}
-html[data-swift-navbar="Glass"] .navbar {
+html[data-swift-themed][data-swift-navbar="Glass"] .page-head {
   background: color-mix(in oklab, var(--fg-color) 72%, transparent) !important;
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent);
 }
-html[data-swift-navbar="Transparent"] .navbar {
+
+html[data-swift-themed][data-swift-navbar="Transparent"] .page-head {
   background: transparent !important;
   border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent);
 }
+
+/* The .navbar variants live in swift-preset-base.css, not here: this file is
+   only in the desk bundle, and .navbar is the portal's header. They also have
+   to sit next to the generic navbar force-paint they must outrank. */

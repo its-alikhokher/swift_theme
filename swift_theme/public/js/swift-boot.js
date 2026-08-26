@@ -19,6 +19,8 @@
         navbar:       "swift_navbar",
         sidebar:      "swift_sidebar_variant",
         sidebarFill:  "swift_sidebar_fill",
+        sidebarTexture: "swift_sidebar_texture",
+        sidebarGradient: "swift_sidebar_gradient",
         perf:         "swift_perf",
         anim:         "swift_anim",
         scrollbar:    "swift_scrollbar",
@@ -107,6 +109,8 @@
     applyAttr("navbar",           get("navbar")      || "");
     applyAttr("sidebar-variant",  get("sidebar")     || "");
     applyAttr("sidebar-fill",     get("sidebarFill") || "");
+    applyAttr("sidebar-texture",  get("sidebarTexture") || "");
+    applyAttr("sidebar-gradient", get("sidebarGradient") || "");
     if (get("perf")      !== "off") applyAttr("perf", "on");
     if (get("anim")      === "off") applyAttr("anim", "off");
     if (get("scrollbar") !== "off") applyAttr("scrollbar", "on");
@@ -351,6 +355,16 @@
                 applyAttr("sidebar-fill", fill);
                 set("sidebarFill", fill);
             }
+            if ("sidebar_texture" in p) {
+                var tex = p.sidebar_texture ? "on" : "";
+                applyAttr("sidebar-texture", tex);
+                set("sidebarTexture", tex);
+            }
+            if ("custom_sidebar_gradient" in p) {
+                var grad = p.custom_sidebar_gradient ? "on" : "";
+                applyAttr("sidebar-gradient", grad);
+                set("sidebarGradient", grad);
+            }
             if (p.enable_perf_mode === 0) { applyAttr("perf", null); set("perf", "off"); }
             if (p.enable_perf_mode === 1) { applyAttr("perf", "on"); set("perf", "on"); }
             if (p.enable_styled_scrollbar === 0) { applyAttr("scrollbar", null); set("scrollbar", "off"); }
@@ -467,6 +481,8 @@
                 navbar_variant: boot.navbar_variant,
                 sidebar_variant: boot.sidebar_variant,
                 sidebar_brand_fill: boot.sidebar_brand_fill,
+                sidebar_texture: boot.sidebar_texture,
+                custom_sidebar_gradient: boot.custom_sidebar_gradient,
                 roles: boot.roles,
                 backdrop: boot.backdrop,
                 show_backdrop_through: boot.show_backdrop_through,

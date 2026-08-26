@@ -172,6 +172,28 @@ html[data-swift-themed] .navbar {
   border-bottom: 1px solid var(--border-color) !important;
   box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 8px 24px -12px rgba(0,0,0,0.35);
 }
+
+/* ...and the three navbar_variant choices, which have to outrank the force-paint
+   directly above. They belong in this file rather than swift-layout.css because
+   this one is imported by both the desk and the portal bundles, and .navbar is
+   the portal's header — shipped only to the desk, the setting could never do
+   anything on the portal at all. The extra attribute wins the tie by
+   specificity; !important is needed because the rule above has it. */
+html[data-swift-themed][data-swift-navbar="Solid"] .navbar {
+  background: var(--fg-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+html[data-swift-themed][data-swift-navbar="Glass"] .navbar {
+  background: color-mix(in oklab, var(--fg-color) 72%, transparent) !important;
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 60%, transparent) !important;
+}
+
+html[data-swift-themed][data-swift-navbar="Transparent"] .navbar {
+  background: transparent !important;
+  border-bottom: 1px solid color-mix(in oklab, var(--border-color) 40%, transparent) !important;
+  box-shadow: none;
+}
 html[data-swift-themed] .navbar .navbar-brand,
 html[data-swift-themed] .navbar .app-logo,
 html[data-swift-themed] .navbar .nav-link {
