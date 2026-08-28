@@ -160,8 +160,15 @@ body.swift-login-Split .page-card-head-text h4 {
   color: var(--swift-on-surface, var(--text-color));
 }
 
+/* This used to be `display: none`, on the reasoning that "the panel beside it
+   already says this". The panel does not: it shows login_heading and
+   login_description, which are different settings. Hiding this meant a site
+   that filled in login_tagline saw nothing at all on Split, with no clue why. */
 body.swift-login-Split .page-card-subtitle {
-  display: none;      /* the panel beside it already says this */
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--swift-on-surface, var(--text-color)) 68%, transparent);
 }
 
 body.swift-login-Split .app-logo {
@@ -186,6 +193,29 @@ body.swift-login-Split .page-card .page-card-body input[type="password"] {
   border: 1px solid transparent;
   background: color-mix(in oklab, var(--swift-accent) 8%, var(--swift-surface, #fff));
   font-size: 15px;
+}
+
+/* Frappe parks an icon inside these fields (position:absolute, left 8px) and
+   buys the space back with padding-left:38px on the input. The shorthand above
+   is more specific, so it overwrote that padding and the text ran underneath
+   the icon - and under the password field's reveal toggle on the right. The
+   space is bought back here, at the wider inset this taller field wants. */
+body.swift-login-Split .page-card .page-card-body .email-field .field-icon,
+body.swift-login-Split .page-card .page-card-body .password-field .field-icon {
+  left: 15px;
+}
+
+body.swift-login-Split .page-card .page-card-body .email-field input,
+body.swift-login-Split .page-card .page-card-body .password-field input {
+  padding-left: 45px;
+}
+
+body.swift-login-Split .page-card .page-card-body .password-field input {
+  padding-right: 45px;
+}
+
+body.swift-login-Split .page-card .page-card-body .password-field .toggle-password {
+  right: 15px;
 }
 
 body.swift-login-Split .page-card .page-card-body input:focus {

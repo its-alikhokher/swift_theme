@@ -170,11 +170,6 @@ child tables · toasts · buttons and links
 ## 7. Do not break Frappe
 
 Hard constraints, each from a real failure.
-
-- **MUST NOT** create a stacking context around the desk. Frappe opens a
-  child-table row as `position: fixed` at z-index 1021 above a 1020 backdrop;
-  `position: relative; z-index: n` on `.layout-main` traps it underneath and the
-  row opens invisible.
 - **MUST NOT** apply `content-visibility` or `contain: paint/strict/content` to
   any desk container. Paint containment makes that element the containing block
   for `position: fixed` descendants and clips them — the same editor ended up

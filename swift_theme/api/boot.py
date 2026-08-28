@@ -60,7 +60,7 @@ GUEST_KEYS = {
     "theme_css", "primary", "secondary", "is_dark", "roles",
     "backdrop", "backdrop_pinned", "enable_backdrops", "show_backdrop_through",
     "density", "radius", "font_scale", "font_family",
-    "navbar_variant", "sidebar_variant", "sidebar_brand_fill",
+    "navbar_variant", "sidebar_variant", "sidebar_brand_fill", "sidebar_texture", "custom_sidebar_gradient",
     "brand_name", "brand_logo", "brand_logo_dark", "brand_favicon",
     "login_layout", "login_bg_image", "login_tagline",
     "presets",
@@ -120,6 +120,10 @@ def get_effective_prefs():
         "navbar_variant":  s.get("navbar_variant")  or "Solid",
         "sidebar_variant": s.get("sidebar_variant") or "Attached",
         "sidebar_brand_fill": int(s.get("sidebar_brand_fill") or 0),
+        "sidebar_texture": int(s.get("sidebar_texture") or 0),
+        # only meaningful without a preset - a preset owns its own pair
+        "custom_sidebar_gradient": int(s.get("custom_sidebar_gradient") or 0)
+        if not colors.get("preset") else 0,
 
         # features
         "enable_switcher":         int(s.get("enable_switcher") or 0),

@@ -13,6 +13,7 @@
   "secondary_color",
   "custom_mode",
   "custom_strength",
+  "custom_sidebar_gradient",
   "backdrop",
   "desk_tab",
   "defaults_section",
@@ -24,6 +25,7 @@
   "navbar_variant",
   "sidebar_variant",
   "sidebar_brand_fill",
+  "sidebar_texture",
   "features_tab",
   "features_section",
   "enable_switcher",
@@ -137,6 +139,14 @@
    "options": "Subtle\nBold"
   },
   {
+   "default": "0",
+   "depends_on": "eval:doc.color_mode=='Custom Colors'",
+   "description": "Run the sidebar from the Primary colour into the Secondary one. Without it the panel is Primary shading into its own darker end, so the Secondary colour never reaches the sidebar at all. Presets keep their own hand-picked pair and are not affected.",
+   "fieldname": "custom_sidebar_gradient",
+   "fieldtype": "Check",
+   "label": "Gradient Sidebar"
+  },
+  {
    "depends_on": "eval:doc.color_mode==\"Custom Colors\" && doc.enable_backdrops==1",
    "description": "Applies to Custom Colors only. In Theme Preset mode each preset brings its own backdrop, so this is ignored.",
    "fieldname": "backdrop",
@@ -210,6 +220,13 @@
    "fieldname": "sidebar_brand_fill",
    "fieldtype": "Check",
    "label": "Brand Colour Sidebar"
+  },
+  {
+   "default": "0",
+   "description": "Draw a faint contour pattern across the lower half of the sidebar. It is cut from the sidebar's own text colour, so it follows every preset and stays legible on a light or a dark panel.",
+   "fieldname": "sidebar_texture",
+   "fieldtype": "Check",
+   "label": "Sidebar Texture"
   },
   {
    "fieldname": "features_tab",
