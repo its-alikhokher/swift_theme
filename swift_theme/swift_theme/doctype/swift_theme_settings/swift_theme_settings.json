@@ -26,6 +26,13 @@
   "sidebar_variant",
   "sidebar_brand_fill",
   "sidebar_texture",
+  "home_section",
+  "enable_home_page",
+  "home_preset",
+  "home_greeting",
+  "home_shortcuts",
+  "home_cards_break",
+  "home_cards",
   "features_tab",
   "features_section",
   "enable_switcher",
@@ -227,6 +234,56 @@
    "fieldname": "sidebar_texture",
    "fieldtype": "Check",
    "label": "Sidebar Texture"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "home_section",
+   "fieldtype": "Section Break",
+   "label": "Home Page"
+  },
+  {
+   "default": "0",
+   "description": "Land on a Swift home page instead of the default workspace. It shows the apps this user is allowed to open, so nothing appears here that they could not already reach. Turn it off and the desk goes straight back to Frappe's own landing.",
+   "fieldname": "enable_home_page",
+   "fieldtype": "Check",
+   "label": "Custom Home Page"
+  },
+  {
+   "default": "Aurora",
+   "depends_on": "enable_home_page",
+   "description": "A whole design for the landing: each one decides the palette, which blocks appear, how they are arranged and what is painted behind them. It applies only while the landing is on screen - no other desk page is touched.",
+   "fieldname": "home_preset",
+   "fieldtype": "Select",
+   "label": "Desk Preset",
+   "options": "Aurora\nDune\nNebula\nAbyss\nPulse\nHorizon\nEclipse\nHoneycomb"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:doc.enable_home_page==1",
+   "description": "The greeting line at the top, by time of day.",
+   "fieldname": "home_greeting",
+   "fieldtype": "Check",
+   "label": "Show Greeting"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval:doc.enable_home_page==1",
+   "description": "Create New, Reports and Notifications, beside the greeting.",
+   "fieldname": "home_shortcuts",
+   "fieldtype": "Check",
+   "label": "Show Shortcuts"
+  },
+  {
+   "fieldname": "home_cards_break",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enable_home_page==1",
+   "description": "Number Cards to show as figures across the top - sales, invoices, payments, whatever you pick. Each card is only drawn for a user who can read its doctype, and its figure is counted through the same permissions, so User Permissions (company, territory) narrow it automatically. Leave empty for no figures.",
+   "fieldname": "home_cards",
+   "fieldtype": "Table MultiSelect",
+   "label": "Home Cards",
+   "options": "Swift Home Card"
   },
   {
    "fieldname": "features_tab",

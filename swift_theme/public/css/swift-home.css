@@ -1,0 +1,1330 @@
+/* Swift Theme — the desk home page.
+
+   Only the page's own furniture lives here. Colour comes from the theme's
+   tokens, so the page follows every preset and Custom Colours without a rule
+   per theme, exactly as the sidebar does. */
+
+
+/* ---- what the page paints with ----
+   Every colour below is one of these, and each one defaults to the theme's own
+   token. Left alone this is the page it always was: the active colour preset or
+   Custom Colours drives it. A Desk Preset then repoints these nine and nothing
+   else, so it restyles the landing without reaching into any other page. */
+
+:root {
+  --swift-home-canvas:       var(--bg-color);
+  --swift-home-surface:      var(--card-bg);
+  --swift-home-surface-2:    var(--fg-color);
+  --swift-home-border:       var(--border-color);
+  --swift-home-ink:          var(--heading-color, var(--text-color));
+  --swift-home-ink-2:        var(--text-color);
+  --swift-home-muted:        var(--text-muted);
+  --swift-home-accent:       var(--swift-accent);
+  --swift-home-accent-soft:  var(--swift-accent-soft);
+}
+
+.swift-home {
+  padding: 8px 0 40px;
+}
+
+/* ---- greeting and shortcuts ---- */
+
+.swift-home-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.swift-home .swift-home-greet h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--swift-home-ink);
+}
+
+.swift-home-greet p {
+  margin: 6px 0 0;
+  color: var(--swift-home-muted);
+  font-size: var(--text-md);
+}
+
+.swift-home-shortcut-box {
+  padding: 14px 16px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: var(--swift-radius-lg, 14px);
+  background: var(--swift-home-surface);
+}
+
+.swift-home-shortcut-title {
+  margin-bottom: 10px;
+  color: var(--swift-home-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.swift-home-shortcut-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.swift-home-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: var(--swift-radius-sm, 8px);
+  background: var(--swift-home-surface-2);
+  color: var(--swift-home-ink-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.swift-home-shortcut:hover {
+  border-color: var(--swift-home-accent);
+  background: var(--swift-home-accent-soft);
+  color: var(--swift-home-accent);
+}
+
+/* Only one greeting and one line below it are ever shown; which pair depends
+   on the design, and the default is the wording most of the screens use. */
+.swift-home-hi-back,
+.swift-home-sub-productive,
+.swift-home-sub-overview {
+  display: none;
+}
+
+/* ---- the figures ---- */
+
+.swift-home-card-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.swift-home .swift-home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: var(--swift-radius-lg, 14px);
+  background: var(--swift-home-surface);
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.swift-home .swift-home-card:hover {
+  border-color: var(--swift-home-accent);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.swift-home-card-label {
+  color: var(--swift-home-muted);
+  font-size: var(--text-sm);
+}
+
+.swift-home-card-value {
+  color: var(--swift-home-ink);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.swift-home-card-doctype {
+  color: var(--swift-home-muted);
+  font-size: var(--text-xs);
+}
+
+/* ---- the apps grid ---- */
+
+.swift-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.swift-home .swift-home-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 12px 18px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: var(--swift-radius-lg, 14px);
+  background: var(--swift-home-surface);
+  color: var(--swift-home-ink-2);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* A tile is an <a>, and the desk's own
+   `html[data-swift-themed] a:not(.btn):not(.nav-link)` paints every link with
+   the accent at (0,3,2) - higher than any sane selector for a tile. So every
+   label came out in the theme's link colour: dark crimson on a dark tile under
+   Aurora and Lagoon. A tile is a surface, not a link in prose, so it takes its
+   own colour back rather than trying to out-specify a rule aimed at text. */
+.swift-home .swift-home-app,
+.swift-home .swift-home-app:hover,
+.swift-home .swift-home-app:focus {
+  color: var(--swift-home-ink-2) !important;
+}
+
+.swift-home .swift-home-app:hover {
+  border-color: var(--swift-home-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--swift-shadow-md, 0 8px 24px -14px rgba(0, 0, 0, 0.35));
+  color: var(--swift-home-ink-2);
+  text-decoration: none;
+}
+
+.swift-home-app-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  background: var(--swift-home-accent-soft);
+  color: var(--swift-home-accent);
+  overflow: hidden;
+}
+
+.swift-home-app-icon img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.swift-home-app-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.swift-home-app-letter {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.swift-home-app-label {
+  font-size: var(--text-md);
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.swift-home-empty {
+  padding: 40px 0;
+  color: var(--swift-home-muted);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .swift-home .swift-home-greet h1 {
+    font-size: 22px;
+  }
+
+  .swift-home-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* ---- drilling into a group ---- */
+
+.swift-home-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 6px 12px 6px 8px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: var(--swift-radius-sm, 8px);
+  background: var(--swift-home-surface);
+  color: var(--swift-home-ink-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.swift-home-back:hover {
+  border-color: var(--swift-home-accent);
+  color: var(--swift-home-accent);
+}
+
+/* A group tile opens its contents rather than navigating, so it says how many
+   are inside instead of pretending to be a destination. */
+.swift-home-app.is-folder {
+  position: relative;
+}
+
+.swift-home-app-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--swift-home-accent-soft);
+  color: var(--swift-home-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ---- the page stands alone ----
+   No sidebar beside it. The placeholder goes with it, or the content keeps a
+   sidebar-width gutter on the left with nothing in it. */
+
+/* Taken out of the layout WITHOUT display:none, on purpose.
+   jQuery's .show() reads the computed display to decide what to restore; with
+   `none` it cannot tell and writes `display: block` inline, which outlived the
+   body class and dropped the sidebar a screen down on the next page. Clearing
+   that afterwards worked, but it moved the layout a second time - right while
+   frappe-charts was drawing, so half the charts on a dashboard reached from
+   here never finished.
+
+   `visibility: hidden` leaves the computed display alone, so .show() is a
+   no-op, nothing needs undoing later, and the width changes exactly once. */
+body.swift-home-open .body-sidebar-container {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+body.swift-home-open .main-section,
+body.swift-home-open .layout-main-section-wrapper {
+  margin-left: 0 !important;
+}
+
+body.swift-home-open .swift-home {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+
+/* ---- the top bar the designs draw ----
+   The desk keeps search, notifications and the user menu in the sidebar, and
+   this page hides the sidebar - which is why the search box disappeared here.
+   The bar below puts them back, wired to the desk's own controls rather than
+   to copies of them. */
+
+.swift-home-topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 28px;
+  border-bottom: 1px solid var(--swift-home-border);
+  background: var(--swift-home-surface);
+}
+
+.swift-home-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  min-width: 150px;
+  font-weight: 600;
+  color: var(--swift-home-ink);
+}
+
+.swift-home-brand-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  object-fit: contain;
+}
+
+.swift-home-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--swift-home-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.swift-home-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 8px 12px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 10px;
+  background: var(--swift-home-surface-2);
+  color: var(--swift-home-muted);
+  cursor: text;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.swift-home-search:hover {
+  border-color: var(--swift-home-accent);
+}
+
+.swift-home-search svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.swift-home-search-text {
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.swift-home-kbd {
+  flex: 0 0 auto;
+  padding: 2px 7px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 6px;
+  background: var(--swift-home-surface);
+  font-size: var(--text-xs);
+}
+
+.swift-home-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  min-width: 150px;
+  justify-content: flex-end;
+}
+
+.swift-home-icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--swift-home-muted);
+  cursor: pointer;
+}
+
+.swift-home-icon-btn:hover {
+  background: var(--swift-home-accent-soft);
+  color: var(--swift-home-accent);
+}
+
+.swift-home-icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* The unread badge only exists when there is something unread - an empty dot
+   sitting on the bell reads as a notification that is not there. */
+.swift-home-bell-count {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 15px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+
+.swift-home-bell-count.is-on {
+  display: block;
+}
+
+.swift-home-avatar {
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.swift-home-avatar .avatar {
+  width: 32px;
+  height: 32px;
+}
+
+/* Frappe's icons carry their own colour classes (text-ink-gray-7 and friends),
+   which are picked for the desk's own palette - on the dark designs they came
+   out almost invisible against the panel. These are line icons, so they read
+   correctly from the button's own colour once the fill is cleared. */
+.swift-home-icon-btn svg,
+.swift-home-search svg,
+.swift-home-shortcut svg,
+.swift-home-back svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+.swift-home-icon-btn svg *,
+.swift-home-search svg *,
+.swift-home-shortcut svg *,
+.swift-home-back svg * {
+  stroke: inherit;
+  fill: none;
+}
+
+.swift-home-shortcut svg {
+  color: var(--swift-home-muted);
+}
+
+/* ---- the hero one design uses ---- */
+
+.swift-home-hero {
+  display: none;
+}
+
+.swift-home-hero-title {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--swift-home-ink);
+}
+
+.swift-home-hero-title em {
+  font-style: normal;
+  color: var(--swift-home-accent);
+}
+
+.swift-home-hero-text {
+  margin: 14px 0 22px;
+  max-width: 320px;
+  color: var(--swift-home-muted);
+  font-size: var(--text-md);
+}
+
+.swift-home-hero-btn,
+.swift-home-section-action {
+  padding: 9px 16px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 8px;
+  background: var(--swift-home-surface);
+  color: var(--swift-home-accent);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.swift-home-hero-btn:hover,
+.swift-home-section-action:hover {
+  border-color: var(--swift-home-accent);
+}
+
+/* ---- the "Your Apps" strip ---- */
+
+.swift-home-section {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.swift-home-section-title {
+  color: var(--swift-home-ink);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.swift-home-section-action {
+  padding: 5px 12px;
+}
+
+/* ---- the trend beside a figure ---- */
+
+.swift-home .swift-home-card-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.swift-home-card-delta {
+  display: inline-block;
+  margin-left: auto;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.swift-home-card-delta.is-up    { background: rgba(16, 185, 129, 0.14); color: #0f9b6c; }
+.swift-home-card-delta.is-down  { background: rgba(239, 68, 68, 0.14);  color: #dc2626; }
+.swift-home-card-delta.is-flat  { background: var(--swift-home-accent-soft); color: var(--swift-home-muted); }
+
+/* ---- the coloured chip on a tile ----
+   A tile with its own app logo keeps it; everything else gets the colour
+   tile_color() picked, with the glyph knocked out in white. */
+
+.swift-home-app-icon {
+  background: var(--swift-tile, var(--swift-home-accent-soft));
+  color: #fff;
+}
+
+.swift-home-app-icon svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+.swift-home-app.has-logo .swift-home-app-icon {
+  background: var(--swift-home-accent-soft);
+  color: var(--swift-home-accent);
+}
+
+/* ---- background artwork ----
+   Generated by scripts/gen_home_art.py from the shapes described there;
+   retune a wave by changing a number in that file, not this blob. Each
+   design gets up to two layers, painted behind the page by .swift-home. */
+:root {
+  --swift-home-art-aurora-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23c7d2fe%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ede9fe%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%27M-40%20-40%20C%20320%2040%2C%20300%20300%2C%20180%20520%20S%2060%20820%2C%20-40%20940%20Z%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-aurora-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2722%27%20height%3D%2722%27%3E%3Ccircle%20cx%3D%2711.0%27%20cy%3D%2711.0%27%20r%3D%271.4%27%20fill%3D%27%23c4b5fd%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-dune-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M-20%20720%20C%20260%20640%2C%20520%20760%2C%20780%20700%20S%201240%20620%2C%201460%20690%20L1460%20920%20L-20%20920%20Z%27%20fill%3D%27%23efe0cb%27%2F%3E%3Cpath%20d%3D%27M-20%20790%20C%20300%20720%2C%20600%20830%2C%20900%20770%20S%201300%20710%2C%201460%20780%20L1460%20920%20L-20%20920%20Z%27%20fill%3D%27%23e6d3b8%27%2F%3E%3Cpath%20d%3D%27M-20%20850%20C%20340%20800%2C%20660%20890%2C%20980%20840%20S%201320%20800%2C%201460%20860%20L1460%20920%20L-20%20920%20Z%27%20fill%3D%27%23dcc7a6%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-dune-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cg%20transform%3D%27translate%281300%20880%29%20rotate%28-38%29%27%3E%3Cpath%20d%3D%27M0%200%20C%20-26%20-94%2C%20-14%20-178%2C%200%20-210%20C%2014%20-178%2C%2026%20-94%2C%200%200%20Z%27%20fill%3D%27%23b7c9b0%27%2F%3E%3Cpath%20d%3D%27M0%200%20L0%20-210%27%20stroke%3D%27%23b7c9b0%27%20stroke-width%3D%271.6%27%20opacity%3D%270.5%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%281300%20880%29%20rotate%28-14%29%27%3E%3Cpath%20d%3D%27M0%200%20C%20-26%20-117%2C%20-14%20-221%2C%200%20-260%20C%2014%20-221%2C%2026%20-117%2C%200%200%20Z%27%20fill%3D%27%23b7c9b0%27%2F%3E%3Cpath%20d%3D%27M0%200%20L0%20-260%27%20stroke%3D%27%23b7c9b0%27%20stroke-width%3D%271.6%27%20opacity%3D%270.5%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%281300%20880%29%20rotate%2810%29%27%3E%3Cpath%20d%3D%27M0%200%20C%20-26%20-106%2C%20-14%20-200%2C%200%20-235%20C%2014%20-200%2C%2026%20-106%2C%200%200%20Z%27%20fill%3D%27%23b7c9b0%27%2F%3E%3Cpath%20d%3D%27M0%200%20L0%20-235%27%20stroke%3D%27%23b7c9b0%27%20stroke-width%3D%271.6%27%20opacity%3D%270.5%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%281300%20880%29%20rotate%2832%29%27%3E%3Cpath%20d%3D%27M0%200%20C%20-26%20-83%2C%20-14%20-157%2C%200%20-185%20C%2014%20-157%2C%2026%20-83%2C%200%200%20Z%27%20fill%3D%27%23b7c9b0%27%2F%3E%3Cpath%20d%3D%27M0%200%20L0%20-185%27%20stroke%3D%27%23b7c9b0%27%20stroke-width%3D%271.6%27%20opacity%3D%270.5%27%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%281300%20880%29%20rotate%2854%29%27%3E%3Cpath%20d%3D%27M0%200%20C%20-26%20-68%2C%20-14%20-128%2C%200%20-150%20C%2014%20-128%2C%2026%20-68%2C%200%200%20Z%27%20fill%3D%27%23b7c9b0%27%2F%3E%3Cpath%20d%3D%27M0%200%20L0%20-150%27%20stroke%3D%27%23b7c9b0%27%20stroke-width%3D%271.6%27%20opacity%3D%270.5%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --swift-home-art-nebula-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M-20%20920%20C%20300%20886%2C%20620%20954%2C%20940%20899.6%20S%201300%20937.0%2C%201460%20886%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.850%27%2F%3E%3Cpath%20d%3D%27M-20%20894%20C%20300%20856%2C%20620%20932%2C%20940%20871.2%20S%201300%20913.0%2C%201460%20856%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.805%27%2F%3E%3Cpath%20d%3D%27M-20%20868%20C%20300%20826%2C%20620%20910%2C%20940%20842.8%20S%201300%20889.0%2C%201460%20826%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.760%27%2F%3E%3Cpath%20d%3D%27M-20%20842%20C%20300%20796%2C%20620%20888%2C%20940%20814.4%20S%201300%20865.0%2C%201460%20796%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.715%27%2F%3E%3Cpath%20d%3D%27M-20%20816%20C%20300%20766%2C%20620%20866%2C%20940%20786.0%20S%201300%20841.0%2C%201460%20766%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.670%27%2F%3E%3Cpath%20d%3D%27M-20%20790%20C%20300%20736%2C%20620%20844%2C%20940%20757.6%20S%201300%20817.0%2C%201460%20736%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.625%27%2F%3E%3Cpath%20d%3D%27M-20%20764%20C%20300%20706%2C%20620%20822%2C%20940%20729.2%20S%201300%20793.0%2C%201460%20706%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.580%27%2F%3E%3Cpath%20d%3D%27M-20%20738%20C%20300%20676%2C%20620%20800%2C%20940%20700.8%20S%201300%20769.0%2C%201460%20676%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.535%27%2F%3E%3Cpath%20d%3D%27M-20%20712%20C%20300%20646%2C%20620%20778%2C%20940%20672.4%20S%201300%20745.0%2C%201460%20646%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.490%27%2F%3E%3Cpath%20d%3D%27M-20%20686%20C%20300%20616%2C%20620%20756%2C%20940%20644.0%20S%201300%20721.0%2C%201460%20616%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.445%27%2F%3E%3Cpath%20d%3D%27M-20%20660%20C%20300%20586%2C%20620%20734%2C%20940%20615.6%20S%201300%20697.0%2C%201460%20586%27%20fill%3D%27none%27%20stroke%3D%27%23c084fc%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.400%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-nebula-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2722%27%20height%3D%2722%27%3E%3Ccircle%20cx%3D%2711.0%27%20cy%3D%2711.0%27%20r%3D%271.4%27%20fill%3D%27%23a855f7%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-abyss-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M-20%20920%20C%20300%20886%2C%20620%20954%2C%20940%20899.6%20S%201300%20937.0%2C%201460%20886%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.800%27%2F%3E%3Cpath%20d%3D%27M-20%20894%20C%20300%20856%2C%20620%20932%2C%20940%20871.2%20S%201300%20913.0%2C%201460%20856%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.755%27%2F%3E%3Cpath%20d%3D%27M-20%20868%20C%20300%20826%2C%20620%20910%2C%20940%20842.8%20S%201300%20889.0%2C%201460%20826%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.710%27%2F%3E%3Cpath%20d%3D%27M-20%20842%20C%20300%20796%2C%20620%20888%2C%20940%20814.4%20S%201300%20865.0%2C%201460%20796%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.665%27%2F%3E%3Cpath%20d%3D%27M-20%20816%20C%20300%20766%2C%20620%20866%2C%20940%20786.0%20S%201300%20841.0%2C%201460%20766%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.620%27%2F%3E%3Cpath%20d%3D%27M-20%20790%20C%20300%20736%2C%20620%20844%2C%20940%20757.6%20S%201300%20817.0%2C%201460%20736%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.575%27%2F%3E%3Cpath%20d%3D%27M-20%20764%20C%20300%20706%2C%20620%20822%2C%20940%20729.2%20S%201300%20793.0%2C%201460%20706%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.530%27%2F%3E%3Cpath%20d%3D%27M-20%20738%20C%20300%20676%2C%20620%20800%2C%20940%20700.8%20S%201300%20769.0%2C%201460%20676%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.485%27%2F%3E%3Cpath%20d%3D%27M-20%20712%20C%20300%20646%2C%20620%20778%2C%20940%20672.4%20S%201300%20745.0%2C%201460%20646%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.440%27%2F%3E%3Cpath%20d%3D%27M-20%20686%20C%20300%20616%2C%20620%20756%2C%20940%20644.0%20S%201300%20721.0%2C%201460%20616%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.395%27%2F%3E%3Cpath%20d%3D%27M-20%20660%20C%20300%20586%2C%20620%20734%2C%20940%20615.6%20S%201300%20697.0%2C%201460%20586%27%20fill%3D%27none%27%20stroke%3D%27%232dd4bf%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.350%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-abyss-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2722%27%20height%3D%2722%27%3E%3Ccircle%20cx%3D%2711.0%27%20cy%3D%2711.0%27%20r%3D%271.4%27%20fill%3D%27%2314b8a6%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-horizon-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%271%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23b9d4f7%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23dceafd%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%27M1480%20-40%20C%201120%2060%2C%201180%20340%2C%201300%20560%20S%201420%20840%2C%201480%20940%20Z%27%20fill%3D%27url%28%23g%29%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-eclipse-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%271440%27%20height%3D%27900%27%20viewBox%3D%270%200%201440%20900%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M-20%20620%20L200%20400%20L360%20540%20L560%20330%20L760%20560%20L980%20380%20L1200%20570%20L1460%20420%20L1460%20920%20L-20%20920%20Z%27%20fill%3D%27%233b2a63%27%2F%3E%3Cpath%20d%3D%27M-20%20720%20L260%20520%20L470%20660%20L700%20470%20L940%20680%20L1180%20520%20L1460%20660%20L1460%20920%20L-20%20920%20Z%27%20fill%3D%27%232a1d4a%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-eclipse-2: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2722%27%20height%3D%2722%27%3E%3Ccircle%20cx%3D%2711.0%27%20cy%3D%2711.0%27%20r%3D%271.4%27%20fill%3D%27%23a78bfa%27%2F%3E%3C%2Fsvg%3E");
+  --swift-home-art-honeycomb-1: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2758.89%27%20height%3D%27102.00%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23dbe3f5%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2754.94%2C17.00%2054.94%2C51.00%2029.44%2C68.00%203.94%2C51.00%203.94%2C17.00%2029.44%2C0.00%27%2F%3E%3Cg%20transform%3D%27translate%2829.44%2051.00%29%27%3E%3Cpolygon%20points%3D%2754.94%2C17.00%2054.94%2C51.00%2029.44%2C68.00%203.94%2C51.00%203.94%2C17.00%2029.44%2C0.00%27%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+
+/* ================================================================
+   Desk Presets — the eight screens from the mock-ups
+
+   A preset is a whole design, not a recolour: it decides the palette, which
+   blocks of the page appear, how they are arranged, and what is painted behind
+   them. "Follow Theme" sets no attribute, so none of this applies and the page
+   stays exactly as it was.
+
+   Everything is scoped to `body.swift-home-open` - a class that exists only
+   while the landing is on screen - so no design can reach another desk page.
+   ================================================================ */
+
+/* ---- what every design shares ---- */
+
+html[data-swift-home-preset] body.swift-home-open {
+  background: var(--swift-home-canvas) !important;
+}
+
+html[data-swift-home-preset] body.swift-home-open .main-section,
+html[data-swift-home-preset] body.swift-home-open .page-container,
+html[data-swift-home-preset] body.swift-home-open .layout-main-section-wrapper,
+html[data-swift-home-preset] body.swift-home-open .layout-main-section,
+html[data-swift-home-preset] body.swift-home-open .page-content,
+html[data-swift-home-preset] body.swift-home-open .container.page-body {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* These designs draw a bar of their own, so Frappe's breadcrumb strip above
+   the page would be a second one stacked on top of it. */
+html[data-swift-home-preset] body.swift-home-open .page-head {
+  display: none !important;
+}
+
+/* The bar runs edge to edge; everything under it sits in a centred column. */
+html[data-swift-home-preset] body.swift-home-open .swift-home {
+  position: relative;
+  z-index: 1;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 60px;
+}
+
+html[data-swift-home-preset] body.swift-home-open .swift-home > *:not(.swift-home-topbar) {
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html[data-swift-home-preset] body.swift-home-open .swift-home-head {
+  margin-top: 34px;
+}
+
+/* Two artwork layers, painted behind the page and pinned to the viewport so
+   they stay put while the grid scrolls. */
+html[data-swift-home-preset] body.swift-home-open .swift-home::before,
+html[data-swift-home-preset] body.swift-home-open .swift-home::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* ---- 1. Aurora — the light screen: lavender sweep and a dot field ---- */
+html[data-swift-home-preset="aurora"] body.swift-home-open {
+  color-scheme: light;
+  --swift-home-canvas:      #f7f7fb;
+  --swift-home-surface:     #ffffff;
+  --swift-home-surface-2:   #f4f4f8;
+  --swift-home-border:      rgba(17, 24, 39, 0.09);
+  --swift-home-ink:         #101828;
+  --swift-home-ink-2:       #1f2937;
+  --swift-home-muted:       #667085;
+  --swift-home-accent:      #4f46e5;
+  --swift-home-accent-soft: rgba(79, 70, 229, 0.10);
+}
+
+html[data-swift-home-preset="aurora"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-aurora-1);
+  opacity: 0.55;
+}
+
+html[data-swift-home-preset="aurora"] body.swift-home-open .swift-home::after {
+  background-image: var(--swift-home-art-aurora-2);
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: right top;
+  opacity: 0.35;
+  left: 62%;
+}
+
+/* ---- 2. Dune — the sand screen: ridges and a plant in the corner ---- */
+html[data-swift-home-preset="dune"] body.swift-home-open {
+  color-scheme: light;
+  --swift-home-canvas:      #f7f1e7;
+  --swift-home-surface:     #fffdf9;
+  --swift-home-surface-2:   #f7f1e7;
+  --swift-home-border:      rgba(90, 70, 45, 0.14);
+  --swift-home-ink:         #33291d;
+  --swift-home-ink-2:       #43372a;
+  --swift-home-muted:       #7c6a55;
+  --swift-home-accent:      #b45309;
+  --swift-home-accent-soft: rgba(180, 83, 9, 0.12);
+}
+
+html[data-swift-home-preset="dune"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-dune-1);
+  background-position: bottom;
+  opacity: 0.9;
+}
+
+html[data-swift-home-preset="dune"] body.swift-home-open .swift-home::after {
+  background-image: var(--swift-home-art-dune-2);
+  background-position: right bottom;
+  opacity: 0.6;
+}
+
+/* ---- 3. Nebula — the purple screen: ribbon lines along the bottom ---- */
+html[data-swift-home-preset="nebula"] body.swift-home-open {
+  color-scheme: dark;
+  --swift-home-canvas:      #150b28;
+  --swift-home-surface:     #221340;
+  --swift-home-surface-2:   #2b1a4e;
+  --swift-home-border:      rgba(255, 255, 255, 0.10);
+  --swift-home-ink:         #f5f0ff;
+  --swift-home-ink-2:       #e6dcfb;
+  --swift-home-muted:       #a794cc;
+  --swift-home-accent:      #c084fc;
+  --swift-home-accent-soft: rgba(192, 132, 252, 0.16);
+}
+
+html[data-swift-home-preset="nebula"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-nebula-1);
+  background-position: bottom;
+  opacity: 1;
+}
+
+html[data-swift-home-preset="nebula"] body.swift-home-open .swift-home::after {
+  background-image: var(--swift-home-art-nebula-2);
+  background-repeat: repeat;
+  background-size: auto;
+  opacity: 0.22;
+  top: 55%;
+  right: 55%;
+}
+
+/* ---- 4. Abyss — the teal screen: the same ribbons, colder ---- */
+html[data-swift-home-preset="abyss"] body.swift-home-open {
+  color-scheme: dark;
+  --swift-home-canvas:      #061620;
+  --swift-home-surface:     #0d2430;
+  --swift-home-surface-2:   #123040;
+  --swift-home-border:      rgba(255, 255, 255, 0.10);
+  --swift-home-ink:         #e6f7f6;
+  --swift-home-ink-2:       #d2ecea;
+  --swift-home-muted:       #8fb3b4;
+  --swift-home-accent:      #2dd4bf;
+  --swift-home-accent-soft: rgba(45, 212, 191, 0.16);
+}
+
+html[data-swift-home-preset="abyss"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-abyss-1);
+  background-position: right bottom;
+  opacity: 1;
+}
+
+html[data-swift-home-preset="abyss"] body.swift-home-open .swift-home::after {
+  background-image: var(--swift-home-art-abyss-2);
+  background-repeat: repeat;
+  background-size: auto;
+  opacity: 0.20;
+  top: 55%;
+  right: 60%;
+}
+
+/* Family one: greeting on the left with the shortcut box beside it, then a
+   plain grid. No figures - the four screens it comes from do not show any. */
+html[data-swift-home-preset="aurora"] body.swift-home-open .swift-home-cards,
+html[data-swift-home-preset="dune"] body.swift-home-open .swift-home-cards,
+html[data-swift-home-preset="nebula"] body.swift-home-open .swift-home-cards,
+html[data-swift-home-preset="abyss"] body.swift-home-open .swift-home-cards {
+  display: none;
+}
+
+html[data-swift-home-preset="aurora"] body.swift-home-open .swift-home-grid,
+html[data-swift-home-preset="dune"] body.swift-home-open .swift-home-grid,
+html[data-swift-home-preset="nebula"] body.swift-home-open .swift-home-grid,
+html[data-swift-home-preset="abyss"] body.swift-home-open .swift-home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+
+/* ---- 5. Pulse — figures across the top, then "Your Apps" ---- */
+html[data-swift-home-preset="pulse"] body.swift-home-open {
+  color-scheme: light;
+  /* One step darker than #f8fafc: at that value a white card sat at 1.05:1
+     against the canvas and the tiles read as one flat sheet. */
+  --swift-home-canvas:      #f1f5f9;
+  --swift-home-surface:     #ffffff;
+  --swift-home-surface-2:   #f1f5f9;
+  --swift-home-border:      rgba(15, 23, 42, 0.09);
+  --swift-home-ink:         #0f172a;
+  --swift-home-ink-2:       #1e293b;
+  --swift-home-muted:       #64748b;
+  --swift-home-accent:      #2563eb;
+  --swift-home-accent-soft: rgba(37, 99, 235, 0.10);
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-shortcuts,
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-shortcuts,
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-shortcuts {
+  display: none;
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-section,
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-section {
+  display: flex;
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home .swift-home-greet h1 {
+  font-size: 24px;
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-card-row {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-app {
+  padding: 16px 10px 14px;
+  gap: 10px;
+}
+
+html[data-swift-home-preset="pulse"] body.swift-home-open .swift-home-app-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+
+/* ---- 6. Horizon — a wide welcome and nothing in the way of the apps ---- */
+html[data-swift-home-preset="horizon"] body.swift-home-open {
+  color-scheme: light;
+  --swift-home-canvas:      #eaf2fd;
+  --swift-home-surface:     #ffffff;
+  --swift-home-surface-2:   #f2f7fe;
+  --swift-home-border:      rgba(15, 23, 42, 0.08);
+  --swift-home-ink:         #0b1b33;
+  --swift-home-ink-2:       #16294a;
+  --swift-home-muted:       #5b7196;
+  --swift-home-accent:      #1d4ed8;
+  --swift-home-accent-soft: rgba(29, 78, 216, 0.10);
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-horizon-1);
+  opacity: 0.8;
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-cards {
+  display: none;
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home .swift-home-greet h1 {
+  font-size: 32px;
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 20px;
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-app {
+  padding: 24px 12px 20px;
+}
+
+/* ---- 7. Eclipse — figures over a ridge line, apps in a panel ---- */
+html[data-swift-home-preset="eclipse"] body.swift-home-open {
+  color-scheme: dark;
+  --swift-home-canvas:      #17102e;
+  --swift-home-surface:     #241a44;
+  --swift-home-surface-2:   #2d2154;
+  --swift-home-border:      rgba(255, 255, 255, 0.10);
+  --swift-home-ink:         #f4f0ff;
+  --swift-home-ink-2:       #e3dbf9;
+  --swift-home-muted:       #a396c9;
+  --swift-home-accent:      #8b5cf6;
+  --swift-home-accent-soft: rgba(139, 92, 246, 0.18);
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-eclipse-1);
+  background-position: center top;
+  background-size: 100% 62%;
+  opacity: 0.85;
+  bottom: auto;
+  height: 62%;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home::after {
+  background-image: var(--swift-home-art-eclipse-2);
+  background-repeat: repeat;
+  background-size: auto;
+  opacity: 0.15;
+}
+
+/* The apps sit on a raised panel, the way the screen groups them. */
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-section,
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-apps {
+  background: color-mix(in oklab, var(--swift-home-surface) 82%, transparent);
+  border: 1px solid var(--swift-home-border);
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-section {
+  margin-bottom: 0;
+  padding: 14px 20px;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-apps {
+  padding: 4px 20px 20px;
+  border-top: 0;
+  border-radius: 0 0 16px 16px;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-app {
+  padding: 16px 10px 14px;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-app-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+
+/* ---- 8. Honeycomb — a headline beside a comb of hexagons ---- */
+html[data-swift-home-preset="honeycomb"] body.swift-home-open {
+  color-scheme: light;
+  --swift-home-canvas:      #f5f8fd;
+  --swift-home-surface:     #ffffff;
+  --swift-home-surface-2:   #f0f5fc;
+  --swift-home-border:      rgba(15, 23, 42, 0.08);
+  --swift-home-ink:         #0f172a;
+  --swift-home-ink-2:       #1e293b;
+  --swift-home-muted:       #64748b;
+  --swift-home-accent:      #2563eb;
+  --swift-home-accent-soft: rgba(37, 99, 235, 0.10);
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home::before {
+  background-image: var(--swift-home-art-honeycomb-1);
+  background-repeat: repeat;
+  background-size: auto;
+  opacity: 0.5;
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-head,
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-cards {
+  display: none;
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-hero {
+  display: block;
+}
+
+@media (min-width: 992px) {
+  /* The headline and the comb are siblings, so they are placed into two
+     columns rather than wrapped in a new element - no design-specific markup,
+     and the same DOM every other design uses. */
+  html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    grid-template-areas:
+      "bar  bar"
+      "hero apps";
+    align-content: start;
+    column-gap: 40px;
+    padding-bottom: 60px;
+  }
+
+  /* Same selector shape as the shared centring rule above, so it ties on
+     specificity and wins on order. It has to: `margin: auto` on a grid item
+     makes it size to its content instead of filling its column, which
+     collapsed the comb to a single tile wide. */
+  html[data-swift-home-preset="honeycomb"] body.swift-home-open
+    .swift-home > *:not(.swift-home-topbar) {
+    max-width: none;
+    margin: 0;
+  }
+
+  html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-topbar {
+    grid-area: bar;
+  }
+
+  html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-hero {
+    grid-area: hero;
+    align-self: center;
+    padding: 60px 0 60px 48px;
+  }
+
+  html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-apps {
+    grid-area: apps;
+    align-self: center;
+    padding: 60px 48px 60px 0;
+  }
+}
+
+/* Hexagons, and the stagger that makes them a comb. */
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-grid {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 6px 4px;
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border: 0;
+  aspect-ratio: 0.9;
+  padding: 0 8px;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 10px -6px rgba(15, 23, 42, 0.4);
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app:nth-child(even) {
+  transform: translateY(26px);
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app:hover {
+  transform: translateY(-2px);
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app:nth-child(even):hover {
+  transform: translateY(24px);
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app-label {
+  font-size: var(--text-sm);
+}
+
+
+/* ---- the wording each screen uses ----
+   Horizon opens with "Welcome back" over "Let's make today productive", and
+   Eclipse says "Here's an overview of your business" - the rest keep the
+   default pair set above. */
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-hi-time,
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-sub-work {
+  display: none;
+}
+
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-hi-back,
+html[data-swift-home-preset="horizon"] body.swift-home-open .swift-home-sub-productive {
+  display: inline;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-sub-work {
+  display: none;
+}
+
+html[data-swift-home-preset="eclipse"] body.swift-home-open .swift-home-sub-overview {
+  display: inline;
+}
+
+/* The count on a group tile sits in the top-right corner, which on a hexagon
+   is the part the clip-path cuts away - it came out as a sliver above
+   Accounting. Inside the straight edge it reads. */
+html[data-swift-home-preset="honeycomb"] body.swift-home-open .swift-home-app-count {
+  top: 30%;
+  right: 10px;
+}
+
+
+/* ---- the desk's own notifications panel, where it lives ----
+   The panel stays Frappe's, in Frappe's DOM, opened and closed by Frappe's own
+   button. Two things are ours: it has to escape the hidden sidebar, and beside
+   a sidebar it is a full-height slide-out (`position: absolute; top: 0;
+   height: 100vh`) which makes no sense hanging off a bell in a top bar.
+
+   `visibility` is the one property a child can turn back on after an ancestor
+   has turned it off - which is exactly why the sidebar is hidden that way. */
+
+body.swift-home-open .body-sidebar .dropdown-notifications {
+  visibility: visible;
+}
+
+body.swift-home-open .body-sidebar .dropdown-notifications.hidden {
+  display: none;
+}
+
+body.swift-home-open .body-sidebar .notifications-list {
+  /* !important on the three placement properties only. Frappe anchors this
+     panel to the sidebar's edge with `left: 100%` from a more deeply nested
+     selector; left alone it lands one viewport to the right of the screen. */
+  position: fixed !important;
+  top: 64px !important;
+  right: 16px !important;
+  left: auto !important;
+  z-index: 1050;
+
+  width: min(380px, 92vw);
+  height: auto;
+  min-height: 0;
+  max-height: 70vh;
+
+  border: 1px solid var(--swift-home-border);
+  border-radius: 14px;
+  background: var(--swift-home-surface);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.45);
+}
+
+/* Its body is sized as a share of a 100vh panel, which collapses to nothing
+   once the panel is only as tall as its contents. */
+body.swift-home-open .body-sidebar .notification-list-body {
+  height: auto;
+  min-height: 220px;
+  max-height: calc(70vh - 56px);
+  overflow-y: auto;
+}
+
+/* Frappe paints the panel's own text from the desk palette; on the dark
+   designs that lands nearly black on a dark panel. */
+body.swift-home-open .body-sidebar .notifications-list,
+body.swift-home-open .body-sidebar .notifications-list a,
+body.swift-home-open .body-sidebar .notification-list-header {
+  color: var(--swift-home-ink-2);
+}
+
+body.swift-home-open .body-sidebar .notifications-list svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+
+/* ---- editing the layout, here, in the design ----
+   Edit mode is a state of the same grid: tiles wiggle-free, get a hide control,
+   and a strip below offers back what was hidden. Save and Discard sit in the
+   top bar. Colour comes from the same nine tokens, so every design keeps its
+   look while being edited. */
+
+.swift-home-edit-controls {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+body.swift-home-edit .swift-home-edit-controls {
+  display: inline-flex;
+}
+
+/* While arranging, the arranging controls are the only controls. */
+body.swift-home-edit .swift-home-topbar-actions .swift-home-icon-btn,
+body.swift-home-edit .swift-home-bell-wrap {
+  display: none;
+}
+
+.swift-home-edit-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 8px;
+  background: var(--swift-home-surface);
+  color: var(--swift-home-ink-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.swift-home-edit-btn.is-save {
+  background: var(--swift-home-accent);
+  border-color: var(--swift-home-accent);
+  color: #fff;
+}
+
+body.swift-home-edit .swift-home-app {
+  cursor: grab;
+}
+
+body.swift-home-edit .swift-home-app:active {
+  cursor: grabbing;
+}
+
+.swift-home-app-hide {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 999px;
+  background: var(--swift-home-surface);
+  color: var(--swift-home-muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.swift-home-app-hide:hover {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.swift-home-app {
+  position: relative;
+}
+
+.swift-home-hidden-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 12px 14px;
+  border: 1px dashed var(--swift-home-border);
+  border-radius: 12px;
+}
+
+.swift-home-hidden-title {
+  color: var(--swift-home-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.swift-home-hidden-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 5px;
+  border: 1px solid var(--swift-home-border);
+  border-radius: 9px;
+  background: var(--swift-home-surface);
+  color: var(--swift-home-ink-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+}
+
+.swift-home-hidden-item .swift-home-app-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+.swift-home-hidden-item .swift-home-app-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.swift-home-hidden-item:hover {
+  border-color: var(--swift-home-accent);
+}
+
+/* While arranging, every design flattens its tiles to plain cards: Honeycomb's
+   clip-path cuts away the very corner the hide control sits in (a click there
+   fell through to the grid), and its stagger transform would fight the drag
+   preview. The palette stays; only the tile geometry yields. */
+body.swift-home-edit .swift-home-app {
+  clip-path: none !important;
+  transform: none !important;
+  aspect-ratio: auto !important;
+}
+
+
+/* ---- the avatar's menu ----
+   frappe.ui.create_menu hangs its panel off <body>, so it is scoped by the
+   landing's body class rather than by a container. The generic themed link
+   rule painted every entry in the accent; a menu is read, not emphasised. */
+
+body.swift-home-open .frappe-menu.context-menu {
+  border: 1px solid var(--swift-home-border);
+  border-radius: 12px;
+  background: var(--swift-home-surface);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+body.swift-home-open .frappe-menu .dropdown-menu-item,
+body.swift-home-open .frappe-menu .menu-item-title,
+body.swift-home-open .frappe-menu a {
+  color: var(--swift-home-ink-2) !important;
+}
+
+body.swift-home-open .frappe-menu .dropdown-menu-item:hover {
+  background: var(--swift-home-accent-soft);
+}
+
+body.swift-home-open .frappe-menu svg {
+  stroke: currentColor;
+  fill: none;
+}

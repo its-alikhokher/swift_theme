@@ -11,7 +11,9 @@
 
 import "./swift-boot.js";
 import "./swift-mode-observer.js";
-import "./swift-switcher.js";
+// The navbar chip and its palette are gone (Ali, 2026-08-28): theming is
+// offered through Frappe's own Toggle Theme dialog, which swift-theme-dialog.js
+// extends with the presets. Enable Theme Switcher still gates that section.
 import "./swift-theme-dialog.js";
 import "./swift-palette.js";
 import "./swift-sidebar.js";

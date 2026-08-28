@@ -314,6 +314,7 @@ class SwiftThemeSettings(Document):
 
     def on_update(self):
         self._release_user_overrides()
+        self._apply_home_page()
 
         # Document.save() already invalidates this doc's own cached copy. What
         # still needs clearing is every user's cached bootinfo, since these
@@ -329,6 +330,34 @@ class SwiftThemeSettings(Document):
         frappe.publish_realtime(
             "swift_theme_updated", {}, room="all", after_commit=True
         )
+
+    def _apply_home_page(self):
+        """Point the desk at the Swift home page, or hand it back untouched.
+
+        `desktop:home_page` is the default Frappe itself reads in
+        boot.add_home_page, so turning this on is not an override of anything:
+        it is the same switch Frappe offers, set to our page.
+
+        Turning it off restores whatever was there before rather than clearing
+        the key. Clearing looked equivalent and was not - Frappe falls back to
+        "desktop", and a site whose landing was something else (or a page that
+        no longer exists, which is its own pre-existing state) would come back
+        somewhere it had never been. The old value is parked under our own key
+        so we never have to guess it.
+        """
+        if not self.has_value_changed("enable_home_page"):
+            return
+
+        PREV = "swift:prev_home_page"
+        current = frappe.db.get_default("desktop:home_page")
+
+        if int(self.enable_home_page or 0):
+            if current != "swift-home":
+                frappe.db.set_default(PREV, current or "")
+            frappe.db.set_default("desktop:home_page", "swift-home")
+        elif current == "swift-home":
+            # only ever undo our own switch
+            frappe.db.set_default("desktop:home_page", frappe.db.get_default(PREV) or "")
 
     def _release_user_overrides(self):
         """Make a changed site colour actually take effect for everyone.
