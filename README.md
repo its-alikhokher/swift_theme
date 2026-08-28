@@ -7,7 +7,7 @@ page — from one palette, and stays out of Frappe's way while doing it.
 📖 **[Documentation](https://github.com/its-alikhokher/swift_theme/wiki)** —
 installation, every setting explained, and troubleshooting.
 
-![The desk on Black Panther](images/01-desk-dark-black-panther.png)
+![The desk home page on Aurora](images/01-home-aurora.png)
 
 ## Themes
 
@@ -49,11 +49,13 @@ nudged a percent or two until one is.
 ## Switching theme
 
 Presets appear inside Frappe's own **Switch Theme** dialog, drawn as the same
-preview cards as Light / Dark / Automatic. Restricted to **Administrator** and
-**System Manager**, enforced on the server rather than only hidden in the UI.
+preview cards as Light / Dark / Automatic — reached from **Toggle Theme** in the
+user menu. There is no separate chip of ours anywhere.
 
-**Enable Theme Switcher** governs all three places a theme can be changed — the
-navbar chip, that dialog, and the command palette.
+Any signed-in user may pick their own. Everything the dialog sets is written to
+the caller's own User record, so a theme is a personal preference like a
+language or a timezone; **Enable Theme Switcher** is the site-wide switch that
+decides whether the presets are offered at all.
 
 Saving Swift Theme Settings applies immediately in every open desk session.
 
@@ -67,30 +69,60 @@ Saving Swift Theme Settings applies immediately in every open desk session.
 - **Focus / reading mode**, a command palette, and a hide-the-sidebar toggle on
   Alt+B
 
-No images are shipped for any of the theming: it is CSS plus one inline SVG,
-so there is nothing extra to download.
+### Desk home page
+
+An optional landing that replaces the default workspace, in eight designs —
+each one decides the palette, which blocks appear, how they are arranged and
+what is painted behind them.
+
+It is built on what the desk already knows: the tiles are
+`frappe.boot.desktop_icons`, so nothing appears that the user could not already
+reach; the figures are Number Cards, counted through the same permissions, so a
+User Permission on company or territory narrows them without the page knowing
+such a thing exists. Search, notifications and the user menu are Frappe's own
+controls, forwarded rather than copied.
+
+Its whole configuration rides on boot, so opening the desk costs no request of
+its own and the page is complete on the first paint.
+
+No images are shipped for any of the theming: it is CSS plus inline SVG, so
+there is nothing extra to download.
 
 ## Screenshots
 
-The same workspace in a light palette — Captain America:
+The same landing on **Eclipse** — figures across the top over a ridge line, and
+the apps on a panel of their own:
 
-![The desk on Captain America](images/02-desk-light-captain-america.png)
+![The desk home page on Eclipse](images/02-home-eclipse.png)
 
-All twelve presets sit inside Frappe's own Switch Theme dialog, drawn as the
-same preview cards as Light / Dark / Automatic:
+**Honeycomb** is a different design, not a recolour: a headline beside a comb of
+hexagonal tiles.
 
-![The theme switcher](images/03-theme-switcher-twelve-presets.png)
+![The desk home page on Honeycomb](images/03-home-honeycomb.png)
 
-The login page, Split layout, themed from the same palette:
+**Dune**, with the sand ridges and the plant in the corner:
 
-![The login page](images/04-login-page-split-layout.png)
+![The desk home page on Dune](images/04-home-dune.png)
 
-Everything is configured from one place — the preset, the desk defaults every
-user inherits, and the login page:
+Notifications are Frappe's own panel, opened by Frappe's own button and simply
+placed under the bell — the same tabs, counts and actions as everywhere else:
 
-| | | |
-|---|---|---|
-| ![Choosing a preset](images/05-settings-choose-preset.png) | ![Desk defaults](images/06-settings-desk-defaults.png) | ![Login page settings](images/07-settings-login-page.png) |
+![Notifications on the home page](images/05-home-notifications.png)
+
+All twelve colour presets sit inside Frappe's own Switch Theme dialog, drawn as
+the same preview cards as Light / Dark / Automatic:
+
+![The Switch Theme dialog](images/06-switch-theme-dialog.png)
+
+Every other page is the desk you know, themed — sidebar, filters, list chrome
+and empty states included:
+
+![A list view](images/07-desk-list.png)
+
+The landing is configured from one section: which design, what it shows, and
+which Number Cards become its figures.
+
+![Home page settings](images/08-settings-home-page.png)
 
 ## Requirements
 
