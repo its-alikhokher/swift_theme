@@ -12,6 +12,16 @@ FONT_SCALES = ["S", "M", "L", "XL"]
 FONT_FAMILIES = ["Inter", "Poppins", "Manrope", "Roboto", "System"]
 PRESETS = list(PREMIUM_THEMES.keys())
 
+# These nine sit on the User form, and they are a System Manager's business,
+# not the user's own (Ali, 2026-08-28) - so they live at permlevel 1, which
+# User already grants to System Manager alone.
+#
+# It costs the theme switcher nothing: _user_prefs reads and set_user_pref
+# writes through frappe.db.get_value / set_value, which do not consult
+# permlevels, so an ordinary user still picks their own theme from the Toggle
+# Theme dialog - they just cannot see or edit the raw fields on their profile.
+USER_FIELD_PERMLEVEL = 1
+
 USER_FIELDS = [
     ("swift_follow_frappe", "Check",  "Follow Frappe's Theme Mode", None, "1"),
     ("swift_mode",          "Select", "Swift Mode Override",         "\n".join(MODES), "Follow Frappe"),
@@ -104,11 +114,18 @@ def _ensure_user_fields():
             # swift_preset holding the old option list for ever, so the new
             # presets were not selectable and apply_theme wrote a value the
             # Select rejected.
-            if options is not None:
-                field = frappe.get_doc("Custom Field", existing)
-                if (field.options or "") != options:
-                    field.options = options
-                    field.save(ignore_permissions=True)
+            field = frappe.get_doc("Custom Field", existing)
+            changed = False
+            if options is not None and (field.options or "") != options:
+                field.options = options
+                changed = True
+            # Sites that installed before this was decided still carry these at
+            # permlevel 0, where every user can see them on their own profile.
+            if int(field.permlevel or 0) != USER_FIELD_PERMLEVEL:
+                field.permlevel = USER_FIELD_PERMLEVEL
+                changed = True
+            if changed:
+                field.save(ignore_permissions=True)
             insert_after = fieldname
             continue
         doc = {
@@ -119,6 +136,7 @@ def _ensure_user_fields():
             "label": label,
             "fieldtype": fieldtype,
             "insert_after": insert_after,
+            "permlevel": USER_FIELD_PERMLEVEL,
         }
         if options is not None:
             doc["options"] = options

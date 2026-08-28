@@ -35,14 +35,20 @@ def preset_catalog():
 
 # Changing the site's look is an administrative act, so the navbar switcher is
 # limited to the roles that would already be allowed into Swift Theme Settings.
-THEME_SWITCH_ROLES = ("System Manager",)
-
-
 def can_switch_theme():
-    if frappe.session.user == "Administrator":
-        return 1
-    roles = set(frappe.get_roles())
-    return 1 if roles.intersection(THEME_SWITCH_ROLES) else 0
+    """May this user pick a theme for themselves?
+
+    Anyone signed in. Everything the switcher can set goes through
+    set_user_pref, which writes one row - the caller's own User record - so
+    choosing a theme is a personal preference like a language or a timezone,
+    not an act on the site. Nothing here changes what anyone else sees.
+
+    Whether the switcher is offered at all remains Enable Theme Switcher's job,
+    site-wide. This used to be System Manager only, on top of that setting,
+    which meant ticking Enable Theme Switcher appeared to do nothing for every
+    ordinary user: they got Frappe's Light/Dark and none of the presets.
+    """
+    return 0 if frappe.session.user in (None, "Guest") else 1
 
 
 def boot_session(bootinfo):
@@ -51,10 +57,35 @@ def boot_session(bootinfo):
 
 def extend_bootinfo(bootinfo):
     bootinfo.swift_theme = get_effective_prefs()
+    # The landing's whole configuration rides on boot, so opening the desk
+    # costs no request of its own: the page draws from what is already in
+    # hand. Only here, not in get_effective_prefs - the login page calls that
+    # as a guest, and a guest has no landing.
+    bootinfo.swift_theme["home"] = _home_boot()
+
+
+def _home_boot():
+    from swift_theme.api.home import _saved_layout
+
+    s = _settings()
+    if not int(s.get("enable_home_page") or 0):
+        return None
+    return {
+        "enabled": 1,
+        "greeting": int(s.get("home_greeting") or 0),
+        "shortcuts": int(s.get("home_shortcuts") or 0),
+        "brand_name": s.get("brand_name") or frappe.get_website_settings("app_name") or "Frappe",
+        "brand_logo": s.get("brand_logo") or None,
+        "layout": _saved_layout(),
+        # whether fetching figures is worth a request at all
+        "has_cards": 1 if [r.number_card for r in (s.get("home_cards") or []) if r.number_card] else 0,
+    }
 
 
 # Keys a signed-out visitor may see. The login page needs branding and layout;
 # it has no business receiving custom CSS/JS or anything else site-internal.
+HOME_PRESETS = ("Aurora", "Dune", "Nebula", "Abyss", "Pulse", "Horizon", "Eclipse", "Honeycomb")
+
 GUEST_KEYS = {
     "color_mode", "color_source", "preset", "preset_name",
     "theme_css", "primary", "secondary", "is_dark", "roles",
@@ -121,6 +152,14 @@ def get_effective_prefs():
         "sidebar_variant": s.get("sidebar_variant") or "Attached",
         "sidebar_brand_fill": int(s.get("sidebar_brand_fill") or 0),
         "sidebar_texture": int(s.get("sidebar_texture") or 0),
+        # The home page's own look. Deliberately not a GUEST_KEY: the landing
+        # is behind a login, so a signed-out visitor has no use for it. Anything
+        # not in the list - a value left over from an earlier option set - falls
+        # back rather than reaching the browser as an attribute matching no
+        # design, which would render the page unstyled.
+        "home_preset": s.get("home_preset")
+        if s.get("home_preset") in HOME_PRESETS
+        else HOME_PRESETS[0],
         # only meaningful without a preset - a preset owns its own pair
         "custom_sidebar_gradient": int(s.get("custom_sidebar_gradient") or 0)
         if not colors.get("preset") else 0,

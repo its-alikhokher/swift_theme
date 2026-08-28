@@ -226,7 +226,6 @@ html[data-swift-themed] .widget,
 html[data-swift-themed] .number-card,
 html[data-swift-themed] .dashboard-graph {
   background: color-mix(in oklab, var(--card-bg) 92%, var(--swift-accent) 8%);
-  border: 1px solid color-mix(in oklab, var(--border-color) 60%, var(--swift-accent) 40%);
   box-shadow: 0 8px 24px -18px color-mix(in oklab, var(--swift-accent) 60%, transparent);
 }
 html[data-swift-themed] .widget:hover,

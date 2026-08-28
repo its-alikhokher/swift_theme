@@ -21,6 +21,7 @@
         sidebarFill:  "swift_sidebar_fill",
         sidebarTexture: "swift_sidebar_texture",
         sidebarGradient: "swift_sidebar_gradient",
+        homePreset:     "swift_home_preset",
         perf:         "swift_perf",
         anim:         "swift_anim",
         scrollbar:    "swift_scrollbar",
@@ -43,6 +44,15 @@
     function applyAttr(name, val) {
         if (val === null || val === undefined || val === "") html.removeAttribute("data-swift-" + name);
         else html.setAttribute("data-swift-" + name, val);
+    }
+
+    /* Slugged the same way the colour presets are: "Honeycomb" -> "honeycomb".
+       An empty value removes the attribute, which is what the desk looked like
+       before any of this existed - the server sends a real design, so that only
+       happens if the setting has never been saved. */
+    function homePresetKey(label) {
+        if (!label) return "";
+        return String(label).trim().toLowerCase().replace(/\s+/g, "-");
     }
 
     /* Defined before the first applyColors call below, not after it.
@@ -85,6 +95,47 @@
     // Frappe's own default colour for as long as the preset's stylesheet took
     // to arrive, which is the flash a preset with strong colours makes obvious.
     var serverBoot = (window.frappe && frappe.boot && frappe.boot.swift_theme) || null;
+
+    /* Every desk load ended with a request for /undefined. Frappe's sidebar
+       header renders its apps dropdown as `<img src="${item.icon_url}">`
+       whenever an item has no `icon` - and the rows Navbar Settings feeds it
+       carry neither, so the fragment's image fetched literally "undefined".
+       Frappe's template takes its icon branch whenever `icon` is set, so
+       filling the blanks in the boot data - before the sidebar reads it -
+       fixes the request without touching any Frappe file. */
+    try {
+        var dd = frappe.boot && frappe.boot.navbar_settings
+            && frappe.boot.navbar_settings.settings_dropdown;
+        (dd || []).forEach(function (item) {
+            if (!item.icon && !item.icon_url) item.icon = "setting-gear";
+        });
+    } catch (e) { /* no boot here (website pages) - nothing to mend */ }
+
+    /* The rest of them come from rows no data patch can reach - the header's
+       own divider entries ({is_divider: true}) go through the same template
+       and interpolate icon_url as the literal text "undefined". The image is
+       born inside jQuery's detached parse fragment, so it never appears in
+       the DOM, but the browser fetches its src anyway: one GET /undefined per
+       divider per load.
+
+       jQuery.parseHTML is the one public door every such fragment passes
+       through ($(html) calls it), so the token is defused there. No sane
+       markup ever means `src="undefined"` literally; it can only be an
+       interpolation hole, and a transparent pixel is the faithful rendering
+       of one. */
+    if (window.jQuery && jQuery.parseHTML) {
+        var origParseHTML = jQuery.parseHTML;
+        var BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
+        jQuery.parseHTML = function (data) {
+            if (typeof data === "string" && data.indexOf("undefined") !== -1) {
+                arguments[0] = data.replace(
+                    /(\ssrc=)(["']?)(?:undefined|null)\2/g,
+                    "$1$2" + BLANK + "$2"
+                );
+            }
+            return origParseHTML.apply(this, arguments);
+        };
+    }
     var cachedRoles = null;
     try {
         var storedRoles = get("roles");
@@ -111,6 +162,9 @@
     applyAttr("sidebar-fill",     get("sidebarFill") || "");
     applyAttr("sidebar-texture",  get("sidebarTexture") || "");
     applyAttr("sidebar-gradient", get("sidebarGradient") || "");
+    // The home page's own look. "Follow Theme" is the absence of a preset,
+    // so it is stored as "" and paints from the theme tokens as before.
+    applyAttr("home-preset",      get("homePreset")     || "");
     if (get("perf")      !== "off") applyAttr("perf", "on");
     if (get("anim")      === "off") applyAttr("anim", "off");
     if (get("scrollbar") !== "off") applyAttr("scrollbar", "on");
@@ -365,6 +419,11 @@
                 applyAttr("sidebar-gradient", grad);
                 set("sidebarGradient", grad);
             }
+            if ("home_preset" in p) {
+                var home = homePresetKey(p.home_preset);
+                applyAttr("home-preset", home);
+                set("homePreset", home);
+            }
             if (p.enable_perf_mode === 0) { applyAttr("perf", null); set("perf", "off"); }
             if (p.enable_perf_mode === 1) { applyAttr("perf", "on"); set("perf", "on"); }
             if (p.enable_styled_scrollbar === 0) { applyAttr("scrollbar", null); set("scrollbar", "off"); }
@@ -483,6 +542,7 @@
                 sidebar_brand_fill: boot.sidebar_brand_fill,
                 sidebar_texture: boot.sidebar_texture,
                 custom_sidebar_gradient: boot.custom_sidebar_gradient,
+                home_preset: boot.home_preset,
                 roles: boot.roles,
                 backdrop: boot.backdrop,
                 show_backdrop_through: boot.show_backdrop_through,
