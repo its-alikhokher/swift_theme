@@ -57,11 +57,6 @@ def boot_session(bootinfo):
 
 def extend_bootinfo(bootinfo):
     bootinfo.swift_theme = get_effective_prefs()
-    # The landing's whole configuration rides on boot, so opening the desk
-    # costs no request of its own: the page draws from what is already in
-    # hand. Only here, not in get_effective_prefs - the login page calls that
-    # as a guest, and a guest has no landing.
-    bootinfo.swift_theme["home"] = _home_boot()
 
 
 def _home_boot():
@@ -201,6 +196,17 @@ def get_effective_prefs():
 
         # catalog
         "presets": preset_catalog(),
+
+        # The landing's whole configuration, so opening the desk costs no
+        # request of its own. It belongs in here rather than only in
+        # extend_bootinfo: saving Swift Theme Settings makes every open session
+        # call this and REPLACE frappe.boot.swift_theme with what comes back,
+        # so anything added only at boot silently disappeared on the first save
+        # - the landing lost its brand, its saved layout and its flags until a
+        # reload. A guest never sees it: "home" is not a GUEST_KEY.
+        # ...and not computed at all for a guest: the login page calls this
+        # too, and a guest has no landing to configure.
+        "home": _home_boot() if frappe.session.user != "Guest" else None,
     }
 
     if frappe.session.user == "Guest":

@@ -589,15 +589,44 @@
     };
 
     function bindRealtime() {
-        if (!(window.frappe && frappe.realtime && frappe.realtime.on)) return;
-        if (bindRealtime._done) return;
+        if (bindRealtime._done) return true;
+        // The socket has to exist, not just frappe.realtime: calling .on()
+        // before the connection is set up registers the handler against a
+        // socket that is then replaced, and the listener goes with it. This is
+        // why the binding looked done and never fired.
+        if (!(window.frappe && frappe.realtime && frappe.realtime.on && frappe.realtime.socket)) {
+            return false;
+        }
         bindRealtime._done = true;
         try {
             frappe.realtime.on("swift_theme_updated", function () { API.reload(); });
-        } catch (e) {}
+        } catch (e) {
+            bindRealtime._done = false;
+            return false;
+        }
+        return true;
     }
+
+    /* Getting this binding to actually happen took three tries, and it is worth
+       saying why none of the obvious ones is enough on its own.
+
+       `document.addEventListener("app_ready", ...)` never fires: Frappe raises
+       app_ready through jQuery's trigger, which runs jQuery handlers only - a
+       native listener for a custom event name never hears it. That alone left
+       the binding silently unmade, so saving Swift Theme Settings reached every
+       open session as a realtime event that nothing was listening for, and the
+       "applies immediately" behaviour quietly did nothing.
+
+       `frappe.after_ajax` can run before frappe.realtime exists, in which case
+       there is nothing to bind to yet. So: jQuery's own listener, plus a short
+       poll that stops the moment it succeeds. */
+    if (window.jQuery) jQuery(document).on("app_ready", bindRealtime);
     document.addEventListener("app_ready", bindRealtime);
     if (window.frappe && frappe.after_ajax) frappe.after_ajax(bindRealtime);
+    (function retry(n) {
+        if (bindRealtime() || n <= 0) return;
+        setTimeout(function () { retry(n - 1); }, 500);
+    })(60);
 
     // "Force Light"/"Force Dark" on the User record, or Frappe's own desk theme
     // set to something other than Automatic, both count as a deliberate choice.
