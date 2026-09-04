@@ -16,6 +16,8 @@ import "./swift-mode-observer.js";
 // extends with the presets. Enable Theme Switcher still gates that section.
 import "./swift-theme-dialog.js";
 import "./swift-palette.js";
+import "./swift-calendar.js";
+import "./swift-orgchart.js";
 import "./swift-sidebar.js";
 import "./swift-focus.js";
 import "./swift-perf.js";

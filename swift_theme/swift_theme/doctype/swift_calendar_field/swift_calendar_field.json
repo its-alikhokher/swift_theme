@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-31 19:30:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "document_type",
+  "fields"
+ ],
+ "fields": [
+  {
+   "columns": 3,
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "columns": 7,
+   "description": "Fieldnames, comma separated - for example customer, status, grand_total. They are read with the reader's own permissions, so a field they cannot see simply does not arrive.",
+   "fieldname": "fields",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Extra Fields",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-31 19:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Swift Theme",
+ "name": "Swift Calendar Field",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
