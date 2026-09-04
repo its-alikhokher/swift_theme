@@ -1239,3 +1239,19 @@ html[data-swift-themed]:not([data-swift-backdrop="none"])
 }
 
 
+
+/* ---- calendar events carrying more than a title ----
+   swift-calendar.js appends the configured fields to the event title, one per
+   line. FullCalendar renders that title as text, so the newlines only become
+   lines with pre-line - and the block has to be allowed to grow. */
+
+html[data-swift-themed] .fc-event-title,
+html[data-swift-themed] .fc-event-title-container {
+    white-space: pre-line;
+    line-height: 1.35;
+}
+
+html[data-swift-themed] .fc-daygrid-event {
+    align-items: flex-start;
+    white-space: normal;
+}

@@ -1,0 +1,226 @@
+/* Swift Theme — the organisational chart (Frappe HR)
+   =========================================================================
+   Frappe HR draws this chart; only its looks are changed here, and only when
+   a Swift colour scheme is active. Nothing is re-implemented: the nodes, the
+   connectors and the expand/collapse behaviour stay HR's own.
+
+   What was wrong with it, seen on a real chart:
+
+   * `.node-info` is a flex ROW holding the job title and the connection count,
+     inside a fixed 12.7rem box, with `ellipsis` on both. So every title was cut
+     mid-word - "Chief Executive Offi... 5 Connecti..." - and the longer the
+     title, the less of either you could read.
+   * Every avatar was an empty grey disc, because an employee with no photo
+     leaves `.avatar-frame` with no background at all.
+   * Leaf nodes advertised "0 Connections", which is noise on exactly the nodes
+     that have nothing to say.
+   * The card was plain white with no border, so on a light desk the chart read
+     as floating text, and on a dark one it glared.
+
+   The layout fix is the important one: the title gets its own line and the
+   count becomes a small pill, so both are readable whatever their length.
+   ========================================================================= */
+
+html[data-swift-themed] .node-card {
+  /* 18rem, as HR has it: the column layout below buys the room, so widening
+     the card only pushed the right-hand branch off the canvas. */
+  width: 18rem;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--swift-radius-lg, 14px);
+  background: var(--card-bg, var(--fg-color));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+html[data-swift-themed] .node-card:hover {
+  border-color: var(--swift-accent);
+  box-shadow: 0 10px 26px -16px rgba(0, 0, 0, 0.45);
+  transform: translateY(-1px);
+}
+
+/* The row that cut every title in half.
+   `!important` because the template carries Bootstrap's `flex-row` utility,
+   and those are declared !important - without it the title and the badge stay
+   shoulder to shoulder and both keep truncating. */
+html[data-swift-themed] .node-info {
+  width: auto;
+  flex-direction: column !important;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+html[data-swift-themed] .node-title {
+  max-width: 100%;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  white-space: normal;      /* let a long job title wrap instead of vanishing */
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* The separator the template prints after the title belongs to the old
+   single-line layout. */
+html[data-swift-themed] .node-title::after {
+  content: none;
+}
+
+html[data-swift-themed] .node-name {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--heading-color, var(--text-color));
+}
+
+/* The count reads as a badge now, and swift-orgchart.js removes it entirely
+   when it is zero. */
+html[data-swift-themed] .node-connections {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--swift-accent-soft, rgba(0, 0, 0, 0.05));
+  color: var(--swift-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* An employee with no photo left this an empty disc; the initials that
+   swift-orgchart.js writes need somewhere to sit. */
+html[data-swift-themed] .node-image {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+html[data-swift-themed] .node-image .avatar-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--swift-accent-soft, var(--control-bg));
+  background-size: cover;
+  background-position: center;
+  color: var(--swift-accent);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* A node that carries a photo should not also carry the initials behind it. */
+html[data-swift-themed] .node-image .avatar-frame.has-photo {
+  background-color: transparent;
+  color: transparent;
+}
+
+/* The root of the tree is the one node you always look for first. */
+html[data-swift-themed] .root-level .node-card {
+  border-color: color-mix(in oklab, var(--swift-accent) 45%, var(--border-color));
+  box-shadow: 0 8px 22px -18px var(--swift-accent);
+}
+
+/* Selection and the path back to the root, in the theme's own colour rather
+   than the stock grey. */
+html[data-swift-themed] .node-card.active,
+html[data-swift-themed] .node-card.active-path {
+  border-color: var(--swift-accent);
+  background: color-mix(in oklab, var(--swift-accent) 6%, var(--card-bg, var(--fg-color)));
+}
+
+html[data-swift-themed] .node-card.active .btn-edit-node {
+  border-radius: 8px;
+  background: var(--swift-accent-soft);
+  color: var(--swift-accent);
+  box-shadow: none;
+}
+
+html[data-swift-themed] .active-connector {
+  stroke: var(--swift-accent);
+  stroke-width: 2;
+}
+
+html[data-swift-themed] .collapsed-connector {
+  stroke: color-mix(in oklab, var(--swift-accent) 35%, transparent);
+}
+
+/* The chart sits on the page background; give it the same canvas the rest of
+   the desk uses so it does not read as a white sheet on a themed page. */
+html[data-swift-themed] .hierarchy,
+html[data-swift-themed] .hierarchy-mobile {
+  background: transparent;
+}
+
+html[data-swift-themed] .mobile-node .node-card {
+  width: auto;
+}
+
+
+/* ---- top to bottom ----
+   HR lays `ul.hierarchy` out as a row of levels, so the chart grows sideways
+   and a deep organisation runs off the right edge. Turning the two axes round
+   is the whole change: the DOM is left exactly as HR builds it, because its
+   expand, collapse and active-path logic all walk that structure by index. */
+
+html[data-swift-themed] .hierarchy {
+  flex-direction: column !important;
+  align-items: center;
+  gap: 52px;                 /* room for the connector to turn */
+  padding: 24px 0 40px;
+}
+
+html[data-swift-themed] .hierarchy > .level {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  margin: 0;
+}
+
+/* Each parent's children are one group; groups sit side by side, and the
+   children inside a group sit side by side too. */
+html[data-swift-themed] .hierarchy .node-children {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-swift-themed] .hierarchy .child-node {
+  margin: 0;
+  list-style: none;
+}
+
+/* The 3rem left margin was there to make room for a connector coming in from
+   the left; the lines arrive from above now. */
+html[data-swift-themed] .hierarchy .node-card {
+  margin-left: 0;
+}
+
+/* The SVG the connectors are drawn into has to cover the whole chart, not the
+   viewport, or the lines are clipped as soon as it grows past one screen. */
+html[data-swift-themed] #hierarchy-chart-wrapper {
+  position: relative;
+}
+
+html[data-swift-themed] #arrows {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* The extra fields a site asks for, under the job title. */
+html[data-swift-themed] .node-extra {
+  max-width: 100%;
+  color: var(--text-light, var(--text-muted));
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  white-space: normal;
+}

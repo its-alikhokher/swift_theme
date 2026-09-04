@@ -59,6 +59,17 @@ def extend_bootinfo(bootinfo):
     bootinfo.swift_theme = get_effective_prefs()
 
 
+def _calendar_fields():
+    """{doctype: [fieldname, ...]} from the settings table."""
+    out = {}
+    for row in _settings().get("calendar_fields") or []:
+        names = [f.strip() for f in (row.fields or "").replace("\n", ",").split(",") if f.strip()]
+        if row.document_type and names:
+            out.setdefault(row.document_type, [])
+            out[row.document_type] += [n for n in names if n not in out[row.document_type]]
+    return out
+
+
 def _home_boot():
     from swift_theme.api.home import _saved_layout
 
@@ -207,6 +218,23 @@ def get_effective_prefs():
         # ...and not computed at all for a guest: the login page calls this
         # too, and a guest has no landing to configure.
         "home": _home_boot() if frappe.session.user != "Guest" else None,
+
+        # Extra fields to show on calendar events, keyed by doctype. Only the
+        # configuration travels: the values themselves are fetched by Frappe's
+        # own get_events, through frappe.get_list, so a reader never receives a
+        # field they could not read on the record.
+        "calendar_fields": _calendar_fields() if frappe.session.user != "Guest" else {},
+
+        # Extra Employee fields for the organisational chart. Again only the
+        # configuration: the values are read on the client through get_list,
+        # which applies the viewer's own permissions.
+        "orgchart_fields": [
+            f.strip()
+            for f in (s.get("orgchart_fields") or "").replace("\n", ",").split(",")
+            if f.strip()
+        ]
+        if frappe.session.user != "Guest"
+        else [],
     }
 
     if frappe.session.user == "Guest":
