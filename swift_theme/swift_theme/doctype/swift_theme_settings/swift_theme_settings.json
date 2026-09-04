@@ -33,6 +33,10 @@
   "home_shortcuts",
   "home_cards_break",
   "home_cards",
+  "calendar_section",
+  "calendar_fields",
+  "orgchart_section",
+  "orgchart_fields",
   "features_tab",
   "features_section",
   "enable_switcher",
@@ -284,6 +288,29 @@
    "fieldtype": "Table MultiSelect",
    "label": "Home Cards",
    "options": "Swift Home Card"
+  },
+  {
+   "fieldname": "calendar_section",
+   "fieldtype": "Section Break",
+   "label": "Calendar"
+  },
+  {
+   "description": "Frappe's calendar shows one field per record - the subject. Add rows here to show more underneath it: pick the doctype, then list the fieldnames. Each value is fetched with the reader's own permissions, so nobody sees a field they could not read on the record itself.",
+   "fieldname": "calendar_fields",
+   "fieldtype": "Table",
+   "label": "Calendar Fields",
+   "options": "Swift Calendar Field"
+  },
+  {
+   "fieldname": "orgchart_section",
+   "fieldtype": "Section Break",
+   "label": "Organizational Chart"
+  },
+  {
+   "description": "Extra Employee fields to show on each card, comma separated - for example cell_number, department. They are read with the viewer's own permissions, so a field they cannot see simply does not appear. Leave empty for name and designation only.",
+   "fieldname": "orgchart_fields",
+   "fieldtype": "Small Text",
+   "label": "Chart Fields"
   },
   {
    "fieldname": "features_tab",
