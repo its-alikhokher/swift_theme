@@ -205,13 +205,16 @@ html[data-swift-sidebar-variant="Floating"] .body-sidebar {
    The server only sends this when no preset is active, so a preset can never
    have its own pair overridden. */
 html[data-swift-sidebar-gradient="on"][data-swift-sidebar-fill="brand"] .body-sidebar {
-  --swift-sidebar-fill-start: var(--swift-primary, var(--swift-accent));
-  --swift-sidebar-fill-end: color-mix(
+  /* --swift-custom-gradient-end and the start come from the custom colours' roles
+     (colour.py sidebar_colours), which also pick --swift-sidebar-fg against both ends;
+     the blend below is only the fallback before they arrive. */
+  --swift-sidebar-fill-start: var(--swift-sidebar-start-custom, var(--swift-primary, var(--swift-accent)));
+  --swift-sidebar-fill-end: var(--swift-custom-gradient-end, color-mix(
     in oklab,
     color-mix(in oklab, var(--swift-secondary, var(--swift-primary)) 62%,
               var(--swift-primary, var(--swift-accent))) 88%,
     #000
-  );
+  ));
 }
 
 html[data-swift-sidebar-fill="brand"] .body-sidebar {
