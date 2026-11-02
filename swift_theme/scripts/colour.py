@@ -100,6 +100,46 @@ def ensure_readable(value, target=4.5, steps=24):
     return candidate
 
 
+SIDEBAR_TARGET = 4.5  # WCAG AA for body text, as the presets' sidebar_fill uses
+
+
+def sidebar_colours(primary, secondary):
+    """The brand sidebar's ends and the text for them, for custom colours.
+
+    The presets get this from generate_theme_css.sidebar_fill; custom colours
+    never did, so their sidebar text was on_primary, chosen against the Primary
+    alone. The panel runs from the Primary down to a darker end (the flat fill),
+    or to a darkened Secondary blend with "Sidebar Gradient" on - a light coral
+    over a dark olive put dark text on the dark end, where it vanished.
+
+    So, as sidebar_fill does: the text is whichever of black and white reads
+    better across every end the panel can have, and if that still misses the
+    floor the panel moves away from the text, 6% at a time, until all clear it.
+    The blends are the ones swift-sidebar.css draws when nothing is set.
+    """
+    ends = [
+        primary,
+        mix(primary, "#000000", 0.16),  # flat fill's bottom
+        mix(mix(secondary, primary, 0.38), "#000000", 0.12),  # gradient's bottom
+    ]
+
+    def floor(ink, colours):
+        return min(contrast(ink, c) for c in colours)
+
+    ink = max((PAPER, INK), key=lambda c: floor(c, ends))
+    toward = "#000000" if ink == PAPER else "#ffffff"
+    for _ in range(24):
+        if floor(ink, ends) >= SIDEBAR_TARGET:
+            break
+        ends = [mix(c, toward, 0.06) for c in ends]
+    return {
+        "sidebar_start": ends[0],
+        "sidebar_end": ends[1],
+        "sidebar_gradient_end": ends[2],
+        "sidebar_fg": ink,
+    }
+
+
 def derive_roles(primary, secondary, mode="Dark", strength="Subtle"):
     dark = (mode or "Dark") == "Dark"
     bold = (strength or "Subtle") == "Bold"
@@ -137,4 +177,5 @@ def derive_roles(primary, secondary, mode="Dark", strength="Subtle"):
         "secondary": secondary,
         "tint": secondary,
         "on_primary": readable_on(primary),
+        **sidebar_colours(primary, secondary),
     }

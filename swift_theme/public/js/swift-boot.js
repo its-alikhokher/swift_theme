@@ -74,6 +74,11 @@
         primary:     ["--swift-primary", "--swift-accent"],
         secondary:   ["--swift-secondary", "--swift-accent-hover"],
         on_primary:  ["--swift-accent-fg"],
+        // the brand sidebar's ends and its text (sidebarColours); presets set these in their stylesheet
+        sidebar_start:        ["--swift-sidebar-fill-start", "--swift-sidebar-start-custom"],
+        sidebar_end:          ["--swift-sidebar-fill-end"],
+        sidebar_gradient_end: ["--swift-custom-gradient-end"],
+        sidebar_fg:           ["--swift-sidebar-fg"],
     };
 
     var CUSTOM_VARS = (function () {
@@ -399,7 +404,27 @@
             muted: mix(ink, canvas, 0.45), border: border,
             primary: primary, secondary: secondary, tint: secondary,
             on_primary: readableOn(primary),
+            ...sidebarColours(primary, secondary),
         };
+    }
+
+    // The same as colour.py sidebar_colours: text that reads on every end the brand sidebar can
+    // have, and the panel nudged away from it until it does.
+    function sidebarColours(primary, secondary) {
+        var ends = [
+            primary,
+            mix(primary, "#000000", 0.16),
+            mix(mix(secondary, primary, 0.38), "#000000", 0.12),
+        ];
+        var floor = function (ink) {
+            return Math.min.apply(null, ends.map(function (c) { return contrast(ink, c); }));
+        };
+        var ink = floor("#ffffff") >= floor("#0b0d12") ? "#ffffff" : "#0b0d12";
+        var toward = ink === "#ffffff" ? "#000000" : "#ffffff";
+        for (var i = 0; i < 24 && floor(ink) < 4.5; i++) {
+            ends = ends.map(function (c) { return mix(c, toward, 0.06); });
+        }
+        return { sidebar_start: ends[0], sidebar_end: ends[1], sidebar_gradient_end: ends[2], sidebar_fg: ink };
     }
 
     function mix(base, tint, amount) {

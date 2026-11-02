@@ -4,7 +4,8 @@
 /**
  * Swift home — the desk landing page.
  *
- * The apps grid is drawn from `frappe.boot.desktop_icons`, which Frappe has
+ * The apps grid is drawn from `frappe.boot.desktop_icons` (or, on the default "Apps"
+ * desktop, from `frappe.boot.app_data` - see icons_from_app_data), which Frappe has
  * already filtered three ways: by app permission, by whether the workspace
  * behind the icon has any item this user can open, and by any roles set on the
  * icon itself. The figures come from Number Cards, whose values are counted
@@ -582,7 +583,8 @@ class SwiftHome {
 	all_icons() {
 		if (this.edit_mode && this.draft) return this.draft;
 		if (this._icons) return this._icons;
-		const boot = (frappe.boot && frappe.boot.desktop_icons) || [];
+		const icons = frappe.boot && frappe.boot.desktop_icons;
+		const boot = icons && icons.length ? icons : this.icons_from_app_data();
 		const layout = this.cfg && this.cfg.layout;
 		if (!layout || !layout.length) return (this._icons = boot);
 		const by_label = new Map(boot.map((i) => [i.label, i]));
@@ -600,6 +602,53 @@ class SwiftHome {
 			if (!seen.has(i.label)) merged.push(i);
 		});
 		return (this._icons = merged);
+	}
+
+	/* Frappe only sends `desktop_icons` while Desktop Settings is on "Desktop Icons". On "Apps" -
+	   the default, and what most sites run - boot carries `app_data` instead: the apps on the Apps
+	   screen, each with its dock (the modules it opens). Reading desktop_icons alone left this grid
+	   empty ("Nothing here yet.") on every such site. So the same picture is drawn from app_data:
+	   each app is a tile, its modules open inside it, and both go where Frappe's own Apps screen
+	   and dock send them (sidebar.app_landing_route / dock_entry_route). app_data is already
+	   permission-filtered: an app the user cannot open comes with on_apps_screen off. */
+	icons_from_app_data() {
+		const sidebar = frappe.app && frappe.app.sidebar;
+		const apps = ((frappe.boot && frappe.boot.app_data) || [])
+			.filter((app) => app.on_apps_screen)
+			.sort((a, b) => (a.sequence_id || 0) - (b.sequence_id || 0));
+		const icons = [];
+		apps.forEach((app) => {
+			const title = app.app_title || app.app_name;
+			const app_route =
+				(sidebar && sidebar.app_landing_route && sidebar.app_landing_route(app)) || app.app_route || "#";
+			icons.push({
+				label: title,
+				icon_type: "App",
+				logo_url: app.app_logo_url,
+				link_type: "External",
+				link: app_route,
+			});
+			(app.dock || []).forEach((entry) => {
+				if (entry.link_type === "URL" && !entry.url) return;
+				const module = entry.module || (entry.link_type === "Sidebar" ? entry.link_to : null);
+				const label = entry.label || entry.link_to;
+				if (!label) return;
+				const route =
+					(sidebar && sidebar.dock_entry_route && sidebar.dock_entry_route({ ...entry, module })) ||
+					entry.url ||
+					`/desk/${frappe.router.slug(entry.link_to || label)}`;
+				icons.push({
+					label,
+					icon: entry.icon,
+					icon_type: "Link",
+					parent_icon: title,
+					module,
+					link_type: "External",
+					link: route,
+				});
+			});
+		});
+		return icons;
 	}
 
 	children_of(label) {
