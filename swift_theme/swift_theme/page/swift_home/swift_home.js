@@ -608,8 +608,9 @@ class SwiftHome {
 	   the default, and what most sites run - boot carries `app_data` instead: the apps on the Apps
 	   screen, each with its dock (the modules it opens). Reading desktop_icons alone left this grid
 	   empty ("Nothing here yet.") on every such site. So the same picture is drawn from app_data:
-	   each app is a tile, its modules open inside it, and both go where Frappe's own Apps screen
-	   and dock send them (sidebar.app_landing_route / dock_entry_route). app_data is already
+	   each app is a tile, its modules open inside it (sidebar.collect_dock_entries, as the dock
+	   lists them), and both go where Frappe's own Apps screen and dock send them
+	   (sidebar.app_landing_route / dock_entry_route). app_data is already
 	   permission-filtered: an app the user cannot open comes with on_apps_screen off. */
 	icons_from_app_data() {
 		const sidebar = frappe.app && frappe.app.sidebar;
@@ -628,23 +629,19 @@ class SwiftHome {
 				link_type: "External",
 				link: app_route,
 			});
-			(app.dock || []).forEach((entry) => {
-				if (entry.link_type === "URL" && !entry.url) return;
-				const module = entry.module || (entry.link_type === "Sidebar" ? entry.link_to : null);
-				const label = entry.label || entry.link_to;
-				if (!label) return;
-				const route =
-					(sidebar && sidebar.dock_entry_route && sidebar.dock_entry_route({ ...entry, module })) ||
-					entry.url ||
-					`/desk/${frappe.router.slug(entry.link_to || label)}`;
+			// The app's modules exactly as Frappe's dock resolves them: title, icon and module from
+			// dock_entry(), the site's and user's order and hidden rows from the dock arrangement.
+			const entries = (sidebar && sidebar.collect_dock_entries && sidebar.collect_dock_entries(app)) || [];
+			entries.forEach((entry) => {
+				if (!entry || !entry.label) return;
 				icons.push({
-					label,
+					label: entry.label,
 					icon: entry.icon,
 					icon_type: "Link",
 					parent_icon: title,
-					module,
+					module: entry.module,
 					link_type: "External",
-					link: route,
+					link: (sidebar.dock_entry_route && sidebar.dock_entry_route(entry)) || entry.url || "#",
 				});
 			});
 		});
